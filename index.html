@@ -133,11 +133,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;col
   </div>
 </div>
 
-<!-- GOING COLD -->
-<div class="alert-section">
-  <h3>&#128308; Agents going cold <span style="font-size:11px;font-weight:400;color:#888">(14+ days since LP last called)</span></h3>
-  <div id="cold-list"></div>
-</div>
+
 
 <hr class="section-divider">
 
@@ -246,7 +242,6 @@ function renderAll(){
   renderLPGrid();
   renderLPScorecard("this",callLogs,weekKey);
   renderLPScorecard("last",lastWeekCallLogs,lastWeekKey);
-  renderColdAgents();
   renderAmandaGrid();
   renderAmandaScorecard("this",amandaActivities.filter(function(a){return getWeekKey(new Date(a.act_date+"T12:00:00"))===weekKey;}));
   renderAmandaScorecard("last",amandaLastWeek);
@@ -295,19 +290,7 @@ function renderLPScorecard(which,logs,wkKey){
   document.getElementById("lp-"+which+"-content").innerHTML=content;
 }
 
-function renderColdAgents(){
-  var cold=agents.filter(function(a){if(!isActive(a)||a[2]==="Unassigned")return false;var ds=lpDays(a[0]);return ds===null||ds>=14;})
-    .sort(function(a,b){return(lpDays(b[0])||999)-(lpDays(a[0])||999);}).slice(0,8);
-  document.getElementById("cold-list").innerHTML=cold.length?cold.map(function(a){
-    var ds=lpDays(a[0]);
-    var lvlClass="badge-"+a[1].toLowerCase();
-    return '<div class="alert-item"><span class="adot '+((!ds||ds>=30)?"adot-red":"adot-amber")+'"></span>'+
-      '<span style="font-weight:600;flex:1">'+a[0]+'</span>'+
-      '<span class="'+lvlClass+'">'+a[1]+'</span>'+
-      '<span class="lp-tag lp-tag-'+a[2]+'">'+a[2]+'</span>'+
-      '<span style="font-size:12px;color:#888">'+(ds===null?"Never called":ds+"d since called")+"</span></div>";
-  }).join(""):'<div class="alert-item"><span class="adot adot-green"></span><span style="color:#43A047">All active agents contacted within 14 days!</span></div>';
-}
+
 
 function renderAmandaGrid(){
   var thisWeekActs=amandaActivities.filter(function(a){return getWeekKey(new Date(a.act_date+"T12:00:00"))===weekKey;});
