@@ -110,6 +110,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;col
 .autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #dde1e7;border-radius:8px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.08)}
 .autocomplete-item{padding:8px 10px;cursor:pointer;font-size:13px}
 .autocomplete-item:hover{background:#f5f6fa}
+.growth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1rem}
+.growth-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.9rem 1rem;position:relative;overflow:hidden}
+.growth-card.highlight{border-color:#1F4E79;border-width:2px}
+.growth-label{font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.growth-val{font-size:28px;font-weight:800;margin-bottom:2px}
+.growth-goal{font-size:11px;color:#888}
+.growth-bar-track{background:#eee;border-radius:20px;height:4px;margin-top:6px;overflow:hidden}
+.growth-bar{height:4px;border-radius:20px}
+.growth-trend{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.trend-up{background:#EAF3DE;color:#3B6D11;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:600}
+.trend-down{background:#FFEBEE;color:#C62828;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:600}
+.trend-same{background:#F5F5F5;color:#555;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:600}
+.channel-badge{background:#FFF9C4;color:#F57F17;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.edit-btn{border:1px solid #dde1e7;background:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:11px;color:#555;font-family:inherit}
+.edit-btn:hover{background:#f5f6fa}
+.save-btn{border:1px solid #1F4E79;background:#1F4E79;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:11px;color:#fff;font-family:inherit}
+.profile-field{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.profile-field label{font-size:10px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.profile-field input{padding:6px 9px;border:1px solid #dde1e7;border-radius:7px;font-size:13px;color:#1a1a1a;background:#fff;font-family:inherit;width:100%}
+.profile-field .val{font-size:13px;color:#1a1a1a;padding:4px 0}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:.85rem 1.1rem;border-top:1px solid #f0f2f5}
+.badge-inactive{background:#FFCDD2;color:#B71C1C;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
 </style>
 </head>
 <body>
@@ -132,6 +154,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;col
 </div>
 
 <div id="view-overview" class="view active">
+
+<!-- GROWTH TRACKER -->
+<div class="section-title" style="margin-bottom:.6rem">&#127942; Growth scoreboard</div>
+<div class="growth-grid" id="growth-grid">
+  <div class="growth-card" style="text-align:center;color:#aaa;padding:1.5rem;grid-column:1/-1">Loading...</div>
+</div>
+<div style="background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1rem">
+  <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Level breakdown</div>
+  <div id="level-breakdown" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+</div>
+
+<hr style="border:none;border-top:1px solid #dde1e7;margin:1.25rem 0">
 
 <!-- AMANDA NEVER LOGGED ALERT -->
 <div class="never-logged-banner" id="never-logged-banner">
@@ -221,7 +255,7 @@ var TODAY = new Date(); TODAY.setHours(0,0,0,0);
 var CUTOFF = new Date(TODAY); CUTOFF.setDate(TODAY.getDate()-90);
 var weekKey = getWeekKey(TODAY);
 var lastWeekKey = getLastWeekKey(TODAY);
-var callLogs = {}, lastWeekCallLogs = {}, amandaActivities = [], amandaLastWeek = [];
+var callLogs = {}, lastWeekCallLogs = {}, amandaActivities = [], amandaLastWeek = [], agentProfiles = {};
 var agents = [];
 
 function getWeekKey(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay(),mon=new Date(dt);mon.setDate(dt.getDate()-(day===0?6:day-1));return mon.toISOString().split("T")[0];}
@@ -263,13 +297,16 @@ function loadAll(){
   return Promise.all([
     sbFetch("GET","call_logs?week_key=eq."+weekKey+"&select=*"),
     sbFetch("GET","call_logs?week_key=eq."+lastWeekKey+"&select=*"),
-    sbFetch("GET","amanda_activities?select=*&order=act_date.desc,created_at.desc")
+    sbFetch("GET","amanda_activities?select=*&order=act_date.desc,created_at.desc"),
+    sbFetch("GET","agent_profiles?select=*")
   ]).then(function(res){
     callLogs={};lastWeekCallLogs={};
     if(res[0])res[0].forEach(function(r){callLogs[r.agent_name]=r;});
     if(res[1])res[1].forEach(function(r){lastWeekCallLogs[r.agent_name]=r;});
     amandaActivities=res[2]||[];
     amandaLastWeek=amandaActivities.filter(function(a){return getWeekKey(new Date(a.act_date+"T12:00:00"))===lastWeekKey;});
+    agentProfiles={};
+    if(res[3])res[3].forEach(function(p){agentProfiles[p.agent_name]=p;});
     setSyncStatus("live");
     renderAll();
   }).catch(function(e){setSyncStatus("error");console.log(e);});
@@ -277,6 +314,7 @@ function loadAll(){
 
 function renderAll(){
   document.getElementById("weekPill").textContent=getWeekLabel(weekKey);
+  renderGrowth();
   document.getElementById("this-week-lbl").textContent=getWeekLabel(weekKey);
   document.getElementById("last-week-lbl").textContent=getWeekLabel(lastWeekKey);
   renderLPGrid();
@@ -472,6 +510,23 @@ function renderAgentProfile(name){
   html+='<div class="stat-box"><div class="stat-num" style="color:#FB8C00">'+fuCount+'</div><div class="stat-lbl">Follow-ups</div></div>';
   html+='</div>';
 
+  html+='<div class="profile-grid">';
+  var prof=agentProfiles[name]||{};
+  html+='<div class="profile-field"><label>Email</label><div class="val" id="prof-email-display">'+(prof.email||'<span style="color:#ccc">Not set</span>')+'</div></div>';
+  html+='<div class="profile-field"><label>Phone</label><div class="val">'+(prof.phone||'<span style="color:#ccc">Not set</span>')+'</div></div>';
+  html+='<div class="profile-field"><label>Address</label><div class="val">'+(prof.address||'<span style="color:#ccc">Not set</span>')+'</div></div>';
+  html+='<div class="profile-field"><label>Birthday</label><div class="val">'+(prof.birthday||'<span style="color:#ccc">Not set</span>')+'</div></div>';
+  html+='</div>';
+  html+='<div style="padding:.5rem 1.1rem .9rem;border-top:1px solid #f0f2f5">';
+  html+='<div style="font-size:11px;color:#888;margin-bottom:.5rem;font-weight:500">Edit contact info</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  html+='<div class="profile-field"><label>Email</label><input id="prof-email" type="text" value="'+(prof.email||'')+'" placeholder="email@example.com"></div>';
+  html+='<div class="profile-field"><label>Phone</label><input id="prof-phone" type="text" value="'+(prof.phone||'')+'" placeholder="(555) 555-5555"></div>';
+  html+='<div class="profile-field"><label>Home address</label><input id="prof-address" type="text" value="'+(prof.address||'')+'" placeholder="123 Main St, Columbus OH"></div>';
+  html+='<div class="profile-field"><label>Birthday</label><input id="prof-birthday" type="text" value="'+(prof.birthday||'')+'" placeholder="MM/DD"></div>';
+  html+='</div>';
+  html+='<button class="save-btn" data-name="'+name+'" onclick="saveAgentProfile(this.getAttribute(\'data-name\'))">Save changes</button>';
+  html+='</div>';
   html+='<div class="history-section">';
   html+='<div class="history-label">Full contact history</div>';
 
@@ -501,9 +556,82 @@ function renderAgentProfile(name){
   el.innerHTML=html;
 }
 
+function renderGrowth(){
+  var active=agents.filter(isActive);
+  var aCount=active.filter(function(a){return a[1]==="A";}).length;
+  var bCount=active.filter(function(a){return a[1]==="B";}).length;
+  var cCount=active.filter(function(a){return a[1]==="C";}).length;
+  var total=active.length;
+  // Channel accounts - agents with 10+ closes (stored in a[6] as latest close but we need closed past year)
+  // For now use upload data if available
+  var channel=agents.filter(function(a){return a[8]&&parseInt(a[8])>=10;}).length;
+  var goals=[
+    {label:"Total active agents",val:total,goal:200,col:"#1F4E79",pct:Math.round(total/200*100)},
+    {label:"A agents",val:aCount,goal:30,col:"#43A047",pct:Math.round(aCount/30*100)},
+    {label:"B agents",val:bCount,goal:35,col:"#FB8C00",pct:Math.round(bCount/35*100)},
+    {label:"C agents",val:cCount,goal:null,col:"#888",pct:100},
+    {label:"Channel accounts",val:channel,goal:null,col:"#F57F17",pct:100},
+  ];
+  document.getElementById("growth-grid").innerHTML=goals.map(function(g){
+    var pct=Math.min(100,g.pct);
+    var barCol=pct>=100?"#43A047":pct>=60?"#FB8C00":"#E53935";
+    return '<div class="growth-card'+(g.label==="Total active agents"?" highlight":"")+'">'+
+      '<div class="growth-label">'+g.label+'</div>'+
+      '<div class="growth-val" style="color:'+g.col+'">'+g.val+'</div>'+
+      (g.goal?'<div class="growth-goal">Goal: '+g.goal+' ('+ pct+'%)</div>'+'<div class="growth-bar-track"><div class="growth-bar" style="width:'+pct+'%;background:'+barCol+'"></div></div>':'<div class="growth-goal">All time</div>')+
+    '</div>';
+  }).join("");
+  // Level breakdown bar
+  var lbHtml='<div style="display:flex;width:100%;height:18px;border-radius:20px;overflow:hidden;margin-bottom:6px">'+
+    '<div style="width:'+(total?Math.round(aCount/total*100):0)+'%;background:#43A047;transition:width .3s"></div>'+
+    '<div style="width:'+(total?Math.round(bCount/total*100):0)+'%;background:#FB8C00;transition:width .3s"></div>'+
+    '<div style="width:'+(total?Math.round(cCount/total*100):0)+'%;background:#e0e0e0;transition:width .3s"></div>'+
+  '</div>'+
+  '<div style="display:flex;gap:12px;font-size:12px">'+
+    '<span style="color:#43A047;font-weight:600">&#9632; A: '+aCount+'</span>'+
+    '<span style="color:#FB8C00;font-weight:600">&#9632; B: '+bCount+'</span>'+
+    '<span style="color:#888;font-weight:600">&#9632; C: '+cCount+'</span>'+
+    '<span style="color:#888;margin-left:4px">= '+total+' active total</span>'+
+  '</div>';
+  document.getElementById("level-breakdown").innerHTML=lbHtml;
+}
+
+function saveAgentProfile(name){
+  var data={
+    agent_name:name,
+    email:document.getElementById("prof-email").value.trim(),
+    phone:document.getElementById("prof-phone").value.trim(),
+    address:document.getElementById("prof-address").value.trim(),
+    birthday:document.getElementById("prof-birthday").value.trim()
+  };
+  fetch(SUPABASE_URL+"/rest/v1/agent_profiles",{
+    method:"POST",
+    headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"},
+    body:JSON.stringify(data)
+  }).then(function(){
+    agentProfiles[name]=data;
+    renderAgentProfile(name);
+    alert("Saved!");
+  }).catch(function(e){alert("Error saving. Please try again.");});
+}
+
 setInterval(function(){loadAll();},60000);
 document.getElementById("weekPill").textContent=getWeekLabel(weekKey);
 loadAll();
 </script>
+
+</div><!-- end view-overview -->
+
+<!-- SEARCH VIEW HTML -->
+<div id="view-search" class="view" style="display:none">
+  <div class="autocomplete-wrap">
+    <input class="search-box" type="text" id="agent-search-input" placeholder="Search any agent by name..." oninput="searchAgent()" onblur="hideAgentSuggestions()" autocomplete="off">
+    <div class="autocomplete-list" id="agent-suggestions" style="display:none"></div>
+  </div>
+  <div id="agent-search-result">
+    <div style="text-align:center;padding:3rem;color:#aaa;font-size:13px">Type an agent name to see their full contact history across all LP calls and Amanda visits.</div>
+  </div>
+</div>
+
 </body>
 </html>
