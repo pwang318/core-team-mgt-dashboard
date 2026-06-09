@@ -434,8 +434,8 @@ function toggleSection(bodyId,chevId){
 
 function switchDashTab(t){
   document.querySelectorAll(".tab").forEach(function(el,i){el.classList.toggle("active",["overview","search"][i]===t);});
-  document.getElementById("view-overview").classList.toggle("active",t==="overview");
-  document.getElementById("view-search").classList.toggle("active",t==="search");
+  document.getElementById("view-overview").style.display=t==="overview"?"block":"none";
+  document.getElementById("view-search").style.display=t==="search"?"block":"none";
 }
 
 function searchAgent(){
@@ -623,7 +623,7 @@ loadAll();
 </div><!-- end view-overview -->
 
 <!-- SEARCH VIEW HTML -->
-<div id="view-search" class="view" style="display:none">
+<div id="view-search" class="view">
   <div class="autocomplete-wrap">
     <input class="search-box" type="text" id="agent-search-input" placeholder="Search any agent by name..." oninput="searchAgent()" onblur="hideAgentSuggestions()" autocomplete="off">
     <div class="autocomplete-list" id="agent-suggestions" style="display:none"></div>
