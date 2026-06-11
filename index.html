@@ -173,12 +173,14 @@ function loadAll(){
   weekKey=getWeekKey(TODAY);
   lastWeekKey=getLastWeekKey(TODAY);
   agents=SEED.map(function(r){return[r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7],r[8]];});
+  var ytdStart=TODAY.getFullYear()+"-01-01";
+  var mtdStart=TODAY.getFullYear()+"-"+String(TODAY.getMonth()+1).padStart(2,"0")+"-01";
   return Promise.all([
     sbFetch("GET","call_logs?week_key=eq."+weekKey+"&select=*"),
     sbFetch("GET","call_logs?week_key=eq."+lastWeekKey+"&select=*"),
     sbFetch("GET","amanda_activities?select=*&order=act_date.desc,created_at.desc"),
     sbFetch("GET","agent_profiles?select=*"),
-    sbFetch("GET","call_logs_history?select=agent_name,lp,call_date&order=call_date.desc")
+    sbFetch("GET","call_logs_history?call_date=gte."+ytdStart+"&select=agent_name,lp,call_date")
   ]).then(function(res){
     callLogs={};lastWeekCallLogs={};
     if(res[0])res[0].forEach(function(r){callLogs[r.agent_name]=r;});
@@ -186,12 +188,9 @@ function loadAll(){
     amandaActivities=res[2]||[];
     agentProfiles={};
     if(res[3])res[3].forEach(function(p){agentProfiles[p.agent_name]=p;});
-    // Combine current week + history for MTD/YTD filtering
-    var allCalls=Object.values(callLogs).concat(res[4]||[]);
-    var mtdStart=TODAY.getFullYear()+"-"+String(TODAY.getMonth()+1).padStart(2,"0")+"-01";
-    var ytdStart=TODAY.getFullYear()+"-01-01";
-    mtdCallLogs=allCalls.filter(function(r){return r.call_date&&r.call_date>=mtdStart;});
-    ytdCallLogs=allCalls.filter(function(r){return r.call_date&&r.call_date>=ytdStart;});
+    var allYTDCalls=res[4]||[];
+    ytdCallLogs=allYTDCalls;
+    mtdCallLogs=allYTDCalls.filter(function(r){return r.call_date>=mtdStart;});
     mtdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=mtdStart;});
     ytdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=ytdStart;});
     setSyncStatus("live");
