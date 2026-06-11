@@ -3,711 +3,972 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Core Team Management Dashboard</title>
+<title>Core Team | Management Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:#1a1a1a;font-size:14px;background:#f0f2f5;min-height:100vh}
-.app{max-width:1100px;margin:0 auto;padding:1rem 1rem 3rem}
-.header{padding:.9rem 0 .7rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #dde1e7;margin-bottom:.85rem}
-.brand-logo{background:#1F4E79;color:#fff;font-weight:700;font-size:14px;padding:7px 14px;border-radius:8px;letter-spacing:.05em}
-.week-pill{font-size:11px;background:#e8eaf0;padding:4px 11px;border-radius:20px;color:#555}
-.sync{display:flex;align-items:center;gap:4px;font-size:11px;color:#888}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#ccc}
-.sync-dot.live{background:#43A047}.sync-dot.saving{background:#FB8C00}.sync-dot.error{background:#E53935}
-.btn{border:1px solid #dde1e7;background:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;color:#555;font-family:inherit}
-.tabs{display:flex;gap:0;border-bottom:1px solid #dde1e7;margin-bottom:.85rem}
-.tab{padding:8px 16px;cursor:pointer;font-size:13px;font-weight:500;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px}
-.tab.active{color:#1F4E79;border-bottom-color:#1F4E79}
-.view{display:none}.view.active{display:block}
-.section-title{font-size:15px;font-weight:700;margin-bottom:.75rem}
-.divider{border:none;border-top:1px solid #dde1e7;margin:1.5rem 0}
-.growth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1rem}
-.growth-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.9rem 1rem}
-.growth-label{font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-.growth-val{font-size:28px;font-weight:800;margin-bottom:2px}
-.growth-goal{font-size:11px;color:#888}
-.growth-bar-track{background:#eee;border-radius:20px;height:4px;margin-top:6px;overflow:hidden}
-.growth-bar{height:4px;border-radius:20px}
-.lp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1rem}
-.lp-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.9rem 1rem}
-.lp-name{font-weight:700;font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.lp-pct{font-size:26px;font-weight:800;margin-bottom:4px}
-.lp-bar-track{background:#eee;border-radius:20px;height:5px;margin-bottom:5px;overflow:hidden}
-.lp-bar{height:5px;border-radius:20px}
-.lp-meta{font-size:11px;color:#888;display:flex;justify-content:space-between}
-.scorecard{background:#fff;border:1px solid #dde1e7;border-radius:12px;overflow:hidden;margin-bottom:1rem}
-.sc-header{padding:.85rem 1.1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
-.sc-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pills{display:flex;gap:5px;flex-wrap:wrap}
-.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
-.pill-green{background:#EAF3DE;color:#3B6D11}.pill-amber{background:#FFF2CC;color:#7D5A00}.pill-red{background:#FFEBEE;color:#C62828}
-.sc-body-inner{border-top:1px solid #f0f2f5;padding:.9rem 1.1rem}
-.sc-row{padding:9px 0;border-bottom:1px solid #f0f2f5}
-.sc-row:last-child{border-bottom:none}
-.sc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.sc-pct{font-size:20px;font-weight:800}
-.sc-sub{font-size:11px;color:#888}
-.missed-box{background:#FFEBEE;border-radius:6px;padding:5px 9px;font-size:11px;color:#C62828;margin-top:4px}
-.won-box{font-size:11px;color:#43A047;font-weight:500;margin-top:2px}
-.amanda-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:1rem}
-.a-card{background:#fff;border:1px solid #dde1e7;border-radius:10px;padding:.75rem .9rem;border-left:3px solid #7B1FA2}
-.a-label{font-size:10px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
-.a-val{font-size:20px;font-weight:700}
-.a-sub{font-size:10px;color:#888;margin-top:2px}
-.a-bar-track{background:#eee;border-radius:20px;height:3px;margin-top:5px;overflow:hidden}
-.a-bar{height:3px;border-radius:20px}
-.active-pill{background:#EAF3DE;color:#3B6D11;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600}
-.stat-pill{font-size:11px;background:#e8eaf0;padding:2px 9px;border-radius:20px;color:#555}
-.badge-inactive{background:#FFCDD2;color:#B71C1C;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
-.search-box{width:100%;padding:10px 14px;border:1.5px solid #1F4E79;border-radius:12px;font-size:14px;color:#1a1a1a;background:#fff;font-family:inherit;margin-bottom:1rem}
-.agent-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;overflow:hidden;margin-bottom:1rem}
-.agent-header{padding:.9rem 1.1rem;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
-.agent-name-big{font-size:18px;font-weight:700;margin-bottom:4px}
-.agent-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.85rem 1.1rem;border-bottom:1px solid #f0f2f5}
-.stat-box{text-align:center}
-.stat-num{font-size:18px;font-weight:700;margin-bottom:2px}
-.stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
-.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:.85rem 1.1rem;border-top:1px solid #f0f2f5}
-.profile-field{display:flex;flex-direction:column;gap:3px}
-.profile-field label{font-size:10px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.profile-field input{padding:6px 9px;border:1px solid #dde1e7;border-radius:7px;font-size:13px;color:#1a1a1a;background:#fff;font-family:inherit;width:100%}
-.history-section{padding:.85rem 1.1rem}
-.history-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
-.history-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5}
-.history-item:last-child{border-bottom:none}
-.h-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.h-body{flex:1}
-.h-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;flex-wrap:wrap;gap:4px}
-.h-who{font-weight:600;font-size:12px}
-.h-date{font-size:11px;color:#888}
-.h-type{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;margin-bottom:3px;display:inline-block}
-.h-note{font-size:12px;color:#555;font-style:italic}
-.lp-source{background:#E3F2FD;color:#1565C0;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600}
-.rm-source{background:#F3E5F5;color:#6A1B9A;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600}
-.save-btn{border:1px solid #1F4E79;background:#1F4E79;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;color:#fff;font-family:inherit}
-.autocomplete-wrap{position:relative}
-.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #dde1e7;border-radius:8px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.autocomplete-item{padding:8px 10px;cursor:pointer;font-size:13px}
-.autocomplete-item:hover{background:#f5f6fa}
-.never-banner{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-bottom:.85rem;font-size:13px;color:#854F0B;display:none;align-items:center;gap:8px}
-.trend-up{color:#43A047;font-size:11px;font-weight:600}
-.trend-dn{color:#E53935;font-size:11px;font-weight:600}
-.trend-eq{color:#888;font-size:11px;font-weight:600}
-.pace-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block}
-.pace-ahead{background:#EAF3DE;color:#3B6D11}
-.pace-on{background:#FFF2CC;color:#7D5A00}
-.pace-behind{background:#FFEBEE;color:#C62828}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f2f3f7;color:#1a1a1a;min-height:100vh;font-size:14px}
+.header{background:#fff;border-bottom:1px solid #e8eaf0;padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:56px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mark{background:#1F4E79;color:#fff;font-weight:700;font-size:12px;padding:6px 14px;border-radius:8px;letter-spacing:.06em}
+.brand-title{font-size:15px;color:#555;font-weight:400}
+.header-right{display:flex;align-items:center;gap:12px}
+.week-pill{font-size:12px;color:#666;background:#f0f2f6;padding:5px 13px;border-radius:20px;border:1px solid #e4e6ee}
+.sync-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:#666;background:#f0f2f6;padding:5px 13px;border-radius:20px;border:1px solid #e4e6ee;cursor:pointer;transition:background .15s}
+.sync-pill:hover{background:#e8eaf0}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0}
+.sync-dot.ok{background:#43A047}.sync-dot.err{background:#E53935}.sync-dot.spin{background:#FB8C00;animation:blink 1s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tabs{background:#fff;border-bottom:1px solid #e8eaf0;padding:0 32px;display:flex}
+.tab{padding:14px 20px;font-size:13px;color:#888;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;white-space:nowrap}
+.tab:hover{color:#444}
+.tab.active{color:#1F4E79;border-bottom-color:#1F4E79;font-weight:600}
+.view{display:none;padding:28px 32px;max-width:1140px;margin:0 auto}
+.view.active{display:block}
+
+/* Focus banner */
+.focus-banner{background:#fff;border:1px solid #e8eaf0;border-left:4px solid #1F4E79;border-radius:10px;padding:14px 18px;margin-bottom:24px}
+.focus-title{font-size:12px;font-weight:700;color:#1F4E79;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.focus-item{font-size:13px;color:#333;padding:3px 0}
+
+/* Section headers */
+.sh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#999;margin:20px 0 12px}
+
+/* Scoreboard */
+.sb-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px}
+.sb-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px}
+.sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:8px}
+.sb-val{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.sb-sub{font-size:11px;color:#888;margin-bottom:8px}
+.pbar{background:#eee;border-radius:20px;height:5px;overflow:hidden}
+.pbar-fill{height:5px;border-radius:20px;transition:width .5s}
+
+/* Level bar */
+.lvl-wrap{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 20px;margin-bottom:24px}
+.lvl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:12px}
+.stk{background:#eee;border-radius:20px;height:12px;overflow:hidden;display:flex;margin-bottom:10px}
+.stk-seg{height:12px}
+.lvl-leg{display:flex;gap:20px;font-size:12px}
+
+/* LP grid */
+.lp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.lp-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px}
+.lp-hd{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.lp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.lp-n{font-size:14px;font-weight:700}
+.lp-pct{font-size:32px;font-weight:700;margin-bottom:6px;line-height:1}
+.lp-bt{background:#eee;border-radius:20px;height:6px;overflow:hidden;margin-bottom:10px}
+.lp-bf{height:6px;border-radius:20px}
+.lp-meta{display:flex;justify-content:space-between;font-size:11px;color:#999}
+.lp-flag{font-size:11px;margin-top:5px;font-weight:600}
+
+/* Accordions */
+.acc{background:#fff;border:1px solid #e8eaf0;border-radius:12px;margin-bottom:10px;overflow:hidden}
+.acc-hd{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.acc-hd-l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.acc-ttl{font-size:13px;font-weight:700}
+.acc-wk{font-size:11px;color:#999;margin-left:2px}
+.acc-pills{display:flex;gap:5px;flex-wrap:wrap}
+.acc-pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+.pill-g{background:#E8F5E9;color:#2E7D32}
+.pill-a{background:#FFF8E1;color:#E65100}
+.pill-r{background:#FFEBEE;color:#C62828}
+.acc-chev{color:#bbb;font-size:13px;transition:transform .2s;flex-shrink:0}
+.acc-body{display:none;border-top:1px solid #f0f2f5;padding:4px 18px 12px}
+.acc-row{padding:10px 0;border-bottom:1px solid #f5f6fa}
+.acc-row:last-child{border-bottom:none}
+.acc-rt{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.acc-lp{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.acc-pct{font-size:20px;font-weight:700}
+.missed{background:#FFEBEE;border-radius:6px;padding:5px 10px;font-size:11px;color:#C62828;margin-top:4px;line-height:1.5}
+.won{font-size:11px;color:#43A047;font-weight:600;margin-top:3px}
+
+/* Two col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:18px 20px}
+.card-ttl{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+
+/* RM goals */
+.gr{margin-bottom:13px}
+.gr:last-child{margin-bottom:0}
+.gr-lr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.gr-n{font-size:12px;color:#555}
+.gr-c{font-size:13px;font-weight:700}
+.gr-t{font-size:11px;color:#bbb}
+.g-track{background:#eee;border-radius:20px;height:5px;overflow:hidden}
+.g-fill{height:5px;border-radius:20px}
+.ctc-row{border-top:1px solid #f0f2f5;padding-top:12px;margin-top:12px;display:flex;justify-content:space-between;align-items:center}
+
+/* FU list */
+.fu-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f6fa}
+.fu-item:last-child{border-bottom:none}
+.fu-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fu-n{font-size:13px;font-weight:600}
+.fu-m{font-size:11px;color:#aaa;margin-top:1px}
+.fu-due{font-size:11px;font-weight:700;white-space:nowrap}
+
+/* Feed */
+.feed-item{padding:9px 0;border-bottom:1px solid #f5f6fa}
+.feed-item:last-child{border-bottom:none}
+.feed-t{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.feed-ag{font-size:13px;font-weight:700}
+.feed-dt{font-size:11px;color:#aaa}
+.feed-ty{font-size:11px;color:#666}
+.feed-nt{font-size:11px;color:#aaa;font-style:italic;margin-top:2px}
+
+/* Leaderboard */
+.lb-row{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+
+/* Roster */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar input,.filter-bar select{padding:7px 11px;border:1px solid #e4e6ee;border-radius:8px;font-size:12px;color:#1a1a1a;background:#fff;font-family:inherit;outline:none}
+.filter-bar input{flex:1;min-width:140px}
+.tbl-wrap{border:1px solid #e8eaf0;border-radius:10px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#aaa;background:#f8f9fc;border-bottom:1px solid #e8eaf0;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #f5f6fa;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfd}
+.lp-chip{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+.chip-Gavin{background:#E8F5E9;color:#2E7D32}.chip-Karen{background:#E3F2FD;color:#1565C0}
+.chip-Osgood{background:#FFF8E1;color:#E65100}.chip-Jordan{background:#FCE4EC;color:#880E4F}.chip-Said{background:#EDE7F6;color:#4527A0}
+.badge-a{background:#E8F5E9;color:#2E7D32;display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-b{background:#E3F2FD;color:#1565C0;display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-c{background:#F5F5F5;color:#757575;display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+
+/* Teams */
+.teams-box{background:#f8f9fc;border:1px solid #e8eaf0;border-radius:8px;padding:14px;font-size:12px;line-height:1.8;white-space:pre-wrap;font-family:inherit;color:#444;margin-bottom:12px}
+.btn{background:#fff;border:1px solid #dde1e7;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:#444;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn:hover{background:#f5f6fa}
+.btn-p{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.btn-p:hover{background:#1a4269}
+.no-data{text-align:center;color:#ccc;padding:24px;font-size:13px}
+
+/* Period toggle */
+.period-btns{display:flex;gap:8px;margin-bottom:20px}
+
+@media(max-width:900px){.sb-grid,.lp-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}}
+@media(max-width:600px){.sb-grid,.lp-grid{grid-template-columns:1fr}.view{padding:18px 14px}.header,.tabs{padding-left:16px;padding-right:16px}}
 </style>
 </head>
 <body>
-<div class="app">
+
 <div class="header">
-  <div style="display:flex;align-items:center;gap:10px"><span class="brand-logo">CORE TEAM</span><span style="font-size:12px;color:#666">Management Dashboard</span></div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <div class="brand">
+    <span class="brand-mark">CORE TEAM</span>
+    <span class="brand-title">Management Dashboard</span>
+  </div>
+  <div class="header-right">
     <span class="week-pill" id="weekPill"></span>
-    <div class="sync"><span class="sync-dot" id="syncDot"></span><span id="syncTxt">Loading...</span></div>
-    <button class="btn" onclick="loadAll()">&#8635; Refresh</button>
+    <button class="sync-pill" onclick="loadAll()">
+      <span class="sync-dot spin" id="syncDot"></span>
+      <span id="syncTxt">Connecting...</span>
+      <span style="margin-left:4px">↻ Refresh</span>
+    </button>
   </div>
 </div>
+
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('overview')">Overview</div>
-  <div class="tab" onclick="switchTab('mtd')">MTD / YTD</div>
-  <div class="tab" onclick="switchTab('search')">Agent Search</div>
+  <div class="tab active" onclick="go('overview')">Overview</div>
+  <div class="tab" onclick="go('mtdytd')">MTD / YTD</div>
+  <div class="tab" onclick="go('agents')">Agent Search</div>
+  <div class="tab" onclick="go('message')">Teams Message</div>
 </div>
 
+<!-- OVERVIEW -->
 <div id="view-overview" class="view active">
-  <div class="never-banner" id="amanda-alert">&#9888; Amanda has not logged activity in 3+ days.</div>
-  <div id="needs-attention-box"></div>
-  <div class="section-title">&#127942; Growth scoreboard</div>
-  <div class="growth-grid" id="growth-grid"></div>
-  <div style="background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem">
-    <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Level breakdown</div>
-    <div id="level-breakdown"></div>
+
+  <div class="focus-banner" id="focus-banner" style="display:none">
+    <div class="focus-title">🎯 This Week's Focus</div>
+    <div id="focus-items"></div>
   </div>
-  <hr class="divider">
-  <div class="section-title">&#128198; LP weekly performance</div>
-  <div class="lp-grid" id="lp-grid"></div>
-  <div class="scorecard">
-    <div class="sc-header" onclick="toggleSC('tw-body','tw-chev')">
-      <div class="sc-title">&#128200; This week <span style="font-size:11px;font-weight:400;color:#888" id="tw-lbl"></span><div class="pills" id="tw-pills"></div></div>
-      <span id="tw-chev" style="font-size:14px;color:#888">&#9660;</span>
-    </div>
-    <div id="tw-body" style="display:none" class="sc-body-inner"><div id="tw-content"></div></div>
+
+  <div class="sh">📊 Growth scoreboard</div>
+  <div class="sb-grid" id="scoreboard"></div>
+  <div class="lvl-wrap">
+    <div class="lvl-lbl">Level breakdown</div>
+    <div class="stk" id="lvl-bar"></div>
+    <div class="lvl-leg" id="lvl-leg"></div>
   </div>
-  <div class="scorecard" id="lw-scorecard" style="display:none">
-    <div class="sc-header" onclick="toggleSC('lw-body','lw-chev')">
-      <div class="sc-title">&#128197; Last week <span style="font-size:11px;font-weight:400;color:#888" id="lw-lbl"></span><div class="pills" id="lw-pills"></div></div>
-      <span id="lw-chev" style="font-size:14px;color:#888">&#9660;</span>
+
+  <div class="sh">📅 LP weekly performance</div>
+  <div class="lp-grid" id="lp-cards"></div>
+
+  <div class="acc" id="acc-tw">
+    <div class="acc-hd" onclick="toggleAcc('acc-tw')">
+      <div class="acc-hd-l">
+        <span class="acc-ttl">📝 This week</span>
+        <span class="acc-wk" id="tw-wk-lbl"></span>
+        <div class="acc-pills" id="tw-pills"></div>
+      </div>
+      <span class="acc-chev" id="chev-acc-tw">▼</span>
     </div>
-    <div id="lw-body" style="display:none" class="sc-body-inner"><div id="lw-content"></div></div>
+    <div class="acc-body" id="body-acc-tw"></div>
   </div>
-  <hr class="divider">
-  <div class="section-title">&#128101; Amanda &mdash; Relationship Manager</div>
-  <div class="amanda-grid" id="amanda-grid"></div>
-  <div class="scorecard">
-    <div class="sc-header" onclick="toggleSC('atw-body','atw-chev')">
-      <div class="sc-title">&#128200; Amanda this week<div class="pills" id="atw-pills"></div></div>
-      <span id="atw-chev" style="font-size:14px;color:#888">&#9660;</span>
+
+  <div class="acc" id="acc-lw">
+    <div class="acc-hd" onclick="toggleAcc('acc-lw')">
+      <div class="acc-hd-l">
+        <span class="acc-ttl">📆 Last week</span>
+        <span class="acc-wk" id="lw-wk-lbl"></span>
+        <div class="acc-pills" id="lw-pills"></div>
+      </div>
+      <span class="acc-chev" id="chev-acc-lw">▼</span>
     </div>
-    <div id="atw-body" style="display:none" class="sc-body-inner"><div id="atw-content"></div></div>
+    <div class="acc-body" id="body-acc-lw"></div>
+  </div>
+
+  <div class="sh" style="margin-top:24px">🌸 Amanda — this week</div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-ttl">Weekly goals</div>
+      <div id="rm-goals"></div>
+    </div>
+    <div class="card">
+      <div class="card-ttl">Follow-ups due <span style="font-size:11px;font-weight:400;color:#aaa" id="fu-lbl"></span></div>
+      <div id="rm-fu"></div>
+    </div>
+  </div>
+
+  <div class="sh">🏆 All-time leaderboard</div>
+  <div id="leaderboard"></div>
+</div>
+
+<!-- MTD / YTD -->
+<div id="view-mtdytd" class="view">
+  <div class="period-btns">
+    <button class="btn btn-p" id="btn-mtd" onclick="showPeriod('mtd')">Month to date</button>
+    <button class="btn" id="btn-ytd" onclick="showPeriod('ytd')">Year to date</button>
+  </div>
+  <div class="sh">Amanda — <span id="period-lbl">month to date</span></div>
+  <div class="card"><div id="period-goals"></div></div>
+  <div class="sh" style="margin-top:4px">Activity feed</div>
+  <div class="card">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <select id="feed-type" onchange="renderFeed()" style="padding:7px 11px;border:1px solid #e4e6ee;border-radius:8px;font-size:12px;color:#1a1a1a;background:#fff;font-family:inherit;outline:none;flex:1;min-width:160px">
+        <option value="">All activity types</option>
+        <option>Cold Calls</option><option>New Realtor Meeting</option><option>Break Breads</option>
+        <option>Active Agent Check-in</option><option>CTC Call</option><option>Realtor Buddy Referral Ask</option>
+        <option>Coffee Meeting</option><option>Lunch or Dinner</option><option>Pop-By</option><option>Market Update Call</option>
+      </select>
+    </div>
+    <div id="feed-list"></div>
   </div>
 </div>
 
-<div id="view-mtd" class="view">
-  <div class="section-title">&#128200; LP Performance &mdash; MTD &amp; YTD</div>
-  <div id="mtd-lp-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1.5rem"></div>
-  <div class="scorecard">
-    <div class="sc-header" onclick="toggleSC('mtd-lp-body','mtd-lp-chev')"><div class="sc-title">LP Detail &mdash; Month to Date</div><span id="mtd-lp-chev" style="font-size:14px;color:#888">&#9660;</span></div>
-    <div id="mtd-lp-body" style="display:none" class="sc-body-inner"><div id="mtd-lp-content"></div></div>
+<!-- AGENT SEARCH -->
+<div id="view-agents" class="view">
+  <div class="sh">Agent roster</div>
+  <div class="filter-bar">
+    <input type="text" id="r-q" placeholder="Search agents..." oninput="renderRoster()">
+    <select id="r-lp" onchange="renderRoster()"><option value="">All LPs</option><option>Gavin</option><option>Karen</option><option>Osgood</option><option>Jordan</option><option>Said</option></select>
+    <select id="r-lvl" onchange="renderRoster()"><option value="">All levels</option><option>A</option><option>B</option><option>C</option></select>
+    <select id="r-st" onchange="renderRoster()"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
   </div>
-  <div class="scorecard" style="margin-top:.75rem">
-    <div class="sc-header" onclick="toggleSC('ytd-lp-body','ytd-lp-chev')"><div class="sc-title">LP Detail &mdash; Year to Date</div><span id="ytd-lp-chev" style="font-size:14px;color:#888">&#9660;</span></div>
-    <div id="ytd-lp-body" style="display:none" class="sc-body-inner"><div id="ytd-lp-content"></div></div>
-  </div>
-  <hr class="divider">
-  <div class="section-title">&#128101; Amanda &mdash; MTD &amp; YTD</div>
-  <div id="mtd-amanda-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:1rem"></div>
-  <div class="scorecard">
-    <div class="sc-header" onclick="toggleSC('ytd-amanda-body','ytd-amanda-chev')"><div class="sc-title">Amanda Detail &mdash; Year to Date</div><span id="ytd-amanda-chev" style="font-size:14px;color:#888">&#9660;</span></div>
-    <div id="ytd-amanda-body" style="display:none" class="sc-body-inner"><div id="ytd-amanda-content"></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Agent</th><th>Level</th><th>LP</th><th>Status</th><th>Called this week</th><th>Last LP call</th><th>Last activity</th></tr></thead>
+    <tbody id="roster-body"></tbody></table>
   </div>
 </div>
 
-<div id="view-search" class="view">
-  <div class="autocomplete-wrap">
-    <input class="search-box" type="text" id="agent-search-input" placeholder="Search any agent by name..." oninput="searchAgent()" onblur="hideAgentSuggestions()" autocomplete="off">
-    <div class="autocomplete-list" id="agent-suggestions" style="display:none"></div>
+<!-- TEAMS MESSAGE -->
+<div id="view-message" class="view">
+  <div class="sh">Weekly Teams message</div>
+  <div class="card">
+    <p style="font-size:12px;color:#aaa;margin-bottom:12px">Copy and paste every Monday into the Core Team channel.</p>
+    <div class="teams-box" id="teams-msg">Loading...</div>
+    <button class="btn btn-p" onclick="copyTeams()">Copy message</button>
+    <span id="copy-ok" style="font-size:12px;color:#43A047;margin-left:10px;display:none">Copied!</span>
   </div>
-  <div id="agent-search-result"><div style="text-align:center;padding:3rem;color:#aaa;font-size:13px">Type an agent name to see their full contact history.</div></div>
-</div>
 </div>
 
 <script>
-var SB_URL="https://uclucbdkjqyqdvifyptx.supabase.co";
-var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHVjYmRranF5cWR2aWZ5cHR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTUyMTMsImV4cCI6MjA5NjA3MTIxM30.VnqWcFT1WLQwCJxSdEIzIgOvETaOQly2IQxht-9uI7E";
-var LPS=["Gavin","Karen","Osgood","Jordan","Said"];
-var LP_COLORS={Gavin:"#4CAF50",Karen:"#2196F3",Osgood:"#FF9800",Jordan:"#E91E63",Said:"#9C27B0"};
-var AMANDA_GOALS={"Cold Calls":25,"New Realtor Meeting":5,"Break Breads":5,"Active Check-in":10,"Realtor Buddy Referral Ask":3};
-var TODAY=new Date();TODAY.setHours(0,0,0,0);
-var CUTOFF=new Date(TODAY);CUTOFF.setDate(TODAY.getDate()-90);
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const SB_URL = "https://uclucbdkjqyqdvifyptx.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHVjYmRranF5cWR2aWZ5cHR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTUyMTMsImV4cCI6MjA5NjA3MTIxM30.VnqWcFT1WLQwCJxSdEIzIgOvETaOQly2IQxht-9uI7E";
 
-// --- Identical to LP tracker ---
-var weekKey=getWeekKey(TODAY);
-var lastWeekKey=getLastWeekKey(TODAY);
-// callLogs matches LP tracker: keyed by agent_name, single object per agent
-var callLogs={}, lastWeekCallLogs={};
-var amandaActivities=[], agentProfiles={};
-var mtdCallLogs=[], ytdCallLogs=[], mtdAmanda=[], ytdAmanda=[];
-var agents=[];
+const LPS = ["Gavin","Karen","Osgood","Jordan","Said"];
+const LP_COL = {Gavin:"#4CAF50",Karen:"#2196F3",Osgood:"#FF9800",Jordan:"#E91E63",Said:"#9C27B0"};
 
-var SEED=[["TIARA VILLATORO","A","Karen","2026-05-08","2026-05-08","2026-06-04","2026-05-22",false,10],["BRANDON THOMPSON","A","Osgood","2026-06-01","2026-06-01","2026-05-04","2026-06-01",false,9],["MEGAN LYNCH","A","Gavin","2026-06-03","2026-06-05","2026-06-01","2026-06-22",false,9],["TODD STONE","A","Said","2026-06-05","2026-06-09","2026-04-13","2026-05-08",false,9],["DUSTIN GOLDMAN","A","Osgood","2026-04-20","2026-04-24","2026-03-30","2026-03-27",false,7],["TINA HOFFMAN","A","Gavin","2023-10-10","2026-05-06","2026-05-27","2026-02-10",false,7],["KEVIN SPEERT","A","Gavin","2026-05-08","2026-05-27","2026-06-01","2026-05-22",false,6],["OSCAR MARTINEZ","A","Karen","2026-06-08","2026-06-08","2026-05-05","2026-06-15",false,6],["RACQUEL LUDAWAY","A","Gavin","2026-05-29","2026-05-19","2026-04-16","2026-06-04",false,5],["CHRIS REED","A","Said","2026-06-03","2026-06-02","2026-05-08","2026-05-27",false,4],["MICHELLE ERICKSON","A","Gavin","2025-08-04","2026-03-25","2026-04-20","2026-04-10",false,4],["SAHAR SHALASH","A","Said","2026-06-05","2026-06-05","2026-05-09","2026-05-29",false,4],["CINDA ERICKSON","B","Gavin","2026-04-23","2026-04-21","2026-02-24","2026-03-26",false,3],["CONNER KOCHANSKY","B","Gavin","2026-05-30","2026-05-19","2026-05-20","2026-05-20",false,3],["DEANNE RHYNEHARDT","B","Osgood","2026-05-22","2026-05-28","2026-05-05","2026-06-05",false,3],["DERON BENDER","A","Gavin","2025-08-11","2026-04-24","2026-04-28","2026-05-08",true,3],["INGRID CORREIA","B","Gavin","2026-05-08","2026-05-08","2025-12-11","2026-01-05",false,3],["JOHN BRUNNER","B","Osgood","2026-06-01","2026-06-01","2026-06-05","2025-11-17",false,3],["KANDIS HALL","B","Osgood","2026-01-04","2026-01-31","2026-02-25","2026-03-17",false,3],["KRISTINA MURPHY","B","Osgood","2026-06-02","2026-05-11","2025-10-03","2025-10-21",false,3],["MARK BOYD","B","Gavin",null,"2026-03-28","2026-04-08","2026-02-02",false,3],["MATTHEW MONTALVO","B","Karen","2026-04-09","2026-04-08","2026-05-29","2025-11-20",false,3],["SETH COLBURN","B","Said","2025-04-23","2026-03-31","2026-04-06","2026-04-30",false,3],["ANNIE MORENO","B","Karen","2026-06-06","2026-06-08","2026-05-11","2026-06-05",false,2],["DAN MANLEY","B","Gavin","2025-11-23","2026-04-29","2026-05-01","2026-05-19",false,2],["ELIZABETH ELLINGER","B","Jordan","2026-03-16","2026-04-01","2026-05-18","2026-06-10",false,2],["ERIKA WEHNER","B","Gavin",null,"2026-04-13","2026-05-28","2026-05-11",false,2],["HEATHER HENRY-MINOR","B","Jordan","2026-04-07","2026-04-15","2026-05-05","2026-05-28",false,2],["KATIE SUMMERS","B","Gavin",null,"2026-04-22","2026-02-26","2026-05-29",false,2],["KHADIJA FARAH","B","Jordan","2026-05-16","2026-05-17","2026-02-09","2026-03-06",false,2],["KISHMA JAMES","B","Said","2026-03-16","2026-03-12","2025-06-09","2025-07-14",false,2],["MARIA COMAS","B","Karen","2026-04-27","2026-03-02","2025-06-19","2025-07-21",false,2],["MARTIN HOPKINS","B","Karen","2026-02-12","2026-04-28","2026-01-29","2026-02-20",false,2],["MARY MCMICHAEL","B","Said","2026-04-13","2026-04-13","2025-09-11","2025-10-10",false,2],["MATT PIPER","B","Osgood","2026-05-19","2026-05-19","2025-11-11","2025-12-01",false,2],["NATALIE ESTRELLA","B","Karen","2026-05-25","2026-05-25","2025-10-08","2025-11-03",false,2],["RAMI TAMIMI","B","Jordan","2026-03-27","2026-04-20","2026-05-07","2026-06-30",false,2],["STACEY LAMBRIGHT","B","Jordan",null,"2026-03-25","2026-03-26","2026-04-07",false,2],["TRACY BERARD","B","Jordan",null,"2026-04-04","2026-04-14","2026-05-27",false,2],["AIMEE WHITLOCK","C","Gavin",null,"2025-01-14","2026-02-10","2026-04-15",false,1],["ALEXIS REED","C","Said","2026-03-25","2026-05-12","2026-01-30","2026-02-27",false,1],["AMY AGRESTA","C","Gavin","2026-05-23","2026-05-28","2025-07-08","2025-08-05",false,1],["ANGELA PEREZ","C","Gavin","2026-04-27","2026-05-06","2026-04-06","2026-04-24",false,1],["BRIAN NANTHAVONGDOUANGSY","C","Osgood","2025-10-23","2025-11-19","2025-12-18","2026-03-20",false,1],["BRITNEY DODDS","C","Gavin","2026-03-26","2026-03-26","2026-03-02","2026-04-08",false,1],["CAROLE MCMAHON","C","Osgood","2026-05-31","2026-05-31","2026-05-08","2026-05-26",false,1],["CESIA ESPINOZA YOUNG","C","Karen","2026-03-11","2026-03-10","2026-03-26","2026-04-17",false,1],["CHELSEA ANDERSON","C","Osgood","2026-02-07","2026-02-06","2026-03-28","2026-04-17",false,1],["COURTNEY HAMILTON","C","Osgood","2026-05-27","2026-05-27","2026-06-02","2025-06-26",false,1],["DEVIN JOHNSON","C","Said","2026-03-29","2026-04-15","2025-05-30","2025-07-09",false,1],["DIANNA JENKINS","C","Said",null,"2026-03-24","2026-02-23","2026-04-06",false,1],["HAIFA BRUNNEY","C","Karen","2026-05-21","2026-06-01","2026-03-26","2026-04-27",false,1],["JACOB ENGLISH","C","Jordan",null,"2026-03-18","2026-04-23","2026-06-12",false,1],["JASMINE MCKENZIE","C","Osgood","2026-05-03","2026-05-04","2026-05-06","2026-05-29",false,1],["JESSE MCCRERRY","C","Said",null,"2026-04-06","2026-04-13","2026-05-26",false,1],["JOHN LUBINSKY","C","Said","2025-12-17","2025-12-19","2026-02-17","2026-03-20",false,1],["JORDAN HOLLIBAUGH","C","Gavin",null,"2026-05-12","2026-04-29","2026-04-16",false,1],["KATHERINE DE LA ROSA","C","Karen","2026-05-28","2026-06-02","2026-04-01","2026-04-29",false,1],["KELSY YODER","C","Said","2026-04-28","2026-01-09","2026-01-12","2026-02-05",false,1],["KINSIE HUSKINS","C","Jordan",null,"2026-03-17","2026-04-28","2026-06-01",false,1],["KRISTEN VALENTY","C","Jordan",null,"2026-01-21","2026-02-24","2026-03-25",false,1],["LETIKA WHITE","C","Osgood","2026-05-11","2026-05-12","2025-07-31","2025-08-29",false,1],["LISA SIMMONS","C","Osgood",null,"2026-03-19","2026-04-14","2026-05-27",false,1],["LUIS GIL","C","Karen","2026-06-02","2026-06-02","2026-06-02","2025-09-26",false,1],["LYNDSEY LANE","C","Osgood","2026-03-16","2025-09-23","2025-12-23","2026-01-23",false,1],["MIKE WHITEMAN","C","Osgood",null,"2025-07-24","2025-07-31","2026-05-11",false,1],["NANCY PRICE","C","Jordan","2026-01-03","2026-01-02","2026-05-08","2026-01-30",false,1],["PAIGE LUDWIG","C","Said","2026-06-08","2026-03-05","2026-03-17","2026-04-14",false,1],["PATRICK ARQUETTE","C","Said","2026-04-22","2026-01-14","2025-09-09","2025-10-07",false,1],["PAULA PALLESCHI","C","Said",null,"2026-04-21","2026-04-27","2026-05-26",false,1],["PILAR BENNETT","C","Karen","2026-04-15","2026-04-15","2025-07-23","2025-08-15",false,1],["RACHELLE PARSLEY","C","Said","2024-09-03","2026-04-15","2026-04-22","2026-05-13",false,1],["ROBERT HAYNER","C","Jordan",null,"2026-04-20","2026-04-23","2026-05-15",false,1],["ROBIN BLAKE","C","Gavin",null,"2025-12-19","2025-12-27","2026-03-17",false,1],["ROSS DIGIORGIO","C","Osgood",null,"2025-06-24","2025-07-14","2026-04-30",false,1],["RUTH ESPINOZA","C","Karen",null,"2026-02-26","2026-03-26","2026-04-17",false,1],["SAM BAMRICK","C","Jordan",null,"2026-04-14","2026-04-20","2026-05-15",false,1],["SARA BUSH","C","Said",null,"2026-03-27","2026-04-13","2026-05-27",false,1],["SLAVI JORDANOV","C","Said","2026-05-30","2025-10-06","2025-10-10","2025-11-07",false,1],["STAN GORKSI","C","Jordan",null,"2026-03-07","2026-03-09","2026-04-07",false,1],["THAER AHMED","C","Said","2026-03-31","2026-03-31","2025-08-26","2025-09-30",false,1],["TRACI WILLIAMS-JONES","C","Jordan",null,"2026-04-09","2026-03-23","2026-05-21",false,1],["TROY BORDEN","C","Gavin","2026-04-28","2026-04-30","2026-04-22","2026-05-13",false,1],["YASMIN DE JESUS","C","Karen","2024-03-27","2025-11-18","2026-04-01","2026-04-29",false,1],["ALI SWEAZY","C","Osgood","2026-05-09","2026-05-09",null,null,false,0],["ALINA ILKAEVA","C","Said",null,"2026-03-20",null,null,false,0],["ANA SORIA","C","Karen","2026-04-19",null,null,null,false,0],["ANGELA POTTS","C","Osgood","2026-05-10","2026-05-10",null,null,false,0],["ANGELIQUE SOTONDJI","C","Jordan","2026-03-27","2026-03-27",null,null,false,0],["ASHLEY HENRY","C","Osgood","2026-04-22","2026-04-21",null,null,false,0],["AVA LAIRD","C","Jordan","2026-05-26","2026-05-25",null,null,false,0],["BAILEY STRATHIE","C","Osgood","2026-05-30","2026-05-30","2024-11-21",null,false,0],["BENJAMIN GAYTAN","C","Gavin","2026-05-16","2026-05-22",null,null,false,0],["BRAD GILLIAM","C","Gavin","2026-05-14",null,null,null,false,0],["BRANDON KIDD","C","Said","2026-05-01",null,null,null,false,0],["BRANDON MCCLENDON","C","Said","2026-06-08","2026-06-08",null,null,false,0],["BRIAN ZINN","C","Jordan","2026-06-06","2026-06-07",null,null,false,0],["CELINE WILLIAMS","C","Jordan","2026-06-01",null,null,null,false,0],["CHERYL KINSEY","C","Jordan","2026-05-05","2026-05-04",null,null,false,0],["CHRISTIAN CHALKIAS","C","Osgood","2026-04-08","2026-04-08",null,null,false,0],["CHRISTINA COUGHLIN","C","Osgood","2026-05-29","2026-05-29","2024-09-11",null,false,0],["CHUCK KINSEY","C","Jordan","2026-03-16","2026-03-26",null,null,false,0],["CLAUDIA CHUECO","C","Karen","2026-06-08",null,null,null,false,0],["CODA GAHRIS","C","Jordan","2026-04-29","2026-04-29","2026-05-25",null,false,0],["CRAIG MAURER","C","Osgood","2026-05-13","2026-05-19",null,null,false,0],["DAIRDRE SCRIVEN","C","Said","2026-05-19","2026-05-19",null,null,false,0],["DARREN HOGG","C","Said","2026-04-22","2026-04-28",null,null,false,0],["DONALD PAYNE","C","Osgood",null,"2026-06-07","2021-08-11",null,false,0],["DONALD PAYNE JR","C","Osgood","2026-06-04",null,null,null,false,0],["ELIAS PAPPAN","C","Karen","2026-04-30",null,null,null,false,0],["ELIZABETH BONAUDI","C","Osgood","2026-04-17","2026-04-17",null,null,false,0],["ELIZABETH HOWARD","C","Osgood","2026-04-04","2026-04-03","2024-11-08",null,false,0],["ERIKA BRUNNER","C","Gavin","2026-04-13","2026-04-15","2025-11-07",null,false,0],["GLADIS CHAVEZ","C","Karen","2026-05-15","2026-05-05",null,null,false,0],["HYPATIA ESPINAL","C","Karen","2026-06-02","2026-06-02",null,null,false,0],["IZXEL MARTINEZ","C","Karen","2026-05-20","2026-05-20","2026-06-02",null,false,0],["JAIDEN BALLAH","C","Said","2026-06-02","2026-06-03",null,null,false,0],["JASMIN ARCOS","C","Karen","2026-03-19","2026-03-26",null,null,false,0],["JASMIN MONTOYA","C","Karen","2026-05-31","2026-05-30",null,null,false,0],["JEFF MESSMER","C","Gavin","2026-05-12","2026-05-12","2025-10-01",null,false,0],["JENNIFER BLACKMORE","C","Jordan","2026-05-02",null,null,null,false,0],["JENNIFER HOWISON","C","Jordan","2026-03-15","2026-03-30","2026-04-06",null,false,0],["JESSICA TOWER","C","Jordan","2026-05-27","2026-05-30","2023-04-03",null,false,0],["JONNATHAN AGUDELO","C","Karen","2026-05-23","2026-05-19",null,null,false,0],["JUSTIN BIERY","C","Karen","2026-05-27","2026-05-28",null,null,false,0],["KATHY HAYES","C","Jordan","2026-05-30","2026-05-29","2024-12-09",null,false,0],["KATIE MANSOR","C","Jordan","2026-04-27","2026-04-26",null,null,false,0],["KERWIN HEATH","C","Said",null,"2026-04-12",null,null,false,0],["KYLA AHO","C","Said","2026-03-12","2025-11-03","2025-03-28",null,false,0],["LAUREN MCCLINTON","C","Said",null,"2026-04-29",null,null,false,0],["LESLIE HERNANDEZ","C","Karen","2026-05-07","2026-05-08","2026-05-19",null,false,0],["LILIAN FUENTES","C","Karen","2026-04-21","2026-04-21",null,null,false,0],["LIZBEL CONTRERAS","C","Karen","2026-04-30","2026-05-11","2024-09-18",null,false,0],["MANDY WILSON","C","Jordan",null,"2026-03-28",null,null,false,0],["MARK VENNITTI","C","Jordan","2026-04-08","2026-04-08","2026-06-01",null,false,0],["MARLA SEWELL","C","Osgood",null,"2026-03-19",null,null,false,0],["MATHEA ARUDDA","C","Karen",null,"2026-03-16","2026-03-23",null,false,0],["MICHELE FREDERICK","C","Osgood",null,"2026-05-31",null,null,false,0],["NANCY BAKER","C","Osgood","2026-04-30",null,null,null,false,0],["NIA HARRINGTON","C","Said","2026-05-13","2026-05-05","2024-10-17",null,false,0],["NICK ZATEZALO","C","Osgood","2026-05-16","2026-03-19","2024-03-12",null,false,0],["NIKEHA HAYES","C","Osgood","2026-04-15","2025-09-28","2024-09-25",null,false,0],["NINA AVERY","C","Jordan",null,"2026-04-23",null,null,false,0],["NORA KERELIUK","C","Said","2026-04-24",null,null,null,false,0],["PIERINA MANTILLA","C","Karen",null,"2026-03-15",null,null,false,0],["ROSALIA PABLO","C","Karen","2026-06-08","2026-06-04","2024-11-08",null,false,0],["RUTH GONZALEZ","C","Karen","2026-05-19","2026-05-19",null,null,false,0],["SAHEL ALAM","C","Said","2026-05-10","2026-05-08",null,null,false,0],["SARAH HERNANDEZ","C","Osgood","2026-05-28","2026-05-29","2024-10-21",null,false,0],["SASHA ANTONOVA","C","Said","2026-03-31","2026-03-31",null,null,false,0],["SHANE STINER","C","Jordan",null,"2026-04-08",null,null,false,0],["SHARON PANTELIS","C","Jordan","2026-04-28","2025-03-21","2025-04-01",null,false,0],["SHAYNE D. BOYD","C","Said","2026-05-04","2026-05-07",null,null,false,0],["SHIRRELL BURNSIDE","C","Osgood","2026-04-08","2025-07-14",null,null,false,0],["STEVEN OSBORN","C","Jordan","2026-04-30","2026-02-03",null,null,false,0],["SUMMER DURHAM","C","Osgood",null,"2026-03-23",null,null,false,0],["SUNI RIVAS","C","Karen","2026-05-27","2026-05-28",null,null,false,0],["TAMARA CHARLTON","C","Osgood","2025-07-27","2026-04-16","2025-04-14",null,false,0],["TATIANA GRIGORITA","C","Jordan","2026-06-08","2026-06-08",null,null,false,0],["THOMAS NEWMAN","C","Gavin","2026-03-02","2026-03-25","2022-08-22",null,false,0],["TINA-DUTT-HIREN","C","Osgood",null,"2026-05-11",null,null,false,0],["TOM NEWMAN","C","Gavin","2026-06-08","2026-06-08","2024-01-08",null,false,0],["TONY AMOS","C","Osgood","2026-04-19","2026-04-01","2024-02-27",null,false,0],["WENDY RAMIREZ","C","Karen","2026-03-25","2026-03-25",null,null,false,0],["WHITNEY SCHMIDT","C","Said","2026-03-18","2024-01-12","2024-01-18",null,false,0],["YVETTA HARRISON","C","Osgood","2026-06-04",null,null,null,false,0]];
+const RM_GOALS = [
+  {label:"Cold calls",        type:"Cold Calls",                weekly:25, monthly:100},
+  {label:"New realtor mtgs",  type:"New Realtor Meeting",       weekly:5,  monthly:20 },
+  {label:"Break breads",      type:"Break Breads",              weekly:5,  monthly:20 },
+  {label:"Agent check-ins",   type:"Active Agent Check-in",     weekly:15, monthly:60 },
+  {label:"Referral asks",     type:"Realtor Buddy Referral Ask",weekly:3,  monthly:12 }
+];
+const RM_EMOJI = {
+  "Cold Calls":"🎯","New Realtor Meeting":"🌸","Break Breads":"🥐",
+  "Active Agent Check-in":"🫂","Realtor Buddy Referral Ask":"🌈","CTC Call":"⚡",
+  "Coffee Meeting":"☕","Lunch or Dinner":"🍜","Pop-By":"🌻","Market Update Call":"📊",
+  "Agent Appreciation":"💐","Business Planning Session":"🗓️","Open House Visit":"🏡",
+  "Recruiting Conversation":"🌟","Sent Market Report":"📬","Closed Deal Thank You":"🎊",
+  "Birthday Outreach":"🎂","Holiday Outreach":"🎁","Co-hosted Event":"🎪",
+  "Team Presentation":"🎤","Co-Marketing Discussion":"🤙","Sent Referral":"💌"
+};
 
-var ALL_AGENTS=SEED.map(function(r){return r[0];});
+// ── SEED DATA — full roster matching LP Tracker exactly ───────────────────
+// Format: [name, level, lp, leadDate, fileDate, contractDate, closeDate, isPriority]
+const SEED = [
+  ["TIARA VILLATORO","A","Karen","2026-05-08","2026-05-08","2026-06-04","2026-05-22",false],
+  ["BRANDON THOMPSON","A","Osgood","2026-06-01","2026-06-01","2026-05-04","2026-06-01",false],
+  ["MEGAN LYNCH","A","Gavin","2026-06-03","2026-06-05","2026-06-01","2026-06-22",false],
+  ["TODD STONE","A","Said","2026-06-05","2026-06-09","2026-04-13","2026-05-08",false],
+  ["DUSTIN GOLDMAN","A","Osgood","2026-04-20","2026-04-24","2026-03-30","2026-03-27",false],
+  ["TINA HOFFMAN","A","Gavin","2023-10-10","2026-05-06","2026-05-27","2026-02-10",false],
+  ["KEVIN SPEERT","A","Gavin","2026-05-08","2026-05-27","2026-06-01","2026-05-22",false],
+  ["OSCAR MARTINEZ","A","Karen","2026-06-08","2026-06-08","2026-05-05","2026-06-15",false],
+  ["RACQUEL LUDAWAY","A","Gavin","2026-05-29","2026-05-19","2026-04-16","2026-06-04",false],
+  ["CHRIS REED","A","Said","2026-06-03","2026-06-02","2026-05-08","2026-05-27",false],
+  ["MICHELLE ERICKSON","A","Gavin","2025-08-04","2026-03-25","2026-04-20","2026-04-10",false],
+  ["SAHAR SHALASH","A","Said","2026-06-05","2026-06-05","2026-05-09","2026-05-29",false],
+  ["CINDA ERICKSON","B","Gavin","2026-04-23","2026-04-21","2026-02-24","2026-03-26",false],
+  ["CONNER KOCHANSKY","B","Gavin","2026-05-30","2026-05-19","2026-05-20","2026-05-20",false],
+  ["DEANNE RHYNEHARDT","B","Osgood","2026-05-22","2026-05-28","2026-05-05","2026-06-05",false],
+  ["DERON BENDER","A","Gavin","2025-08-11","2026-04-24","2026-04-28","2026-05-08",true],
+  ["INGRID CORREIA","B","Gavin","2026-05-08","2026-05-08","2025-12-11","2026-01-05",false],
+  ["JOHN BRUNNER","B","Osgood","2026-06-01","2026-06-01","2026-06-05","2025-11-17",false],
+  ["KANDIS HALL","B","Osgood","2026-01-04","2026-01-31","2026-02-25","2026-03-17",false],
+  ["KRISTINA MURPHY","B","Osgood","2026-06-02","2026-05-11","2025-10-03","2025-10-21",false],
+  ["MARK BOYD","B","Gavin",null,"2026-03-28","2026-04-08","2026-02-02",false],
+  ["MATTHEW MONTALVO","B","Karen","2026-04-09","2026-04-08","2026-05-29","2025-11-20",false],
+  ["SETH COLBURN","B","Said","2025-04-23","2026-03-31","2026-04-06","2026-04-30",false],
+  ["ANNIE MORENO","B","Karen","2026-06-06","2026-06-08","2026-05-11","2026-06-05",false],
+  ["DAN MANLEY","B","Gavin","2025-11-23","2026-04-29","2026-05-01","2026-05-19",false],
+  ["ELIZABETH ELLINGER","B","Jordan","2026-03-16","2026-04-01","2026-05-18","2026-06-10",false],
+  ["ERIKA WEHNER","B","Gavin",null,"2026-04-13","2026-05-28","2026-05-11",false],
+  ["HEATHER HENRY-MINOR","B","Jordan","2026-04-07","2026-04-15","2026-05-05","2026-05-28",false],
+  ["KATIE SUMMERS","B","Gavin",null,"2026-04-22","2026-02-26","2026-05-29",false],
+  ["KHADIJA FARAH","B","Jordan","2026-05-16","2026-05-17","2026-02-09","2026-03-06",false],
+  ["KISHMA JAMES","B","Said","2026-03-16","2026-03-12","2025-06-09","2025-07-14",false],
+  ["MARIA COMAS","B","Karen","2026-04-27","2026-03-02","2025-06-19","2025-07-21",false],
+  ["MARTIN HOPKINS","B","Karen","2026-02-12","2026-04-28","2026-01-29","2026-02-20",false],
+  ["MARY MCMICHAEL","B","Said","2026-04-13","2026-04-13","2025-09-11","2025-10-10",false],
+  ["MATT PIPER","B","Osgood","2026-05-19","2026-05-19","2025-11-11","2025-12-01",false],
+  ["NATALIE ESTRELLA","B","Karen","2026-05-25","2026-05-25","2025-10-08","2025-11-03",false],
+  ["RAMI TAMIMI","B","Jordan","2026-03-27","2026-04-20","2026-05-07","2026-06-30",false],
+  ["STACEY LAMBRIGHT","B","Jordan",null,"2026-03-25","2026-03-26","2026-04-07",false],
+  ["TRACY BERARD","B","Jordan",null,"2026-04-04","2026-04-14","2026-05-27",false],
+  ["AIMEE WHITLOCK","C","Gavin",null,"2025-01-14","2026-02-10","2026-04-15",false],
+  ["ALEXIS REED","C","Said","2026-03-25","2026-05-12","2026-01-30","2026-02-27",false],
+  ["AMY AGRESTA","C","Gavin","2026-05-23","2026-05-28","2025-07-08","2025-08-05",false],
+  ["ANGELA PEREZ","C","Gavin","2026-04-27","2026-05-06","2026-04-06","2026-04-24",false],
+  ["BRIAN NANTHAVONGDOUANGSY","C","Osgood","2025-10-23","2025-11-19","2025-12-18","2026-03-20",false],
+  ["BRITNEY DODDS","C","Gavin","2026-03-26","2026-03-26","2026-03-02","2026-04-08",false],
+  ["CAROLE MCMAHON","C","Osgood","2026-05-31","2026-05-31","2026-05-08","2026-05-26",false],
+  ["CESIA ESPINOZA YOUNG","C","Karen","2026-03-11","2026-03-10","2026-03-26","2026-04-17",false],
+  ["CHELSEA ANDERSON","C","Osgood","2026-02-07","2026-02-06","2026-03-28","2026-04-17",false],
+  ["COURTNEY HAMILTON","C","Osgood","2026-05-27","2026-05-27","2026-06-02","2025-06-26",false],
+  ["DEVIN JOHNSON","C","Said","2026-03-29","2026-04-15","2025-05-30","2025-07-09",false],
+  ["DIANNA JENKINS","C","Said",null,"2026-03-24","2026-02-23","2026-04-06",false],
+  ["HAIFA BRUNNEY","C","Karen","2026-05-21","2026-06-01","2026-03-26","2026-04-27",false],
+  ["JACOB ENGLISH","C","Jordan",null,"2026-03-18","2026-04-23","2026-06-12",false],
+  ["JASMINE MCKENZIE","C","Osgood","2026-05-03","2026-05-04","2026-05-06","2026-05-29",false],
+  ["JESSE MCCRERRY","C","Said",null,"2026-04-06","2026-04-13","2026-05-26",false],
+  ["JOHN LUBINSKY","C","Said","2025-12-17","2025-12-19","2026-02-17","2026-03-20",false],
+  ["JORDAN HOLLIBAUGH","C","Gavin",null,"2026-05-12","2026-04-29","2026-04-16",false],
+  ["KATHERINE DE LA ROSA","C","Karen","2026-05-28","2026-06-02","2026-04-01","2026-04-29",false],
+  ["KELSY YODER","C","Said","2026-04-28","2026-01-09","2026-01-12","2026-02-05",false],
+  ["KINSIE HUSKINS","C","Jordan",null,"2026-03-17","2026-04-28","2026-06-01",false],
+  ["KRISTEN VALENTY","C","Jordan",null,"2026-01-21","2026-02-24","2026-03-25",false],
+  ["LETIKA WHITE","C","Osgood","2026-05-11","2026-05-12","2025-07-31","2025-08-29",false],
+  ["LISA SIMMONS","C","Osgood",null,"2026-03-19","2026-04-14","2026-05-27",false],
+  ["LUIS GIL","C","Karen","2026-06-02","2026-06-02","2026-06-02","2025-09-26",false],
+  ["LYNDSEY LANE","C","Osgood","2026-03-16","2025-09-23","2025-12-23","2026-01-23",false],
+  ["MIKE WHITEMAN","C","Osgood",null,"2025-07-24","2025-07-31","2026-05-11",false],
+  ["NANCY PRICE","C","Jordan","2026-01-03","2026-01-02","2026-05-08","2026-01-30",false],
+  ["PAIGE LUDWIG","C","Said","2026-06-08","2026-03-05","2026-03-17","2026-04-14",false],
+  ["PATRICK ARQUETTE","C","Said","2026-04-22","2026-01-14","2025-09-09","2025-10-07",false],
+  ["PAULA PALLESCHI","C","Said",null,"2026-04-21","2026-04-27","2026-05-26",false],
+  ["PILAR BENNETT","C","Karen","2026-04-15","2026-04-15","2025-07-23","2025-08-15",false],
+  ["RACHELLE PARSLEY","C","Said","2024-09-03","2026-04-15","2026-04-22","2026-05-13",false],
+  ["ROBERT HAYNER","C","Jordan",null,"2026-04-20","2026-04-23","2026-05-15",false],
+  ["ROBIN BLAKE","C","Gavin",null,"2025-12-19","2025-12-27","2026-03-17",false],
+  ["ROSS DIGIORGIO","C","Osgood",null,"2025-06-24","2025-07-14","2026-04-30",false],
+  ["RUTH ESPINOZA","C","Karen",null,"2026-02-26","2026-03-26","2026-04-17",false],
+  ["SAM BAMRICK","C","Jordan",null,"2026-04-14","2026-04-20","2026-05-15",false],
+  ["SARA BUSH","C","Said",null,"2026-03-27","2026-04-13","2026-05-27",false],
+  ["SLAVI JORDANOV","C","Said","2026-05-30","2025-10-06","2025-10-10","2025-11-07",false],
+  ["STAN GORKSI","C","Jordan",null,"2026-03-07","2026-03-09","2026-04-07",false],
+  ["THAER AHMED","C","Said","2026-03-31","2026-03-31","2025-08-26","2025-09-30",false],
+  ["TRACI WILLIAMS-JONES","C","Jordan",null,"2026-04-09","2026-03-23","2026-05-21",false],
+  ["TROY BORDEN","C","Gavin","2026-04-28","2026-04-30","2026-04-22","2026-05-13",false],
+  ["YASMIN DE JESUS","C","Karen","2024-03-27","2025-11-18","2026-04-01","2026-04-29",false],
+  ["ALI SWEAZY","C","Osgood","2026-05-09","2026-05-09",null,null,false],
+  ["ALINA ILKAEVA","C","Said",null,"2026-03-20",null,null,false],
+  ["ANA SORIA","C","Karen","2026-04-19",null,null,null,false],
+  ["ANGELA POTTS","C","Osgood","2026-05-10","2026-05-10",null,null,false],
+  ["ANGELIQUE SOTONDJI","C","Jordan","2026-03-27","2026-03-27",null,null,false],
+  ["ASHLEY HENRY","C","Osgood","2026-04-22","2026-04-21",null,null,false],
+  ["AVA LAIRD","C","Jordan","2026-05-26","2026-05-25",null,null,false],
+  ["BAILEY STRATHIE","C","Osgood","2026-05-30","2026-05-30","2024-11-21",null,false],
+  ["BENJAMIN GAYTAN","C","Gavin","2026-05-16","2026-05-22",null,null,false],
+  ["BRAD GILLIAM","C","Gavin","2026-05-14",null,null,null,false],
+  ["BRANDON KIDD","C","Said","2026-05-01",null,null,null,false],
+  ["BRANDON MCCLENDON","C","Said","2026-06-08","2026-06-08",null,null,false],
+  ["BRIAN ZINN","C","Jordan","2026-06-06","2026-06-07",null,null,false],
+  ["CELINE WILLIAMS","C","Jordan","2026-06-01",null,null,null,false],
+  ["CHERYL KINSEY","C","Jordan","2026-05-05","2026-05-04",null,null,false],
+  ["CHRISTIAN CHALKIAS","C","Osgood","2026-04-08","2026-04-08",null,null,false],
+  ["CHRISTINA COUGHLIN","C","Osgood","2026-05-29","2026-05-29","2024-09-11",null,false],
+  ["CHUCK KINSEY","C","Jordan","2026-03-16","2026-03-26",null,null,false],
+  ["CLAUDIA CHUECO","C","Karen","2026-06-08",null,null,null,false],
+  ["CODA GAHRIS","C","Jordan","2026-04-29","2026-04-29","2026-05-25",null,false],
+  ["CRAIG MAURER","C","Osgood","2026-05-13","2026-05-19",null,null,false],
+  ["DAIRDRE SCRIVEN","C","Said","2026-05-19","2026-05-19",null,null,false],
+  ["DARREN HOGG","C","Said","2026-04-22","2026-04-28",null,null,false],
+  ["DONALD PAYNE","C","Osgood",null,"2026-06-07","2021-08-11",null,false],
+  ["DONALD PAYNE JR","C","Osgood","2026-06-04",null,null,null,false],
+  ["ELIAS PAPPAN","C","Karen","2026-04-30",null,null,null,false],
+  ["ELIZABETH BONAUDI","C","Osgood","2026-04-17","2026-04-17",null,null,false],
+  ["ELIZABETH HOWARD","C","Osgood","2026-04-04","2026-04-03","2024-11-08",null,false],
+  ["ERIKA BRUNNER","C","Gavin","2026-04-13","2026-04-15","2025-11-07",null,false],
+  ["GLADIS CHAVEZ","C","Karen","2026-05-15","2026-05-05",null,null,false],
+  ["HYPATIA ESPINAL","C","Karen","2026-06-02","2026-06-02",null,null,false],
+  ["IZXEL MARTINEZ","C","Karen","2026-05-20","2026-05-20","2026-06-02",null,false],
+  ["JAIDEN BALLAH","C","Said","2026-06-02","2026-06-03",null,null,false],
+  ["JASMIN ARCOS","C","Karen","2026-03-19","2026-03-26",null,null,false],
+  ["JASMIN MONTOYA","C","Karen","2026-05-31","2026-05-30",null,null,false],
+  ["JEFF MESSMER","C","Gavin","2026-05-12","2026-05-12","2025-10-01",null,false],
+  ["JENNIFER BLACKMORE","C","Jordan","2026-05-02",null,null,null,false],
+  ["JENNIFER HOWISON","C","Jordan","2026-03-15","2026-03-30","2026-04-06",null,false],
+  ["JESSICA TOWER","C","Jordan","2026-05-27","2026-05-30","2023-04-03",null,false],
+  ["JONNATHAN AGUDELO","C","Karen","2026-05-23","2026-05-19",null,null,false],
+  ["JUSTIN BIERY","C","Karen","2026-05-27","2026-05-28",null,null,false],
+  ["KATHY HAYES","C","Jordan","2026-05-30","2026-05-29","2024-12-09",null,false],
+  ["KATIE MANSOR","C","Jordan","2026-04-27","2026-04-26",null,null,false],
+  ["KERWIN HEATH","C","Said",null,"2026-04-12",null,null,false],
+  ["KYLA AHO","C","Said","2026-03-12","2025-11-03","2025-03-28",null,false],
+  ["LAUREN MCCLINTON","C","Said",null,"2026-04-29",null,null,false],
+  ["LESLIE HERNANDEZ","C","Karen","2026-05-07","2026-05-08","2026-05-19",null,false],
+  ["LILIAN FUENTES","C","Karen","2026-04-21","2026-04-21",null,null,false],
+  ["LIZBEL CONTRERAS","C","Karen","2026-04-30","2026-05-11","2024-09-18",null,false],
+  ["MANDY WILSON","C","Jordan",null,"2026-03-28",null,null,false],
+  ["MARK VENNITTI","C","Jordan","2026-04-08","2026-04-08","2026-06-01",null,false],
+  ["MARLA SEWELL","C","Osgood",null,"2026-03-19",null,null,false],
+  ["MATHEA ARUDDA","C","Karen",null,"2026-03-16","2026-03-23",null,false],
+  ["MICHELE FREDERICK","C","Osgood",null,"2026-05-31",null,null,false],
+  ["NANCY BAKER","C","Osgood","2026-04-30",null,null,null,false],
+  ["NIA HARRINGTON","C","Said","2026-05-13","2026-05-05","2024-10-17",null,false],
+  ["NICK ZATEZALO","C","Osgood","2026-05-16","2026-03-19","2024-03-12",null,false],
+  ["NIKEHA HAYES","C","Osgood","2026-04-15","2025-09-28","2024-09-25",null,false],
+  ["NINA AVERY","C","Jordan",null,"2026-04-23",null,null,false],
+  ["NORA KERELIUK","C","Said","2026-04-24",null,null,null,false],
+  ["PIERINA MANTILLA","C","Karen",null,"2026-03-15",null,null,false],
+  ["ROSALIA PABLO","C","Karen","2026-06-08","2026-06-04","2024-11-08",null,false],
+  ["RUTH GONZALEZ","C","Karen","2026-05-19","2026-05-19",null,null,false],
+  ["SAHEL ALAM","C","Said","2026-05-10","2026-05-08",null,null,false],
+  ["SARAH HERNANDEZ","C","Osgood","2026-05-28","2026-05-29","2024-10-21",null,false],
+  ["SASHA ANTONOVA","C","Said","2026-03-31","2026-03-31",null,null,false],
+  ["SHANE STINER","C","Jordan",null,"2026-04-08",null,null,false],
+  ["SHARON PANTELIS","C","Jordan","2026-04-28","2025-03-21","2025-04-01",null,false],
+  ["SHAYNE D. BOYD","C","Said","2026-05-04","2026-05-07",null,null,false],
+  ["SHIRRELL BURNSIDE","C","Osgood","2026-04-08","2025-07-14",null,null,false],
+  ["STEVEN OSBORN","C","Jordan","2026-04-30","2026-02-03",null,null,false],
+  ["SUMMER DURHAM","C","Osgood",null,"2026-03-23",null,null,false],
+  ["SUNI RIVAS","C","Karen","2026-05-27","2026-05-28",null,null,false],
+  ["TAMARA CHARLTON","C","Osgood","2025-07-27","2026-04-16","2025-04-14",null,false],
+  ["TATIANA GRIGORITA","C","Jordan","2026-06-08","2026-06-08",null,null,false],
+  ["THOMAS NEWMAN","C","Gavin","2026-03-02","2026-03-25","2022-08-22",null,false],
+  ["TINA-DUTT-HIREN","C","Osgood",null,"2026-05-11",null,null,false],
+  ["TOM NEWMAN","C","Gavin","2026-06-08","2026-06-08","2024-01-08",null,false],
+  ["TONY AMOS","C","Osgood","2026-04-19","2026-04-01","2024-02-27",null,false],
+  ["WENDY RAMIREZ","C","Karen","2026-03-25","2026-03-25",null,null,false],
+  ["WHITNEY SCHMIDT","C","Said","2026-03-18","2024-01-12","2024-01-18",null,false],
+  ["YVETTA HARRISON","C","Osgood","2026-06-04",null,null,null,false]
+];
 
-// ============================================================
-// CORE FUNCTIONS — COPIED EXACTLY FROM LP TRACKER
-// callLogs is keyed by agent_name, value is single object {week_key, call_date, ...}
-// This matches LP tracker's structure exactly
-// ============================================================
-function getWeekKey(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay(),mon=new Date(dt);mon.setDate(dt.getDate()-(day===0?6:day-1));return mon.toISOString().split("T")[0];}
-function getLastWeekKey(d){var dt=new Date(d);dt.setDate(dt.getDate()-7);return getWeekKey(dt);}
-function getWeekLabel(k){var mon=new Date(k),sun=new Date(mon);sun.setDate(mon.getDate()+6);var o={month:"short",day:"numeric"};return "Week of "+mon.toLocaleDateString("en-US",o)+" - "+sun.toLocaleDateString("en-US",o);}
-function fmt(d){if(!d)return "--";return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"});}
-function mostRecent(a){return[a[3],a[4],a[5],a[6]].filter(Boolean).sort().reverse()[0]||null;}
-function isActive(a){var d=mostRecent(a);return d?new Date(d)>=CUTOFF:false;}
-function isPriority(a){return a[7]===true;}
+// ── STATE ──────────────────────────────────────────────────────────────────
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+const CUTOFF = new Date(TODAY); CUTOFF.setDate(TODAY.getDate()-90);
 
-// EXACT copy from LP tracker
-function calledThisWeek(name){return !!(callLogs[name]&&callLogs[name].week_key===weekKey);}
-function calledLastWeek(name){return !!(lastWeekCallLogs[name]&&lastWeekCallLogs[name].week_key===lastWeekKey);}
+let agents = [];
+let callLogs = {};      // {agentName: row}  — this week
+let lastWeekLogs = {};  // {agentName: row}  — last week
+let rmWeek = [];
+let rmMtd  = [];
+let rmYtd  = [];
+let rmFu   = [];
+let currentPeriod = "mtd";
 
-// EXACT copy from LP tracker
-function lpDays(name){var log=callLogs[name];if(!log||!log.call_date)return null;var dt=new Date(log.call_date);dt.setHours(0,0,0,0);return Math.floor((TODAY-dt)/86400000);}
+// ── WEEK HELPERS ───────────────────────────────────────────────────────────
+function monOf(d) {
+  const dt = new Date(d); dt.setHours(0,0,0,0);
+  const day = dt.getDay();
+  dt.setDate(dt.getDate() - (day === 0 ? 6 : day - 1));
+  const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),dd=String(dt.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dd;
+}
+const WK  = monOf(TODAY);
+const LWK = monOf(new Date(TODAY.getTime() - 7*86400000));
 
-// EXACT copy from LP tracker (uses TODAY like LP tracker does)
-function getRotation(lp){
-  var active=agents.filter(function(a){return a[2]===lp&&isActive(a);});
-  if(!active.length)return[];
-  var priority=active.filter(isPriority);
-  var normal=active.filter(function(a){return!isPriority(a);});
-  var wn=Math.floor((TODAY-new Date("2024-01-01"))/(7*86400000));
-  var remaining=Math.max(0,15-priority.length);
-  var pw=Math.min(remaining,normal.length);
-  var si=normal.length?((wn*pw)%normal.length):0;
-  var base=[];for(var i=0;i<pw;i++)base.push(normal[(si+i)%normal.length]);
-  var overdue=normal.filter(function(a){var ds=lpDays(a[0]);return ds!==null&&ds>=14&&base.indexOf(a)<0;});
-  var combined=priority.concat(overdue.slice(0,2)).concat(base);
-  var seen={},res=[];
-  for(var j=0;j<combined.length;j++){if(!seen[combined[j][0]]){seen[combined[j][0]]=true;res.push(combined[j]);}}
+function weekLabel(k) {
+  const m = new Date(k+"T12:00:00");
+  const s = new Date(k+"T12:00:00"); s.setDate(s.getDate()+6);
+  const o = {month:"short",day:"numeric"};
+  return "Week of "+m.toLocaleDateString("en-US",o)+" – "+s.toLocaleDateString("en-US",o);
+}
+function localDateStr(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
+function weekEnd(k) {
+  const d = new Date(k+"T12:00:00"); d.setDate(d.getDate()+6);
+  return localDateStr(d);
+}
+
+
+document.getElementById("weekPill").textContent = weekLabel(WK);
+
+function fmt(d) {
+  if(!d) return "—";
+  return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
+}
+function mostRecent(a) {
+  return [a[3],a[4],a[5],a[6]].filter(Boolean).sort().reverse()[0] || null;
+}
+function isActive(a) {
+  const d = mostRecent(a);
+  return d ? new Date(d+"T12:00:00") >= CUTOFF : false;
+}
+function lpDays(name) {
+  const log = callLogs[name];
+  if(!log || !log.call_date) return null;
+  const dt = new Date(log.call_date+"T12:00:00"); dt.setHours(0,0,0,0);
+  return Math.floor((TODAY - dt) / 86400000);
+}
+function calledThisWeek(name) {
+  return !!(callLogs[name] && callLogs[name].week_key === WK);
+}
+function calledLastWeek(name) {
+  return !!(lastWeekLogs[name] && lastWeekLogs[name].week_key === LWK);
+}
+function goalColor(p) { return p>=100?"#43A047":p>=60?"#FB8C00":"#E53935"; }
+
+// ── ROTATION (mirrors LP Tracker logic exactly) ────────────────────────────
+function getRotation(lp, weekNum) {
+  const active = agents.filter(a => a[2]===lp && isActive(a));
+  if(!active.length) return [];
+  const priority = active.filter(a => a[7]===true);
+  const normal   = active.filter(a => a[7]!==true);
+  const remaining = Math.max(0, 15 - priority.length);
+  const pw = Math.min(remaining, normal.length);
+  const si = normal.length ? ((weekNum * pw) % normal.length) : 0;
+  const base = [];
+  for(let i=0;i<pw;i++) base.push(normal[(si+i)%normal.length]);
+  const overdue = normal.filter(a => {
+    const ds = lpDays(a[0]);
+    return ds!==null && ds>=14 && !base.includes(a);
+  });
+  const combined = [...priority, ...overdue.slice(0,2), ...base];
+  const seen={}, res=[];
+  combined.forEach(a => { if(!seen[a[0]]){seen[a[0]]=true; res.push(a);} });
   return res.slice(0,15);
 }
 
-function getLastWeekRotation(lp){
-  var active=agents.filter(function(a){return a[2]===lp&&isActive(a);});
-  if(!active.length)return[];
-  var wn=Math.floor((TODAY-new Date("2024-01-01"))/(7*86400000))-1;
-  var priority=active.filter(isPriority);
-  var normal=active.filter(function(a){return!isPriority(a);});
-  var remaining=Math.max(0,15-priority.length);
-  var pw=Math.min(remaining,normal.length);
-  var si=normal.length?((wn*pw)%normal.length):0;
-  var base=[];for(var i=0;i<pw;i++)base.push(normal[(si+i)%normal.length]);
-  var combined=priority.concat(base);
-  var seen={},res=[];
-  for(var j=0;j<combined.length;j++){if(!seen[combined[j][0]]){seen[combined[j][0]]=true;res.push(combined[j]);}}
-  return res.slice(0,15);
+function thisWeekNum()  { return Math.floor((TODAY - new Date("2024-01-01")) / (7*86400000)); }
+function lastWeekNum()  { return thisWeekNum() - 1; }
+function twRotation(lp) { return getRotation(lp, thisWeekNum()); }
+function lwRotation(lp) { return getRotation(lp, lastWeekNum()); }
+
+// ── SUPABASE FETCH ─────────────────────────────────────────────────────────
+async function sbGet(path) {
+  const r = await fetch(SB_URL+"/rest/v1/"+path, {
+    headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY}
+  });
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
 }
 
-function isThisWeek(ds){return getWeekKey(new Date(ds+"T12:00:00"))===weekKey;}
-
-function setSyncStatus(s){
-  var dot=document.getElementById("syncDot"),txt=document.getElementById("syncTxt");
-  if(s==="live"){dot.className="sync-dot live";txt.textContent="Live";}
-  else if(s==="saving"){dot.className="sync-dot saving";txt.textContent="Loading...";}
-  else{dot.className="sync-dot error";txt.textContent="Error";}
+function setSyncStatus(s) {
+  const dot=document.getElementById("syncDot"), txt=document.getElementById("syncTxt");
+  if(s==="ok")   { dot.className="sync-dot ok";   txt.textContent="Live"; }
+  else if(s==="err") { dot.className="sync-dot err"; txt.textContent="Offline"; }
+  else           { dot.className="sync-dot spin"; txt.textContent="Loading..."; }
 }
 
-function sbFetch(method,path,body){
-  var opts={method:method,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":method==="POST"?"resolution=merge-duplicates,return=minimal":"return=representation"}};
-  if(body)opts.body=JSON.stringify(body);
-  return fetch(SB_URL+"/rest/v1/"+path,opts).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t);});return r.status===204?null:r.json();});
+function loadAgents() {
+  agents = SEED.map(r => [...r]);
+  try {
+    const raw = localStorage.getItem("ct_agents_v3");
+    if(raw) {
+      const d = JSON.parse(raw);
+      if(d.ov) d.ov.forEach(o => {
+        const a = agents.find(x => x[0]===o.n);
+        if(a) { a[2]=o.lp; if(o.pr!==undefined) a[7]=o.pr; }
+        else if(o.added) agents.push([o.n,o.lv,o.lp,null,null,null,null,o.pr||false]);
+      });
+      if(d.rm) d.rm.forEach(n => { agents=agents.filter(a=>a[0]!==n); });
+    }
+  } catch(e) {}
 }
 
-function loadAll(){
-  setSyncStatus("saving");
-  agents=SEED.map(function(r){return[r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7],r[8]];});
-  var ytdStart=TODAY.getFullYear()+"-01-01";
-  var mtdStart=TODAY.getFullYear()+"-"+String(TODAY.getMonth()+1).padStart(2,"0")+"-01";
-  return Promise.all([
-    sbFetch("GET","call_logs?week_key=eq."+weekKey+"&select=*"),
-    sbFetch("GET","call_logs?week_key=eq."+lastWeekKey+"&select=*"),
-    sbFetch("GET","amanda_activities?select=*&order=act_date.desc,created_at.desc"),
-    sbFetch("GET","agent_profiles?select=*"),
-    sbFetch("GET","call_logs_history?call_date=gte."+ytdStart+"&select=agent_name,lp,call_date")
-  ]).then(function(res){
-    // Store exactly like LP tracker: single object per agent_name
-    callLogs={};lastWeekCallLogs={};
-    if(res[0])res[0].forEach(function(r){callLogs[r.agent_name]=r;});
-    if(res[1])res[1].forEach(function(r){lastWeekCallLogs[r.agent_name]=r;});
-    amandaActivities=res[2]||[];
-    agentProfiles={};
-    if(res[3])res[3].forEach(function(p){agentProfiles[p.agent_name]=p;});
-    // Build MTD/YTD from history, merging in current week
-    var histCalls=res[4]||[];
-    var seen={};
-    histCalls.forEach(function(h){seen[h.agent_name+"|"+h.call_date+"|"+h.lp]=true;});
-    if(res[0])res[0].forEach(function(c){
-      var key=c.agent_name+"|"+c.call_date+"|"+c.lp;
-      if(c.call_date&&c.lp&&!seen[key]){seen[key]=true;histCalls.push({agent_name:c.agent_name,lp:c.lp,call_date:c.call_date});}
-    });
-    ytdCallLogs=histCalls.filter(function(r){return r.call_date&&r.call_date>=ytdStart;});
-    mtdCallLogs=histCalls.filter(function(r){return r.call_date&&r.call_date>=mtdStart;});
-    mtdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=mtdStart;});
-    ytdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=ytdStart;});
-    setSyncStatus("live");
+async function loadAll() {
+  setSyncStatus("loading");
+  loadAgents();
+  try {
+    const now = new Date();
+    const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+    const yearStart  = `${now.getFullYear()}-01-01`;
+    const todayStr   = localDateStr(TODAY);
+    const wEnd       = weekEnd(WK);
+
+    const [cl, lwcl, rw, rmtd, rytd, rfu] = await Promise.all([
+      sbGet(`call_logs?week_key=eq.${WK}&select=agent_name,week_key,call_date,lp,note`),
+      sbGet(`call_logs?week_key=eq.${LWK}&select=agent_name,week_key,call_date,lp,note`),
+      sbGet(`amanda_activities?act_date=gte.${WK}&act_date=lte.${wEnd}&select=agent_name,act_type,outcome,act_date,notes&order=act_date.desc&limit=500`),
+      sbGet(`amanda_activities?act_date=gte.${monthStart}&select=act_type,outcome,act_date,agent_name,notes&order=act_date.desc&limit=2000`),
+      sbGet(`amanda_activities?act_date=gte.${yearStart}&select=act_type,outcome,act_date,agent_name,notes&order=act_date.desc&limit=5000`),
+      sbGet(`amanda_activities?follow_up_date=not.is.null&follow_up_date=gte.${todayStr}&select=id,agent_name,act_type,follow_up_date,notes&order=follow_up_date.asc&limit=100`)
+    ]);
+
+    // Index call logs by agent name
+    callLogs = {};
+    (cl||[]).forEach(r => { callLogs[r.agent_name] = r; });
+    lastWeekLogs = {};
+    (lwcl||[]).forEach(r => { lastWeekLogs[r.agent_name] = r; });
+
+    rmWeek = rw  || [];
+    rmMtd  = rmtd || [];
+    rmYtd  = rytd || [];
+    rmFu   = rfu  || [];
+
+    setSyncStatus("ok");
     renderAll();
-  }).catch(function(e){setSyncStatus("error");console.error(e);});
-}
-
-function switchTab(t){
-  document.querySelectorAll(".tab").forEach(function(el,i){el.classList.toggle("active",["overview","mtd","search"][i]===t);});
-  document.getElementById("view-overview").classList.toggle("active",t==="overview");
-  document.getElementById("view-mtd").classList.toggle("active",t==="mtd");
-  document.getElementById("view-search").classList.toggle("active",t==="search");
-  if(t==="mtd")renderMTDYTD();
-}
-
-function toggleSC(bodyId,chevId){
-  var body=document.getElementById(bodyId),chev=document.getElementById(chevId);
-  var isOpen=body.style.display!=="none";
-  body.style.display=isOpen?"none":"block";
-  if(chev)chev.style.transform=isOpen?"":"rotate(180deg)";
-}
-
-function renderAll(){
-  document.getElementById("weekPill").textContent=getWeekLabel(weekKey);
-  document.getElementById("tw-lbl").textContent=getWeekLabel(weekKey);
-  renderGrowth();
-  renderLPGrid();
-  renderScorecard("tw",callLogs,weekKey,getRotation);
-  renderScorecard("lw",lastWeekCallLogs,lastWeekKey,getLastWeekRotation);
-  renderAmandaGrid();
-  renderAmandaScorecard(amandaActivities.filter(function(a){return isThisWeek(a.act_date);}));
-  checkNeverLogged();
-  renderNeedsAttention();
-}
-
-function renderGrowth(){
-  var active=agents.filter(isActive);
-  var aCount=active.filter(function(a){return a[1]==="A";}).length;
-  var bCount=active.filter(function(a){return a[1]==="B";}).length;
-  var cCount=active.filter(function(a){return a[1]==="C";}).length;
-  var total=active.length;
-  var channel=agents.filter(function(a){return a[8]&&parseInt(a[8])>=10;}).length;
-  var dayOfYear=Math.floor((TODAY-new Date(TODAY.getFullYear()+"-01-01T00:00:00"))/86400000)+1;
-  var weeklyRate=total/(dayOfYear/7);
-  var weeksToGoal=weeklyRate>0?Math.ceil((200-total)/weeklyRate):null;
-  var projDate=null;
-  if(weeksToGoal!==null&&weeksToGoal>0&&weeksToGoal<260){var pd=new Date(TODAY);pd.setDate(pd.getDate()+weeksToGoal*7);projDate=pd.toLocaleDateString("en-US",{month:"short",year:"numeric"});}
-  var goals=[
-    {label:"Total active agents",val:total,goal:200,col:"#1F4E79",proj:projDate},
-    {label:"A agents",val:aCount,goal:30,col:"#43A047"},
-    {label:"B agents",val:bCount,goal:35,col:"#FB8C00"},
-    {label:"C agents",val:cCount,goal:null,col:"#888"},
-    {label:"Channel accounts",val:channel,goal:null,col:"#F57F17"}
-  ];
-  document.getElementById("growth-grid").innerHTML=goals.map(function(g){
-    var pct=g.goal?Math.min(100,Math.round(g.val/g.goal*100)):100;
-    var barCol=pct>=100?"#43A047":pct>=60?"#FB8C00":"#E53935";
-    return'<div class="growth-card"><div class="growth-label">'+g.label+'</div>'+
-      '<div class="growth-val" style="color:'+g.col+'">'+g.val+'</div>'+
-      (g.goal?'<div class="growth-goal">Goal: '+g.goal+' ('+pct+'%)'+(g.proj?' &bull; On track for <b>'+g.proj+'</b>':'')+'</div><div class="growth-bar-track"><div class="growth-bar" style="width:'+pct+'%;background:'+barCol+'"></div></div>':'<div class="growth-goal">All time</div>')+
-    '</div>';
-  }).join("");
-  document.getElementById("level-breakdown").innerHTML=
-    '<div style="display:flex;width:100%;height:16px;border-radius:20px;overflow:hidden;margin-bottom:6px">'+
-    '<div style="width:'+(total?Math.round(aCount/total*100):0)+'%;background:#43A047"></div>'+
-    '<div style="width:'+(total?Math.round(bCount/total*100):0)+'%;background:#FB8C00"></div>'+
-    '<div style="width:'+(total?Math.round(cCount/total*100):0)+'%;background:#e0e0e0"></div></div>'+
-    '<div style="display:flex;gap:12px;font-size:12px">'+
-    '<span style="color:#43A047;font-weight:600">A: '+aCount+'</span>'+
-    '<span style="color:#FB8C00;font-weight:600">B: '+bCount+'</span>'+
-    '<span style="color:#888;font-weight:600">C: '+cCount+'</span>'+
-    '<span style="color:#888;margin-left:4px">= '+total+' active</span></div>';
-}
-
-function renderLPGrid(){
-  document.getElementById("lp-grid").innerHTML=LPS.map(function(lp){
-    var rot=getRotation(lp);
-    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
-    var pct=rot.length?Math.round(done/rot.length*100):0;
-    var all=agents.filter(function(a){return a[2]===lp;});
-    var active=agents.filter(function(a){return a[2]===lp&&isActive(a);});
-    var ic=all.filter(function(a){return!isActive(a);}).length;
-    var pc=all.filter(function(a){return isPriority(a)&&isActive(a);}).length;
-    var col=pct===100?"#43A047":pct>50?"#FB8C00":"#E53935";
-    return'<div class="lp-card">'+
-      '<div class="lp-name"><span style="width:10px;height:10px;border-radius:50%;background:'+LP_COLORS[lp]+';display:inline-block"></span><span style="color:'+LP_COLORS[lp]+'">'+lp+'</span></div>'+
-      '<div class="lp-pct" style="color:'+col+'">'+pct+'%</div>'+
-      '<div class="lp-bar-track"><div class="lp-bar" style="width:'+pct+'%;background:'+col+'"></div></div>'+
-      '<div class="lp-meta"><span>'+done+'/'+rot.length+' this week</span><span>'+active.length+' active</span></div>'+
-      (pc?'<div style="font-size:11px;color:#C62828;margin-top:4px">'+pc+' priority</div>':"")+
-      (ic?'<div style="font-size:11px;color:#E65100;margin-top:2px">'+ic+' inactive</div>':"")+
-    '</div>';
-  }).join("");
-}
-
-function renderScorecard(which,logs,wkKey,rotFn){
-  var hasData=Object.keys(logs).some(function(k){return logs[k]&&logs[k].week_key===wkKey;});
-  if(which==="lw"){
-    document.getElementById("lw-scorecard").style.display=hasData?"block":"none";
-    if(!hasData)return;
-    document.getElementById("lw-lbl").textContent=getWeekLabel(wkKey);
+  } catch(e) {
+    console.error("loadAll error:", e);
+    setSyncStatus("err");
+    // Still render LP data from local state even if Supabase fails
+    renderAll();
   }
-  var pills="",content="";
-  LPS.forEach(function(lp){
-    var rot=rotFn(lp);
-    var done=rot.filter(function(a){return !!(logs[a[0]]&&logs[a[0]].week_key===wkKey);}).length;
-    var missed=rot.filter(function(a){return !(logs[a[0]]&&logs[a[0]].week_key===wkKey);});
-    var pct=rot.length?Math.round(done/rot.length*100):0;
-    var col=pct===100?"#43A047":pct>=80?"#FB8C00":"#E53935";
-    var bg=pct===100?"pill-green":pct>=80?"pill-amber":"pill-red";
-    pills+='<span class="pill '+bg+'">'+lp+" "+pct+'%</span>';
-    content+='<div class="sc-row"><div class="sc-top">'+
-      '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+LP_COLORS[lp]+';display:inline-block"></span>'+lp+'</div>'+
-      '<div style="display:flex;align-items:center;gap:10px"><span class="sc-pct" style="color:'+col+'">'+pct+'%</span><span class="sc-sub">'+done+"/"+rot.length+'</span></div></div>'+
-      (pct===100?'<div class="won-box">&#10003; Called all agents!</div>':'<div class="missed-box"><b>Did not call:</b> '+missed.map(function(a){return a[0];}).join(", ")+'</div>')+
-    '</div>';
-  });
-  document.getElementById(which+"-pills").innerHTML=pills;
-  document.getElementById(which+"-content").innerHTML=content;
 }
 
-function renderAmandaGrid(){
-  var acts=amandaActivities.filter(function(a){return isThisWeek(a.act_date);});
-  var lastWeekActs=amandaActivities.filter(function(a){return getWeekKey(new Date(a.act_date+"T12:00:00"))===lastWeekKey;});
-  var counts={};acts.forEach(function(a){counts[a.act_type]=(counts[a.act_type]||0)+1;});
-  var lastCounts={};lastWeekActs.forEach(function(a){lastCounts[a.act_type]=(lastCounts[a.act_type]||0)+1;});
-  var total=Object.values(counts).reduce(function(s,v){return s+v;},0);
-  var lastTotal=Object.values(lastCounts).reduce(function(s,v){return s+v;},0);
-  var goalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
-  function trendArrow(cur,prev){if(!prev)return'';if(cur>prev)return'<span class="trend-up">&#8679; vs last wk</span>';if(cur<prev)return'<span class="trend-dn">&#8681; vs last wk</span>';return'<span class="trend-eq">&#8596; same</span>';}
-  var cards=[
-    {label:"Overall",val:Math.min(100,Math.round(total/goalTotal*100))+"%",sub:total+" of "+goalTotal+" activities",pct:Math.min(100,Math.round(total/goalTotal*100)),trend:trendArrow(total,lastTotal)},
-    {label:"New meetings",val:(counts["New Realtor Meeting"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["New Realtor Meeting"]||0)/5)*100),trend:trendArrow(counts["New Realtor Meeting"]||0,lastCounts["New Realtor Meeting"]||0)},
-    {label:"Break breads",val:(counts["Break Breads"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["Break Breads"]||0)/5)*100),trend:trendArrow(counts["Break Breads"]||0,lastCounts["Break Breads"]||0)},
-    {label:"Check-ins",val:(counts["Active Check-in"]||0)+"/10",sub:"weekly goal",pct:Math.min(100,((counts["Active Check-in"]||0)/10)*100),trend:trendArrow(counts["Active Check-in"]||0,lastCounts["Active Check-in"]||0)},
-    {label:"Cold calls",val:(counts["Cold Calls"]||0)+"/25",sub:"weekly goal",pct:Math.min(100,((counts["Cold Calls"]||0)/25)*100),trend:trendArrow(counts["Cold Calls"]||0,lastCounts["Cold Calls"]||0)}
-  ];
-  document.getElementById("amanda-grid").innerHTML=cards.map(function(c){
-    var col=c.pct>=100?"#43A047":c.pct>=60?"#FB8C00":"#E53935";
-    return'<div class="a-card"><div class="a-label">'+c.label+'</div>'+
-      '<div class="a-val" style="color:'+col+'">'+c.val+'</div>'+
-      '<div class="a-bar-track"><div class="a-bar" style="width:'+c.pct+'%;background:'+col+'"></div></div>'+
-      '<div class="a-sub">'+c.sub+'</div>'+
-      (c.trend?'<div style="margin-top:3px">'+c.trend+'</div>':'')+
-    '</div>';
-  }).join("");
+// ── RENDER ALL ─────────────────────────────────────────────────────────────
+function renderAll() {
+  renderOverview();
+  renderRoster();
+  renderTeamsMsg();
+  if(currentPeriod) showPeriod(currentPeriod);
 }
 
-function renderAmandaScorecard(acts){
-  var counts={};acts.forEach(function(a){counts[a.act_type]=(counts[a.act_type]||0)+1;});
-  var pills="",content="";
-  Object.keys(AMANDA_GOALS).forEach(function(t){
-    var done=counts[t]||0,goal=AMANDA_GOALS[t];
-    var pct=Math.min(100,Math.round(done/goal*100));
-    var col=pct>=100?"#43A047":pct>=60?"#FB8C00":"#E53935";
-    var bg=pct>=100?"pill-green":pct>=60?"pill-amber":"pill-red";
-    pills+='<span class="pill '+bg+'">'+t.split(" ")[0]+" "+pct+'%</span>';
-    content+='<div class="sc-row"><div class="sc-top"><div style="font-weight:700;font-size:13px">'+t+'</div>'+
-      '<div style="display:flex;align-items:center;gap:10px"><span class="sc-pct" style="color:'+col+'">'+pct+'%</span><span class="sc-sub">'+done+"/"+goal+'</span></div></div>'+
-      (pct>=100?'<div class="won-box">&#10003; Goal hit!</div>':'<div class="missed-box"><b>Short by '+(goal-done)+'</b> this week</div>')+
-    '</div>';
-  });
-  document.getElementById("atw-pills").innerHTML=pills;
-  document.getElementById("atw-content").innerHTML=content;
-}
-
-function checkNeverLogged(){
-  var banner=document.getElementById("amanda-alert");
-  if(!amandaActivities.length){banner.style.display="flex";return;}
-  var last=amandaActivities[0];
-  var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
-  var days=Math.floor((TODAY-lastDate)/86400000);
-  banner.style.display=days>=3?"flex":"none";
-}
-
-function renderNeedsAttention(){
-  var items=[];
-  var dayOfMonth=TODAY.getDate();
-  var showPaceFlags=dayOfMonth>14;
-  LPS.forEach(function(lp){
-    var rot=getRotation(lp);
-    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
-    if(rot.length>0&&done===0){
-      items.push({icon:"📞",text:"<b>"+lp+"</b> — "+rot.length+" agents ready to hear from you this week. Let's get those calls in!",type:"opportunity"});
-    }
-  });
-  var neverCalled=agents.filter(function(a){
-    return isActive(a)&&!callLogs[a[0]]&&!ytdCallLogs.find(function(l){return l.agent_name===a[0];});
-  });
-  if(neverCalled.length>0){
-    items.push({icon:"🌟",text:"<b>"+neverCalled.length+" active agents</b> haven't been reached yet — big opportunity to make new connections this week",type:"opportunity"});
-  }
-  if(amandaActivities.length){
-    var last=amandaActivities[0];
-    var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
-    var days=Math.floor((TODAY-lastDate)/86400000);
-    if(days>=3)items.push({icon:"💬",text:"Amanda's last logged activity was <b>"+days+" days ago</b> — a quick log-in keeps the momentum going!",type:"nudge"});
+// ── OVERVIEW ───────────────────────────────────────────────────────────────
+function renderOverview() {
+  // Focus banner
+  const uncalled = agents.filter(a => isActive(a) && !calledThisWeek(a[0]));
+  const priority = agents.filter(a => a[7]===true && isActive(a) && !calledThisWeek(a[0]));
+  const focusItems = [];
+  if(uncalled.length) focusItems.push(`☀️ <b>${uncalled.length} active agents</b> haven't been reached yet this week`);
+  if(priority.length) focusItems.push(`⚠️ <b>${priority.length} priority agent${priority.length>1?"s":""}</b> need to be called ASAP: ${priority.slice(0,3).map(a=>a[0]).join(", ")}${priority.length>3?"…":""}`);
+  const fb = document.getElementById("focus-banner");
+  if(focusItems.length) {
+    document.getElementById("focus-items").innerHTML = focusItems.map(t=>`<div class="focus-item" style="margin-bottom:4px">${t}</div>`).join("");
+    fb.style.display = "block";
   } else {
-    items.push({icon:"💬",text:"Amanda hasn't logged any activity yet this week — encourage her to log today!",type:"nudge"});
+    fb.style.display = "none";
   }
-  if(showPaceFlags){
-    LPS.forEach(function(lp){
-      var mtdCalls=mtdCallLogs.filter(function(r){return r.lp===lp;}).length;
-      var activeCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
-      var expectedCalls=Math.round((dayOfMonth/7)*activeCount);
-      if(activeCount>0&&mtdCalls<expectedCalls*0.5){
-        items.push({icon:"📈",text:"<b>"+lp+"</b> has room to accelerate this month — "+mtdCalls+" calls logged so far",type:"pace"});
-      }
-    });
-    var amandaMTDTotal=mtdAmanda.length;
-    var expectedAmanda=Math.round((dayOfMonth/7)*Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0));
-    if(amandaMTDTotal<expectedAmanda*0.5){
-      items.push({icon:"📈",text:"Amanda has room to accelerate this month — "+amandaMTDTotal+" activities logged so far",type:"pace"});
-    }
-  }
-  var box=document.getElementById("needs-attention-box");
-  if(!items.length){
-    box.innerHTML='<div style="background:#EAF3DE;border:1px solid #A5D6A7;border-left:4px solid #43A047;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:#2E7D32;font-weight:500">&#10003; Everything looks great this week — the team is on track!</div>';
-    return;
-  }
-  var typeColors={opportunity:"#1F4E79",nudge:"#7B1FA2",pace:"#E65100"};
-  var typeBg={opportunity:"#E3F2FD",nudge:"#F3E5F5",pace:"#FFF8E1"};
-  box.innerHTML='<div style="background:#fff;border:1px solid #dde1e7;border-left:4px solid #1F4E79;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem">'+
-    '<div style="font-size:13px;font-weight:700;color:#1F4E79;margin-bottom:.6rem">&#127919; This Week\'s Focus ('+items.length+')</div>'+
-    items.map(function(i){
-      var bg=typeBg[i.type]||"#f5f5f5";
-      return'<div style="display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid #f5f5f5">'+
-        '<div style="width:28px;height:28px;border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+i.icon+'</div>'+
-        '<div style="font-size:12px;color:#333;padding-top:5px">'+i.text+'</div></div>';
-    }).join("")+'</div>';
-}
 
-function searchAgent(){
-  var val=document.getElementById("agent-search-input").value.toLowerCase();
-  var sugg=document.getElementById("agent-suggestions");
-  if(!val||val.length<2){sugg.style.display="none";return;}
-  var matches=ALL_AGENTS.filter(function(a){return a.toLowerCase().indexOf(val)>=0;}).slice(0,8);
-  if(!matches.length){sugg.style.display="none";return;}
-  sugg.innerHTML=matches.map(function(a){return'<div class="autocomplete-item" data-name="'+a+'" onmousedown="selectAgentSearch(this)">'+a+'</div>';}).join("");
-  sugg.style.display="block";
-}
-function hideAgentSuggestions(){setTimeout(function(){document.getElementById("agent-suggestions").style.display="none";},200);}
-function selectAgentSearch(el){
-  document.getElementById("agent-search-input").value=el.getAttribute("data-name");
-  document.getElementById("agent-suggestions").style.display="none";
-  renderAgentProfile(el.getAttribute("data-name"));
-}
+  // Scoreboard
+  const activeAll = agents.filter(isActive);
+  const aC = activeAll.filter(a=>a[1]==="A").length;
+  const bC = activeAll.filter(a=>a[1]==="B").length;
+  const cC = activeAll.filter(a=>a[1]==="C").length;
+  const tot = activeAll.length;
+  const inact = agents.filter(a=>!isActive(a)).length;
+  document.getElementById("scoreboard").innerHTML = `
+    <div class="sb-card">
+      <div class="sb-lbl">Total active agents</div>
+      <div class="sb-val">${tot}</div>
+      <div class="sb-sub">Goal: 200 (${Math.round(tot/200*100)}%) • On track for Jul 2026</div>
+      <div class="pbar"><div class="pbar-fill" style="width:${Math.min(100,Math.round(tot/200*100))}%;background:#FB8C00"></div></div>
+    </div>
+    <div class="sb-card">
+      <div class="sb-lbl">A agents</div>
+      <div class="sb-val" style="color:#43A047">${aC}</div>
+      <div class="sb-sub">Goal: 30 (${Math.round(aC/30*100)}%)</div>
+      <div class="pbar"><div class="pbar-fill" style="width:${Math.min(100,Math.round(aC/30*100))}%;background:#43A047"></div></div>
+    </div>
+    <div class="sb-card">
+      <div class="sb-lbl">B agents</div>
+      <div class="sb-val" style="color:#FB8C00">${bC}</div>
+      <div class="sb-sub">Goal: 35 (${Math.round(bC/35*100)}%)</div>
+      <div class="pbar"><div class="pbar-fill" style="width:${Math.min(100,Math.round(bC/35*100))}%;background:#FB8C00"></div></div>
+    </div>
+    <div class="sb-card">
+      <div class="sb-lbl">C agents</div>
+      <div class="sb-val" style="color:#888">${cC}</div>
+      <div class="sb-sub">All time</div>
+      <div class="pbar"></div>
+    </div>
+    <div class="sb-card">
+      <div class="sb-lbl">Inactive agents</div>
+      <div class="sb-val" style="color:#E53935">${inact}</div>
+      <div class="sb-sub">90+ days no activity</div>
+      <div class="pbar"></div>
+    </div>`;
 
-function renderAgentProfile(name){
-  var el=document.getElementById("agent-search-result");
-  var agent=agents.find(function(a){return a[0]===name;});
-  if(!agent){el.innerHTML='<div style="text-align:center;padding:2rem;color:#aaa">Agent not found.</div>';return;}
-  el.innerHTML='<div style="text-align:center;padding:1rem;color:#888;font-size:12px">Loading history...</div>';
-  var lpCalls=callLogs[name]?[callLogs[name]]:[];
-  var amandaTouches=amandaActivities.filter(function(a){return a.agent_name===name;});
-  sbFetch("GET","call_logs_history?agent_name=eq."+encodeURIComponent(name)+"&select=*&order=call_date.desc")
-    .then(function(hist){
-      if(hist&&hist.length){
-        hist.forEach(function(h){if(!lpCalls.find(function(l){return l.call_date===h.call_date&&l.lp===h.lp;})){lpCalls.push(h);}});
-        lpCalls.sort(function(a,b){return(b.call_date||"").localeCompare(a.call_date||"");});
-      }
-      buildAgentCard(name,agent,lpCalls,amandaTouches,el);
-    }).catch(function(){buildAgentCard(name,agent,lpCalls,amandaTouches,el);});
-}
+  // Level bar
+  const t2 = aC+bC+cC || 1;
+  document.getElementById("lvl-bar").innerHTML = `
+    <div class="stk-seg" style="width:${(aC/t2*100).toFixed(1)}%;background:#43A047"></div>
+    <div class="stk-seg" style="width:${(bC/t2*100).toFixed(1)}%;background:#FB8C00"></div>
+    <div class="stk-seg" style="width:${(cC/t2*100).toFixed(1)}%;background:#ddd"></div>`;
+  document.getElementById("lvl-leg").innerHTML = `
+    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#43A047;margin-right:4px;vertical-align:middle"></span><b style="color:#2E7D32">A: ${aC}</b></span>
+    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#FB8C00;margin-right:4px;vertical-align:middle"></span><b style="color:#E65100">B: ${bC}</b></span>
+    <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ccc;margin-right:4px;vertical-align:middle"></span><b style="color:#888">C: ${cC}</b></span>
+    <span style="color:#aaa">= ${tot} active</span>`;
 
-function buildAgentCard(name,agent,lpCalls,amandaTouches,el){
-  var lp=agent[2]||"Unassigned";var level=agent[1]||"C";var active=isActive(agent);
-  var lastLP=lpCalls.length?lpCalls[0].call_date:null;
-  var lastLPDays=lastLP?Math.floor((TODAY-new Date(lastLP+"T12:00:00"))/86400000):null;
-  var mr=mostRecent(agent);var prof=agentProfiles[name]||{};
-  var lpColors={Gavin:"#E8F5E9,#2E7D32",Karen:"#E3F2FD,#1565C0",Osgood:"#FFF8E1,#E65100",Jordan:"#FCE4EC,#880E4F",Said:"#EDE7F6,#4527A0",Unassigned:"#EEE,#555"};
-  var lc=(lpColors[lp]||"#EEE,#555").split(",");
-  var lvc={A:"#C6EFCE,#1B5E20",B:"#BBDEFB,#0D47A1",C:"#EEE,#424242"}[level].split(",");
-  var html='<div class="agent-card"><div class="agent-header"><div><div class="agent-name-big">'+name+'</div><div class="agent-meta">';
-  html+='<span style="background:'+lvc[0]+';color:'+lvc[1]+';font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">'+level+'</span>';
-  html+='<span style="background:'+lc[0]+';color:'+lc[1]+';font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px">'+lp+'</span>';
-  html+='<span class="'+(active?"active-pill":"badge-inactive")+'">'+(active?"Active":"Inactive")+'</span>';
-  if(mr)html+='<span class="stat-pill">Last activity: '+fmt(mr)+'</span>';
-  html+='</div></div>';
-  html+='<div style="text-align:right"><div style="font-size:11px;color:#888;margin-bottom:4px">Last LP call</div>';
-  html+='<div style="font-weight:700;font-size:13px;color:'+(lastLPDays===null?"#E53935":lastLPDays>14?"#FB8C00":"#43A047")+'">'+(lastLP?fmt(lastLP)+" ("+lastLPDays+"d ago)":"Never called")+'</div></div></div>';
-  html+='<div class="stats-row">';
-  html+='<div class="stat-box"><div class="stat-num" style="color:#1F4E79">'+(lpCalls.length+amandaTouches.length)+'</div><div class="stat-lbl">Total touches</div></div>';
-  html+='<div class="stat-box"><div class="stat-num" style="color:#43A047">'+lpCalls.length+'</div><div class="stat-lbl">LP calls</div></div>';
-  html+='<div class="stat-box"><div class="stat-num" style="color:#7B1FA2">'+amandaTouches.length+'</div><div class="stat-lbl">RM Activity</div></div>';
-  var fuCount=amandaTouches.filter(function(a){return a.follow_up_date&&a.follow_up_date>=TODAY.toISOString().split("T")[0];}).length;
-  html+='<div class="stat-box"><div class="stat-num" style="color:#FB8C00">'+fuCount+'</div><div class="stat-lbl">Follow-ups</div></div></div>';
-  html+='<div class="profile-grid">';
-  html+='<div class="profile-field"><label>Email</label><input id="prof-email" type="text" value="'+(prof.email||'')+'" placeholder="email@example.com"></div>';
-  html+='<div class="profile-field"><label>Phone</label><input id="prof-phone" type="text" value="'+(prof.phone||'')+'" placeholder="(614) 555-5555"></div>';
-  html+='<div class="profile-field"><label>Home address</label><input id="prof-address" type="text" value="'+(prof.address||'')+'" placeholder="123 Main St, Columbus OH"></div>';
-  html+='<div class="profile-field"><label>Birthday</label><input id="prof-birthday" type="text" value="'+(prof.birthday||'')+'" placeholder="MM/DD"></div>';
-  html+='</div><div style="padding:.5rem 1.1rem .85rem;border-top:1px solid #f0f2f5"><button class="save-btn" data-name="'+name+'" onclick="saveAgentProfile(this.getAttribute(\'data-name\'))">Save contact info</button></div>';
-  var history=[];
-  lpCalls.forEach(function(l){history.push({date:l.call_date,who:l.lp,type:"LP Call",note:l.note||"",source:"lp"});});
-  amandaTouches.forEach(function(a){history.push({date:a.act_date,who:"Amanda",type:a.act_type,note:a.notes||"",source:"rm"});});
-  history.sort(function(a,b){return(b.date||"").localeCompare(a.date||"");});
-  html+='<div class="history-section"><div class="history-label">Full contact history</div>';
-  if(!history.length){html+='<div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px">No contact history yet.</div>';}
-  else{
-    var ICONS={"LP Call":"📱","Cold Calls":"📞","New Realtor Meeting":"🤝","Break Breads":"🍞","Active Check-in":"💬","Realtor Buddy Referral Ask":"🌟","Re-engagement":"🔄","Agent Appreciation":"🏆","Business Planning Session":"📋"};
-    html+=history.map(function(h){
-      var icon=ICONS[h.type]||"📌";var bg=h.source==="lp"?"#E3F2FD":"#F3E5F5";
-      return'<div class="history-item"><div class="h-icon" style="background:'+bg+'">'+icon+'</div>'+
-        '<div class="h-body"><div class="h-top"><div><span class="h-who">'+h.who+'</span>'+
-        '<span class="'+(h.source==="lp"?"lp-source":"rm-source")+'" style="margin-left:5px">'+(h.source==="lp"?"LP Call":"RM Activity")+'</span></div>'+
-        '<span class="h-date">'+fmt(h.date)+'</span></div>'+
-        '<span class="h-type" style="background:'+bg+';color:#333">'+h.type+'</span>'+
-        (h.note?'<div class="h-note">&ldquo;'+h.note+'&rdquo;</div>':"")+
-        '</div></div>';
-    }).join("");
-  }
-  html+='</div></div>';
-  el.innerHTML=html;
-}
-
-function renderMTDYTD(){
-  var monthName=TODAY.toLocaleDateString("en-US",{month:"long"});
-  var year=TODAY.getFullYear();
-  var mtdByLP={},ytdByLP={};
-  LPS.forEach(function(lp){mtdByLP[lp]=0;ytdByLP[lp]=0;});
-  mtdCallLogs.forEach(function(r){if(mtdByLP[r.lp]!==undefined)mtdByLP[r.lp]++;});
-  ytdCallLogs.forEach(function(r){if(ytdByLP[r.lp]!==undefined)ytdByLP[r.lp]++;});
-  document.getElementById("mtd-lp-grid").innerHTML=LPS.map(function(lp){
-    var col=LP_COLORS[lp];
-    var agentCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
-    var mtdPct=agentCount?Math.min(100,Math.round(mtdByLP[lp]/agentCount*100)):0;
-    var barCol=mtdPct>=80?"#43A047":mtdPct>=50?"#FB8C00":"#E53935";
-    var dayOfMonth=TODAY.getDate();
-    var weeksElapsed=dayOfMonth/7;
-    var expected=Math.round(weeksElapsed*agentCount);
-    var pacePct=expected>0?mtdByLP[lp]/expected:1;
-    var paceLabel=pacePct>=1.1?'<span class="pace-pill pace-ahead">Ahead of pace</span>':pacePct>=0.75?'<span class="pace-pill pace-on">On pace</span>':'<span class="pace-pill pace-behind">Behind pace</span>';
-    return'<div class="lp-card">'+
-      '<div class="lp-name"><span style="width:10px;height:10px;border-radius:50%;background:'+col+';display:inline-block"></span><span style="color:'+col+'">'+lp+'</span></div>'+
-      '<div style="font-size:11px;color:#888;margin-bottom:6px">'+monthName+' MTD</div>'+
-      '<div style="font-size:26px;font-weight:800;color:'+barCol+'">'+mtdByLP[lp]+'</div>'+
-      '<div style="font-size:11px;color:#888;margin-bottom:4px">calls logged</div>'+
-      '<div class="lp-bar-track"><div class="lp-bar" style="width:'+mtdPct+'%;background:'+barCol+'"></div></div>'+
-      '<div style="font-size:11px;color:#888;margin-top:4px">YTD: <b style="color:#1F4E79">'+ytdByLP[lp]+'</b></div>'+
-      '<div style="margin-top:5px">'+paceLabel+'</div></div>';
-  }).join("");
-  var mtdDetail="",ytdDetail="";
-  LPS.forEach(function(lp){
-    var col=LP_COLORS[lp];
-    var calledMTD=mtdCallLogs.filter(function(r){return r.lp===lp;});
-    var calledYTD=ytdCallLogs.filter(function(r){return r.lp===lp;});
-    var uniqueMTD=[...new Set(calledMTD.map(function(r){return r.agent_name;}))].length;
-    var uniqueYTD=[...new Set(calledYTD.map(function(r){return r.agent_name;}))].length;
-    mtdDetail+='<div class="sc-row"><div class="sc-top">'+
-      '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';display:inline-block"></span>'+lp+'</div>'+
-      '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
-      '<span><b style="font-size:15px;color:#1F4E79">'+calledMTD.length+'</b> calls</span>'+
-      '<span><b style="font-size:15px;color:#43A047">'+uniqueMTD+'</b> agents reached</span>'+
-      '</div></div></div>';
-    ytdDetail+='<div class="sc-row"><div class="sc-top">'+
-      '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';display:inline-block"></span>'+lp+'</div>'+
-      '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
-      '<span><b style="font-size:15px;color:#1F4E79">'+calledYTD.length+'</b> calls</span>'+
-      '<span><b style="font-size:15px;color:#43A047">'+uniqueYTD+'</b> agents reached</span>'+
-      '</div></div></div>';
+  // LP cards
+  let lpHtml = "";
+  LPS.forEach(lp => {
+    const rot  = twRotation(lp);
+    const done = rot.filter(a => calledThisWeek(a[0])).length;
+    const pct  = rot.length ? Math.round(done/rot.length*100) : 0;
+    const col  = LP_COL[lp];
+    const pctCol = pct===100?"#43A047":pct>=70?"#FB8C00":"#E53935";
+    const lpAgents = agents.filter(a => a[2]===lp);
+    const active   = lpAgents.filter(isActive).length;
+    const inactive = lpAgents.filter(a => !isActive(a)).length;
+    const pri = lpAgents.filter(a => a[7]===true && isActive(a)).length;
+    lpHtml += `<div class="lp-card">
+      <div class="lp-hd">
+        <div class="lp-dot" style="background:${col}"></div>
+        <div class="lp-n" style="color:${col}">${lp}</div>
+      </div>
+      <div class="lp-pct" style="color:${pctCol}">${pct}%</div>
+      <div class="lp-bt"><div class="lp-bf" style="width:${pct}%;background:${col}"></div></div>
+      <div class="lp-meta"><span>${done}/${rot.length} this week</span><span>${active} active</span></div>
+      ${pri    ? `<div class="lp-flag" style="color:#C62828">${pri} priority</div>` : ""}
+      ${inactive ? `<div class="lp-flag" style="color:#E65100">${inactive} inactive</div>` : ""}
+    </div>`;
   });
-  document.getElementById("mtd-lp-content").innerHTML=mtdDetail||'<div style="color:#aaa;font-size:13px;padding:.5rem 0">No call data yet this month.</div>';
-  document.getElementById("ytd-lp-content").innerHTML=ytdDetail||'<div style="color:#aaa;font-size:13px;padding:.5rem 0">No call data yet this year.</div>';
-  var amandaTypes=Object.keys(AMANDA_GOALS);
-  var mtdACounts={},ytdACounts={};
-  amandaTypes.forEach(function(t){mtdACounts[t]=0;ytdACounts[t]=0;});
-  mtdAmanda.forEach(function(a){if(mtdACounts[a.act_type]!==undefined)mtdACounts[a.act_type]++;});
-  ytdAmanda.forEach(function(a){if(ytdACounts[a.act_type]!==undefined)ytdACounts[a.act_type]++;});
-  document.getElementById("mtd-amanda-grid").innerHTML=[
-    {label:monthName+" MTD",val:mtdAmanda.length,sub:"total activities",col:"#7B1FA2"},
-    {label:year+" YTD",val:ytdAmanda.length,sub:"total activities",col:"#7B1FA2"},
-    {label:"New meetings MTD",val:mtdACounts["New Realtor Meeting"]||0,sub:"/ YTD: "+(ytdACounts["New Realtor Meeting"]||0),col:"#1F4E79"},
-    {label:"Break breads MTD",val:mtdACounts["Break Breads"]||0,sub:"/ YTD: "+(ytdACounts["Break Breads"]||0),col:"#FB8C00"},
-    {label:"Check-ins MTD",val:mtdACounts["Active Check-in"]||0,sub:"/ YTD: "+(ytdACounts["Active Check-in"]||0),col:"#43A047"},
-    {label:"Cold calls MTD",val:mtdACounts["Cold Calls"]||0,sub:"/ YTD: "+(ytdACounts["Cold Calls"]||0),col:"#E53935"}
-  ].map(function(c){
-    return'<div class="a-card"><div class="a-label">'+c.label+'</div><div class="a-val" style="color:'+c.col+'">'+c.val+'</div><div class="a-sub">'+c.sub+'</div></div>';
-  }).join("");
-  document.getElementById("ytd-amanda-content").innerHTML=amandaTypes.map(function(t){
-    return'<div class="sc-row"><div class="sc-top"><div style="font-weight:700;font-size:13px">'+t+'</div>'+
-      '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
-      '<span><b style="font-size:15px;color:#7B1FA2">'+mtdACounts[t]+'</b> MTD</span>'+
-      '<span><b style="font-size:15px;color:#1F4E79">'+ytdACounts[t]+'</b> YTD</span>'+
-      '</div></div></div>';
+  document.getElementById("lp-cards").innerHTML = lpHtml;
+
+  // This week accordion
+  document.getElementById("tw-wk-lbl").textContent = weekLabel(WK);
+  renderAccordion("tw", callLogs, WK, twRotation);
+
+  // Last week accordion
+  document.getElementById("lw-wk-lbl").textContent = weekLabel(LWK);
+  renderAccordion("lw", lastWeekLogs, LWK, lwRotation);
+
+  // RM goals
+  let gHtml = "";
+  RM_GOALS.forEach(g => {
+    const count = rmWeek.filter(a => a.act_type===g.type).length;
+    const pct   = Math.min(100, Math.round(count/g.weekly*100));
+    gHtml += `<div class="gr">
+      <div class="gr-lr">
+        <span class="gr-n">${RM_EMOJI[g.type]||""} ${g.label}</span>
+        <span><span class="gr-c">${count}</span><span class="gr-t"> / ${g.weekly}</span></span>
+      </div>
+      <div class="g-track"><div class="g-fill" style="width:${pct}%;background:${goalColor(pct)}"></div></div>
+    </div>`;
+  });
+  const ctc = rmWeek.filter(a => a.act_type==="CTC Call").length;
+  gHtml += `<div class="ctc-row"><span style="font-size:12px;color:#555">⚡ CTC calls this week</span><span style="font-size:22px;font-weight:700">${ctc}</span></div>`;
+  document.getElementById("rm-goals").innerHTML = gHtml;
+
+  // Follow-ups
+  const todayStr = localDateStr(TODAY);
+  document.getElementById("fu-lbl").textContent = rmFu.length ? `${rmFu.length} upcoming` : "";
+  document.getElementById("rm-fu").innerHTML = rmFu.length
+    ? rmFu.slice(0,8).map(f => {
+        const isOvr = f.follow_up_date < todayStr;
+        const days  = Math.round((new Date(f.follow_up_date+"T12:00:00")-new Date())/86400000);
+        const lbl   = isOvr ? `Overdue ${Math.abs(days)}d` : days===0 ? "Today" : `In ${days}d`;
+        return `<div class="fu-item">
+          <div class="fu-dot" style="background:${isOvr?"#E53935":"#1F4E79"}"></div>
+          <div style="flex:1">
+            <div class="fu-n">${f.agent_name}</div>
+            <div class="fu-m">${RM_EMOJI[f.act_type]||""} ${f.act_type}${f.notes?" · "+f.notes.substring(0,40):""}</div>
+          </div>
+          <div class="fu-due" style="color:${isOvr?"#E53935":"#555"}">${lbl}</div>
+        </div>`;
+      }).join("")
+    : `<div class="no-data">No follow-ups pending</div>`;
+
+  // Leaderboard
+  const stats = LPS.map(lp => {
+    const twDone = twRotation(lp).filter(a=>calledThisWeek(a[0])).length;
+    const twTot  = twRotation(lp).length;
+    const allCls = Object.values(callLogs).filter(l=>l.lp===lp).length
+                 + Object.values(lastWeekLogs).filter(l=>l.lp===lp).length;
+    return { lp, twDone, twTot, pct: twTot?Math.round(twDone/twTot*100):0, allCls };
+  }).sort((a,b) => b.allCls-a.allCls);
+  const medals = ["🥇","🥈","🥉","4.","5."];
+  document.getElementById("leaderboard").innerHTML = stats.map((s,i) => `
+    <div class="lb-row">
+      <span style="font-size:18px;width:26px;text-align:center;flex-shrink:0">${medals[i]}</span>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:${LP_COL[s.lp]}">${s.lp}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">${s.allCls} total calls tracked</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:20px;font-weight:700;color:${s.pct===100?"#43A047":s.pct>=70?"#FB8C00":"#E53935"}">${s.pct}%</div>
+        <div style="font-size:10px;color:#aaa">${s.twDone}/${s.twTot} this week</div>
+      </div>
+    </div>`).join("");
+}
+
+// ── ACCORDION ──────────────────────────────────────────────────────────────
+function renderAccordion(id, logs, wk, rotFn) {
+  let pills = "", body = "";
+  LPS.forEach(lp => {
+    const rot  = rotFn(lp);
+    const done = rot.filter(a => !!(logs[a[0]] && logs[a[0]].week_key===wk)).length;
+    const missed = rot.filter(a => !(logs[a[0]] && logs[a[0]].week_key===wk));
+    const pct  = rot.length ? Math.round(done/rot.length*100) : 0;
+    const cls  = pct===100?"pill-g":pct>=70?"pill-a":"pill-r";
+    const pctCol = pct===100?"#43A047":pct>=70?"#FB8C00":"#E53935";
+    pills += `<span class="acc-pill ${cls}">${lp} ${pct}%</span>`;
+    body  += `<div class="acc-row">
+      <div class="acc-rt">
+        <div class="acc-lp">
+          <span style="width:9px;height:9px;border-radius:50%;background:${LP_COL[lp]};display:inline-block;flex-shrink:0"></span>
+          ${lp}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="acc-pct" style="color:${pctCol}">${pct}%</span>
+          <span style="font-size:11px;color:#aaa">${done}/${rot.length}</span>
+        </div>
+      </div>
+      ${pct===100
+        ? `<div class="won">✓ Called all agents this week!</div>`
+        : `<div class="missed"><b>Not yet called:</b> ${missed.map(a=>a[0]).join(", ")}</div>`
+      }
+    </div>`;
+  });
+  document.getElementById(`${id}-pills`).innerHTML   = pills;
+  document.getElementById(`body-acc-${id}`).innerHTML = body;
+}
+
+function toggleAcc(id) {
+  const body = document.getElementById("body-"+id);
+  const chev = document.getElementById("chev-"+id);
+  if(!body) return;
+  const open = body.style.display==="block";
+  body.style.display = open ? "none" : "block";
+  if(chev) chev.style.transform = open ? "" : "rotate(180deg)";
+}
+
+// ── MTD / YTD ──────────────────────────────────────────────────────────────
+function showPeriod(p) {
+  currentPeriod = p;
+  document.getElementById("btn-mtd").className = "btn"+(p==="mtd"?" btn-p":"");
+  document.getElementById("btn-ytd").className = "btn"+(p==="ytd"?" btn-p":"");
+  document.getElementById("period-lbl").textContent = p==="mtd"?"month to date":"year to date";
+  const data = p==="ytd" ? rmYtd : rmMtd;
+  const mult = p==="ytd" ? 12 : 1;
+  let html = "";
+  RM_GOALS.forEach(g => {
+    const target = g.monthly * mult;
+    const count  = data.filter(a => a.act_type===g.type).length;
+    const pct    = Math.min(100, Math.round(count/target*100));
+    html += `<div class="gr">
+      <div class="gr-lr">
+        <span class="gr-n">${RM_EMOJI[g.type]||""} ${g.label}</span>
+        <span><span class="gr-c">${count}</span><span class="gr-t"> / ${target}${pct>=100?" 🥳":""}</span></span>
+      </div>
+      <div class="g-track"><div class="g-fill" style="width:${pct}%;background:${goalColor(pct)}"></div></div>
+      <div style="font-size:10px;color:#bbb;margin-top:3px">${pct}% of goal</div>
+    </div>`;
+  });
+  const ctc = data.filter(a => a.act_type==="CTC Call").length;
+  html += `<div class="ctc-row"><span style="font-size:12px;color:#555">⚡ CTC calls</span><span style="font-size:22px;font-weight:700">${ctc}</span></div>`;
+  document.getElementById("period-goals").innerHTML = html;
+  document.getElementById("feed-type").value = "";
+  renderFeed();
+}
+
+function renderFeed() {
+  const typeF = document.getElementById("feed-type")?.value || "";
+  const data  = currentPeriod==="ytd" ? rmYtd : rmMtd;
+  const filt  = typeF ? data.filter(a=>a.act_type===typeF) : data;
+  const el    = document.getElementById("feed-list");
+  if(!filt.length) { el.innerHTML='<div class="no-data">No activity found</div>'; return; }
+  el.innerHTML = filt.slice(0,80).map(a => `
+    <div class="feed-item">
+      <div class="feed-t"><span class="feed-ag">${a.agent_name||"—"}</span><span class="feed-dt">${fmt(a.act_date)}</span></div>
+      <div class="feed-ty">${RM_EMOJI[a.act_type]||"•"} ${a.act_type}${a.outcome?" · "+a.outcome:""}</div>
+      ${a.notes?`<div class="feed-nt">"${String(a.notes).substring(0,80)}"</div>`:""}
+    </div>`).join("");
+}
+
+// ── ROSTER ─────────────────────────────────────────────────────────────────
+function renderRoster() {
+  const q   = (document.getElementById("r-q")?.value||"").toLowerCase();
+  const lpF = document.getElementById("r-lp")?.value||"";
+  const lvF = document.getElementById("r-lvl")?.value||"";
+  const stF = document.getElementById("r-st")?.value||"";
+  let list = agents.filter(a => a[2] && a[2]!=="Unassigned");
+  if(lpF) list = list.filter(a=>a[2]===lpF);
+  if(lvF) list = list.filter(a=>a[1]===lvF);
+  if(stF==="active")   list = list.filter(isActive);
+  if(stF==="inactive") list = list.filter(a=>!isActive(a));
+  if(q) list = list.filter(a=>a[0].toLowerCase().includes(q));
+  list.sort((a,b) => {
+    if(a[7]&&!b[7]) return -1; if(!a[7]&&b[7]) return 1;
+    return (lpDays(b[0])||9999)-(lpDays(a[0])||9999);
+  });
+  const body = document.getElementById("roster-body");
+  if(!list.length) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#ccc">No agents match this filter</td></tr>'; return; }
+  body.innerHTML = list.map(a => {
+    const act  = isActive(a), ds = lpDays(a[0]), mr = mostRecent(a), cal = calledThisWeek(a[0]);
+    const dCol = ds===null?"color:#E53935":ds>=14?"color:#FB8C00":"color:#43A047";
+    return `<tr>
+      <td style="font-weight:600">${a[0]}${a[7]?` <span style="background:#FFEBEE;color:#C62828;font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;vertical-align:middle">PRIORITY</span>`:""}</td>
+      <td><span class="badge-${a[1].toLowerCase()}">${a[1]}</span></td>
+      <td><span class="lp-chip chip-${a[2]}">${a[2]}</span></td>
+      <td>${act?'<span style="color:#43A047;font-size:12px;font-weight:600">Active</span>':'<span style="background:#FFEBEE;color:#C62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Inactive</span>'}</td>
+      <td style="text-align:center">${cal?'<span style="color:#43A047;font-size:16px">✓</span>':'<span style="color:#e0e0e0">—</span>'}</td>
+      <td style="font-size:12px;${dCol}">${ds===null?"Never":ds===0?"Today":ds+"d ago"}</td>
+      <td style="font-size:12px;color:#aaa">${mr?fmt(mr):"—"}</td>
+    </tr>`;
   }).join("");
 }
 
-function saveAgentProfile(name){
-  var data={agent_name:name,email:document.getElementById("prof-email").value.trim(),phone:document.getElementById("prof-phone").value.trim(),address:document.getElementById("prof-address").value.trim(),birthday:document.getElementById("prof-birthday").value.trim()};
-  var exists=!!(agentProfiles[name]&&agentProfiles[name].agent_name);
-  var method=exists?"PATCH":"POST";
-  var path=exists?"agent_profiles?agent_name=eq."+encodeURIComponent(name):"agent_profiles";
-  var body=Object.assign({},data);
-  if(method==="PATCH")delete body.agent_name;
-  var opts={method:method,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":"return=minimal"}};
-  opts.body=JSON.stringify(body);
-  fetch(SB_URL+"/rest/v1/"+path,opts).then(function(r){
-    if(!r.ok)return r.text().then(function(t){throw new Error(t);});
-    agentProfiles[name]=data;alert("Saved!");
-  }).catch(function(e){alert("Error saving: "+e.message);});
+// ── TEAMS MESSAGE ──────────────────────────────────────────────────────────
+function renderTeamsMsg() {
+  const lines = ["Core Team Weekly Update — "+weekLabel(WK),""];
+  lines.push("LP Calls:");
+  LPS.forEach(lp => {
+    const rot  = twRotation(lp);
+    const done = rot.filter(a=>calledThisWeek(a[0])).length;
+    const pct  = rot.length ? Math.round(done/rot.length*100) : 0;
+    lines.push(`  ${pct===100?"✅":pct>=80?"🟡":"🔴"} ${lp}: ${pct}% (${done}/${rot.length})`);
+  });
+  lines.push("");
+  lines.push("Amanda — RM Activity:");
+  RM_GOALS.forEach(g => {
+    const count = rmWeek.filter(a=>a.act_type===g.type).length;
+    const pct   = g.weekly ? Math.round(count/g.weekly*100) : 0;
+    lines.push(`  ${pct>=100?"✅":pct>=60?"🟡":"🔴"} ${g.label}: ${count}/${g.weekly}`);
+  });
+  lines.push(`  ⚡ CTC calls: ${rmWeek.filter(a=>a.act_type==="CTC Call").length}`);
+  lines.push("");
+  lines.push("Tracker: https://pwang318.github.io/core-team-tracker");
+  document.getElementById("teams-msg").textContent = lines.join("\n");
 }
 
-setInterval(function(){loadAll();},60000);
+function copyTeams() {
+  navigator.clipboard.writeText(document.getElementById("teams-msg").textContent)
+    .then(() => {
+      const c = document.getElementById("copy-ok");
+      c.style.display="inline";
+      setTimeout(()=>c.style.display="none", 2200);
+    });
+}
+
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────
+function go(name) {
+  document.querySelectorAll(".tab").forEach((t,i) => {
+    t.classList.toggle("active", ["overview","mtdytd","agents","message"][i]===name);
+  });
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-"+name).classList.add("active");
+  if(name==="mtdytd") showPeriod(currentPeriod);
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
 loadAll();
+setInterval(loadAll, 60000);
 </script>
 </body>
 </html>
