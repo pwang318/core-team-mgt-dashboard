@@ -97,6 +97,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;col
 .drow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f2f5;font-size:13px}
 .drow:last-child{border-bottom:none}
 .never-banner{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-bottom:.85rem;font-size:13px;color:#854F0B;display:none;align-items:center;gap:8px}
+.attn-box{background:#fff;border:1px solid #EF9A9A;border-left:4px solid #E53935;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem}
+.attn-title{font-size:13px;font-weight:700;color:#C62828;margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.attn-item{font-size:12px;color:#555;padding:5px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:flex-start;gap:7px}
+.attn-item:last-child{border-bottom:none}
+.attn-dot{width:6px;height:6px;border-radius:50%;background:#E53935;flex-shrink:0;margin-top:5px}
+.trend-up{color:#43A047;font-size:11px;font-weight:600}
+.trend-dn{color:#E53935;font-size:11px;font-weight:600}
+.trend-eq{color:#888;font-size:11px;font-weight:600}
+.pace-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block}
+.pace-ahead{background:#EAF3DE;color:#3B6D11}
+.pace-on{background:#FFF2CC;color:#7D5A00}
+.pace-behind{background:#FFEBEE;color:#C62828}
 </style>
 </head>
 <body>
@@ -105,6 +117,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;col
 <div class="tabs"><div class="tab active" onclick="switchTab('overview')">Overview</div><div class="tab" onclick="switchTab('mtd')">MTD / YTD</div><div class="tab" onclick="switchTab('search')">Agent Search</div></div>
 <div id="view-overview" class="view active">
 <div class="never-banner" id="amanda-alert">&#9888; Amanda has not logged activity in 3+ days.</div>
+<div id="needs-attention-box"></div>
 <div class="section-title">&#127942; Growth scoreboard</div>
 <div class="growth-grid" id="growth-grid"></div>
 <div style="background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem"><div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Level breakdown</div><div id="level-breakdown"></div></div>
@@ -251,6 +264,7 @@ function renderAll(){
   renderAmandaGrid();
   renderAmandaScorecard(amandaActivities.filter(function(a){return isThisWeek(a.act_date);}));
   checkNeverLogged();
+  renderNeedsAttention();
 }
 
 function renderGrowth(){
@@ -260,13 +274,23 @@ function renderGrowth(){
   var cCount=active.filter(function(a){return a[1]==="C";}).length;
   var total=active.length;
   var channel=agents.filter(function(a){return a[8]&&parseInt(a[8])>=10;}).length;
-  var goals=[{label:"Total active agents",val:total,goal:200,col:"#1F4E79"},{label:"A agents",val:aCount,goal:30,col:"#43A047"},{label:"B agents",val:bCount,goal:35,col:"#FB8C00"},{label:"C agents",val:cCount,goal:null,col:"#888"},{label:"Channel accounts",val:channel,goal:null,col:"#F57F17"}];
+  // Project date to 200 agents based on YTD growth rate
+  var ytdStart=TODAY.getFullYear()+"-01-01";
+  var agentsAddedYTD=ytdCallLogs.filter(function(r){
+    var d=r.call_date||"";return d>=ytdStart;
+  });
+  var dayOfYear=Math.floor((TODAY-new Date(TODAY.getFullYear()+"-01-01T00:00:00"))/86400000)+1;
+  var weeklyRate=total/(dayOfYear/7);
+  var weeksToGoal=weeklyRate>0?Math.ceil((200-total)/weeklyRate):null;
+  var projDate=null;
+  if(weeksToGoal!==null&&weeksToGoal>0&&weeksToGoal<260){var pd=new Date(TODAY);pd.setDate(pd.getDate()+weeksToGoal*7);projDate=pd.toLocaleDateString("en-US",{month:"short",year:"numeric"});}
+  var goals=[{label:"Total active agents",val:total,goal:200,col:"#1F4E79",proj:projDate},{label:"A agents",val:aCount,goal:30,col:"#43A047"},{label:"B agents",val:bCount,goal:35,col:"#FB8C00"},{label:"C agents",val:cCount,goal:null,col:"#888"},{label:"Channel accounts",val:channel,goal:null,col:"#F57F17"}];
   document.getElementById("growth-grid").innerHTML=goals.map(function(g){
     var pct=g.goal?Math.min(100,Math.round(g.val/g.goal*100)):100;
     var barCol=pct>=100?"#43A047":pct>=60?"#FB8C00":"#E53935";
     return'<div class="growth-card"><div class="growth-label">'+g.label+'</div>'+
       '<div class="growth-val" style="color:'+g.col+'">'+g.val+'</div>'+
-      (g.goal?'<div class="growth-goal">Goal: '+g.goal+' ('+pct+'%)</div><div class="growth-bar-track"><div class="growth-bar" style="width:'+pct+'%;background:'+barCol+'"></div></div>':'<div class="growth-goal">All time</div>')+
+      (g.goal?'<div class="growth-goal">Goal: '+g.goal+' ('+pct+'%)'+(g.proj?' &bull; On track for <b>'+g.proj+'</b>':'')+'</div><div class="growth-bar-track"><div class="growth-bar" style="width:'+pct+'%;background:'+barCol+'"></div></div>':'<div class="growth-goal">All time</div>')+
     '</div>';
   }).join("");
   document.getElementById("level-breakdown").innerHTML='<div style="display:flex;width:100%;height:16px;border-radius:20px;overflow:hidden;margin-bottom:6px">'+
@@ -323,22 +347,28 @@ function renderScorecard(which,logs,wkKey){
 
 function renderAmandaGrid(){
   var acts=amandaActivities.filter(function(a){return isThisWeek(a.act_date);});
+  var lastWeekActs=amandaActivities.filter(function(a){return getWeekKey(new Date(a.act_date+"T12:00:00"))===lastWeekKey;});
   var counts={};acts.forEach(function(a){counts[a.act_type]=(counts[a.act_type]||0)+1;});
+  var lastCounts={};lastWeekActs.forEach(function(a){lastCounts[a.act_type]=(lastCounts[a.act_type]||0)+1;});
   var total=Object.values(counts).reduce(function(s,v){return s+v;},0);
+  var lastTotal=Object.values(lastCounts).reduce(function(s,v){return s+v;},0);
   var goalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
+  function trendArrow(cur,prev){if(!prev)return'';if(cur>prev)return'<span class="trend-up">&#8679; vs last wk</span>';if(cur<prev)return'<span class="trend-dn">&#8681; vs last wk</span>';return'<span class="trend-eq">&#8596; same as last wk</span>';}
   var cards=[
-    {label:"Overall",val:Math.min(100,Math.round(total/goalTotal*100))+"%",sub:total+" of "+goalTotal+" activities",pct:Math.min(100,Math.round(total/goalTotal*100))},
-    {label:"New meetings",val:(counts["New Realtor Meeting"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["New Realtor Meeting"]||0)/5)*100)},
-    {label:"Break breads",val:(counts["Break Breads"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["Break Breads"]||0)/5)*100)},
-    {label:"Check-ins",val:(counts["Active Check-in"]||0)+"/10",sub:"weekly goal",pct:Math.min(100,((counts["Active Check-in"]||0)/10)*100)},
-    {label:"Cold calls",val:(counts["Cold Calls"]||0)+"/25",sub:"weekly goal",pct:Math.min(100,((counts["Cold Calls"]||0)/25)*100)},
+    {label:"Overall",val:Math.min(100,Math.round(total/goalTotal*100))+"%",sub:total+" of "+goalTotal+" activities",pct:Math.min(100,Math.round(total/goalTotal*100)),trend:trendArrow(total,lastTotal)},
+    {label:"New meetings",val:(counts["New Realtor Meeting"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["New Realtor Meeting"]||0)/5)*100),trend:trendArrow(counts["New Realtor Meeting"]||0,lastCounts["New Realtor Meeting"]||0)},
+    {label:"Break breads",val:(counts["Break Breads"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["Break Breads"]||0)/5)*100),trend:trendArrow(counts["Break Breads"]||0,lastCounts["Break Breads"]||0)},
+    {label:"Check-ins",val:(counts["Active Check-in"]||0)+"/10",sub:"weekly goal",pct:Math.min(100,((counts["Active Check-in"]||0)/10)*100),trend:trendArrow(counts["Active Check-in"]||0,lastCounts["Active Check-in"]||0)},
+    {label:"Cold calls",val:(counts["Cold Calls"]||0)+"/25",sub:"weekly goal",pct:Math.min(100,((counts["Cold Calls"]||0)/25)*100),trend:trendArrow(counts["Cold Calls"]||0,lastCounts["Cold Calls"]||0)},
   ];
   document.getElementById("amanda-grid").innerHTML=cards.map(function(c){
     var col=c.pct>=100?"#43A047":c.pct>=60?"#FB8C00":"#E53935";
     return'<div class="a-card"><div class="a-label">'+c.label+'</div>'+
       '<div class="a-val" style="color:'+col+'">'+c.val+'</div>'+
       '<div class="a-bar-track"><div class="a-bar" style="width:'+c.pct+'%;background:'+col+'"></div></div>'+
-      '<div class="a-sub">'+c.sub+'</div></div>';
+      '<div class="a-sub">'+c.sub+'</div>'+
+      (c.trend?'<div style="margin-top:3px">'+c.trend+'</div>':'')+
+    '</div>';
   }).join("");
 }
 
@@ -466,6 +496,14 @@ function renderMTDYTD(){
     var agentCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
     var mtdPct=agentCount?Math.min(100,Math.round(mtdByLP[lp]/agentCount*100)):0;
     var barCol=mtdPct>=80?"#43A047":mtdPct>=50?"#FB8C00":"#E53935";
+    // Pace: compare calls to date vs expected based on days elapsed this month
+    var dayOfMonth=TODAY.getDate();
+    var daysInMonth=new Date(TODAY.getFullYear(),TODAY.getMonth()+1,0).getDate();
+    var weeksElapsed=dayOfMonth/7;
+    var expected=Math.round(weeksElapsed*agentCount);
+    var actual=mtdByLP[lp];
+    var pacePct=expected>0?actual/expected:1;
+    var paceLabel=pacePct>=1.1?'<span class="pace-pill pace-ahead">Ahead of pace</span>':pacePct>=0.75?'<span class="pace-pill pace-on">On pace</span>':'<span class="pace-pill pace-behind">Behind pace</span>';
     return'<div class="lp-card">'+
       '<div class="lp-name"><span style="width:10px;height:10px;border-radius:50%;background:'+col+';display:inline-block"></span><span style="color:'+col+'">'+lp+'</span></div>'+
       '<div style="font-size:11px;color:#888;margin-bottom:6px">'+monthName+' MTD</div>'+
@@ -473,6 +511,7 @@ function renderMTDYTD(){
       '<div style="font-size:11px;color:#888;margin-bottom:4px">calls logged</div>'+
       '<div class="lp-bar-track"><div class="lp-bar" style="width:'+mtdPct+'%;background:'+barCol+'"></div></div>'+
       '<div style="font-size:11px;color:#888;margin-top:4px">YTD: <b style="color:#1F4E79">'+ytdByLP[lp]+'</b></div>'+
+      '<div style="margin-top:5px">'+paceLabel+'</div>'+
     '</div>';
   }).join("");
 
@@ -532,6 +571,59 @@ function renderMTDYTD(){
       '</div></div></div>';
   }).join("");
   document.getElementById("ytd-amanda-content").innerHTML=ytdADetail;
+}
+
+function renderNeedsAttention(){
+  var items=[];
+  var todayStr=TODAY.toISOString().split("T")[0];
+  var dayOfMonth=TODAY.getDate();
+  var daysInMonth=new Date(TODAY.getFullYear(),TODAY.getMonth()+1,0).getDate();
+
+  // 1. Amanda inactivity
+  if(amandaActivities.length){
+    var last=amandaActivities[0];
+    var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
+    var days=Math.floor((TODAY-lastDate)/86400000);
+    if(days>=3)items.push("Amanda has not logged any activity in <b>"+days+" days</b> — last logged "+fmt(last.act_date));
+  } else {
+    items.push("Amanda has not logged any activity yet this week");
+  }
+
+  // 2. LPs with 0% this week
+  LPS.forEach(function(lp){
+    var rot=getRotation(lp,weekKey);
+    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
+    if(rot.length>0&&done===0)items.push("<b>"+lp+"</b> has not called any agents this week (0/"+rot.length+")");
+  });
+
+  // 3. Agents never called (no entry in callLogs or history)
+  var neverCalled=agents.filter(function(a){
+    return isActive(a)&&!Object.values(callLogs).find(function(l){return l.agent_name===a[0];})&&!ytdCallLogs.find(function(l){return l.agent_name===a[0];});
+  });
+  if(neverCalled.length>0){
+    items.push("<b>"+neverCalled.length+" active agents</b> have never been called: "+neverCalled.slice(0,5).map(function(a){return a[0];}).join(", ")+(neverCalled.length>5?" and "+(neverCalled.length-5)+" more":""));
+  }
+
+  // 4. LPs behind pace MTD
+  LPS.forEach(function(lp){
+    var mtdCalls=mtdCallLogs.filter(function(r){return r.lp===lp;}).length;
+    var activeCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
+    var weeksElapsed=dayOfMonth/7;
+    var expectedCalls=Math.round(weeksElapsed*activeCount);
+    if(activeCount>0&&mtdCalls<expectedCalls*0.5&&dayOfMonth>7)items.push("<b>"+lp+"</b> is behind pace MTD — "+mtdCalls+" calls logged, expected ~"+expectedCalls+" by now");
+  });
+
+  // 5. Amanda MTD pace check
+  var amandaMTDTotal=mtdAmanda.length;
+  var weeklyGoalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
+  var expectedAmanda=Math.round((dayOfMonth/7)*weeklyGoalTotal);
+  if(dayOfMonth>7&&amandaMTDTotal<expectedAmanda*0.5)items.push("Amanda is behind pace this month — "+amandaMTDTotal+" activities logged, expected ~"+expectedAmanda+" by now");
+
+  var box=document.getElementById("needs-attention-box");
+  if(!items.length){box.innerHTML='<div style="background:#EAF3DE;border:1px solid #A5D6A7;border-left:4px solid #43A047;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:#2E7D32;font-weight:500">&#10003; No issues flagged — everything looks on track!</div>';return;}
+  box.innerHTML='<div class="attn-box"><div class="attn-title">&#9888; Needs Attention ('+items.length+')</div>'+
+    items.map(function(i){return'<div class="attn-item"><div class="attn-dot"></div><div>'+i+'</div></div>';}).join("")+
+  '</div>';
 }
 
 // Uses PATCH to update existing profiles, POST to insert new ones.
