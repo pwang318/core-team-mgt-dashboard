@@ -177,8 +177,14 @@ function calledThisWeek(name){
 function getWeekEndKey(wk){var d=new Date(wk);d.setDate(d.getDate()+6);return d.toISOString().split("T")[0];}
 function lpDays(name){
   var rows=callLogs[name];
-  if(!rows||!rows.length)return null;
-  var latest=rows.map(function(r){return r.call_date;}).filter(Boolean).sort().reverse()[0];
+  var latest=null;
+  if(rows&&rows.length){
+    latest=rows.map(function(r){return r.call_date;}).filter(Boolean).sort().reverse()[0]||null;
+  }
+  if(!latest){
+    var hist=ytdCallLogs.filter(function(r){return r.agent_name===name;});
+    if(hist.length)latest=hist.map(function(r){return r.call_date;}).filter(Boolean).sort().reverse()[0]||null;
+  }
   if(!latest)return null;
   var dt=new Date(latest+"T12:00:00");dt.setHours(0,0,0,0);
   return Math.floor((TODAY-dt)/86400000);
