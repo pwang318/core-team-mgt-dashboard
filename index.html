@@ -248,7 +248,8 @@ function getRotation(lp,wkKey){
   var pw=Math.min(remaining,normal.length);
   var si=normal.length?((wn*pw)%normal.length):0;
   var base=[];for(var i=0;i<pw;i++)base.push(normal[(si+i)%normal.length]);
-  var combined=priority.concat(base);
+  var overdue=normal.filter(function(a){var ds=lpDays(a[0]);return ds!==null&&ds>=14&&base.indexOf(a)<0;});
+  var combined=priority.concat(overdue.slice(0,2)).concat(base);
   var seen={},res=[];
   for(var j=0;j<combined.length;j++){if(!seen[combined[j][0]]){seen[combined[j][0]]=true;res.push(combined[j]);}}
   return res.slice(0,15);
