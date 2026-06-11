@@ -188,9 +188,20 @@ function loadAll(){
     amandaActivities=res[2]||[];
     agentProfiles={};
     if(res[3])res[3].forEach(function(p){agentProfiles[p.agent_name]=p;});
-    var allYTDCalls=res[4]||[];
-    ytdCallLogs=allYTDCalls;
-    mtdCallLogs=allYTDCalls.filter(function(r){return r.call_date>=mtdStart;});
+    // Merge current week calls into history for complete MTD/YTD
+    var histCalls=res[4]||[];
+    var seen={};
+    histCalls.forEach(function(h){seen[h.agent_name+"|"+h.call_date+"|"+h.lp]=true;});
+    // res[0] is this week's call_logs — add any not already in history
+    if(res[0])res[0].forEach(function(c){
+      var key=c.agent_name+"|"+c.call_date+"|"+c.lp;
+      if(c.call_date&&c.lp&&!seen[key]){
+        seen[key]=true;
+        histCalls.push({agent_name:c.agent_name,lp:c.lp,call_date:c.call_date});
+      }
+    });
+    ytdCallLogs=histCalls.filter(function(r){return r.call_date&&r.call_date>=ytdStart;});
+    mtdCallLogs=histCalls.filter(function(r){return r.call_date&&r.call_date>=mtdStart;});
     mtdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=mtdStart;});
     ytdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=ytdStart;});
     setSyncStatus("live");
@@ -478,13 +489,13 @@ function renderMTDYTD(){
       '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';display:inline-block"></span>'+lp+'</div>'+
       '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
       '<span><b style="font-size:15px;color:#1F4E79">'+calledMTD.length+'</b> calls</span>'+
-      '<span><b style="font-size:15px;color:#43A047">'+uniqueMTD+'</b> unique agents</span>'+
+      '<span><b style="font-size:15px;color:#43A047">'+uniqueMTD+'</b> agents reached</span>'+
       '</div></div></div>';
     ytdDetail+='<div class="sc-row"><div class="sc-top">'+
       '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';display:inline-block"></span>'+lp+'</div>'+
       '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
       '<span><b style="font-size:15px;color:#1F4E79">'+calledYTD.length+'</b> calls</span>'+
-      '<span><b style="font-size:15px;color:#43A047">'+uniqueYTD+'</b> unique agents</span>'+
+      '<span><b style="font-size:15px;color:#43A047">'+uniqueYTD+'</b> agents reached</span>'+
       '</div></div></div>';
   });
   document.getElementById("mtd-lp-content").innerHTML=mtdDetail||'<div style="color:#aaa;font-size:13px;padding:.5rem 0">No call data yet this month.</div>';
@@ -523,9 +534,7 @@ function renderMTDYTD(){
   document.getElementById("ytd-amanda-content").innerHTML=ytdADetail;
 }
 
-, POST to insert new ones.
-// This resolves the "Error saving" issue caused by Supabase rejecting duplicate upserts
-// when agent_name lacks a unique constraint enforced at the API level.
+// Uses PATCH to update existing profiles, POST to insert new ones.
 function saveAgentProfile(name){
   var data={agent_name:name,email:document.getElementById("prof-email").value.trim(),phone:document.getElementById("prof-phone").value.trim(),address:document.getElementById("prof-address").value.trim(),birthday:document.getElementById("prof-birthday").value.trim()};
   var exists=!!(agentProfiles[name]&&agentProfiles[name].agent_name);
