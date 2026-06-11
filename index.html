@@ -1,1 +1,683 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Core Team Management Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:#1a1a1a;font-size:14px;background:#f0f2f5;min-height:100vh}
+.app{max-width:1100px;margin:0 auto;padding:1rem 1rem 3rem}
+.header{padding:.9rem 0 .7rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid #dde1e7;margin-bottom:.85rem}
+.brand-logo{background:#1F4E79;color:#fff;font-weight:700;font-size:14px;padding:7px 14px;border-radius:8px;letter-spacing:.05em}
+.week-pill{font-size:11px;background:#e8eaf0;padding:4px 11px;border-radius:20px;color:#555}
+.sync{display:flex;align-items:center;gap:4px;font-size:11px;color:#888}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#ccc}
+.sync-dot.live{background:#43A047}.sync-dot.saving{background:#FB8C00}.sync-dot.error{background:#E53935}
+.btn{border:1px solid #dde1e7;background:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;color:#555;font-family:inherit}
+.tabs{display:flex;gap:0;border-bottom:1px solid #dde1e7;margin-bottom:.85rem}
+.tab{padding:8px 16px;cursor:pointer;font-size:13px;font-weight:500;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#1F4E79;border-bottom-color:#1F4E79}
+.view{display:none}.view.active{display:block}
+.section-title{font-size:15px;font-weight:700;margin-bottom:.75rem}
+.divider{border:none;border-top:1px solid #dde1e7;margin:1.5rem 0}
+.growth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1rem}
+.growth-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.9rem 1rem}
+.growth-label{font-size:11px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.growth-val{font-size:28px;font-weight:800;margin-bottom:2px}
+.growth-goal{font-size:11px;color:#888}
+.growth-bar-track{background:#eee;border-radius:20px;height:4px;margin-top:6px;overflow:hidden}
+.growth-bar{height:4px;border-radius:20px}
+.lp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1rem}
+.lp-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.9rem 1rem}
+.lp-name{font-weight:700;font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.lp-pct{font-size:26px;font-weight:800;margin-bottom:4px}
+.lp-bar-track{background:#eee;border-radius:20px;height:5px;margin-bottom:5px;overflow:hidden}
+.lp-bar{height:5px;border-radius:20px}
+.lp-meta{font-size:11px;color:#888;display:flex;justify-content:space-between}
+.scorecard{background:#fff;border:1px solid #dde1e7;border-radius:12px;overflow:hidden;margin-bottom:1rem}
+.sc-header{padding:.85rem 1.1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.sc-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.pill-green{background:#EAF3DE;color:#3B6D11}.pill-amber{background:#FFF2CC;color:#7D5A00}.pill-red{background:#FFEBEE;color:#C62828}
+.sc-body-inner{border-top:1px solid #f0f2f5;padding:.9rem 1.1rem}
+.sc-row{padding:9px 0;border-bottom:1px solid #f0f2f5}
+.sc-row:last-child{border-bottom:none}
+.sc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sc-pct{font-size:20px;font-weight:800}
+.sc-sub{font-size:11px;color:#888}
+.missed-box{background:#FFEBEE;border-radius:6px;padding:5px 9px;font-size:11px;color:#C62828;margin-top:4px}
+.won-box{font-size:11px;color:#43A047;font-weight:500;margin-top:2px}
+.amanda-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:1rem}
+.a-card{background:#fff;border:1px solid #dde1e7;border-radius:10px;padding:.75rem .9rem;border-left:3px solid #7B1FA2}
+.a-label{font-size:10px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.a-val{font-size:20px;font-weight:700}
+.a-sub{font-size:10px;color:#888;margin-top:2px}
+.a-bar-track{background:#eee;border-radius:20px;height:3px;margin-top:5px;overflow:hidden}
+.a-bar{height:3px;border-radius:20px}
+.lp-tag{display:inline-block;padding:1px 7px;border-radius:20px;font-size:11px;font-weight:600}
+.lp-tag-Gavin{background:#E8F5E9;color:#2E7D32}.lp-tag-Karen{background:#E3F2FD;color:#1565C0}
+.lp-tag-Osgood{background:#FFF8E1;color:#E65100}.lp-tag-Jordan{background:#FCE4EC;color:#880E4F}
+.lp-tag-Said{background:#EDE7F6;color:#4527A0}
+.active-pill{background:#EAF3DE;color:#3B6D11;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600}
+.stat-pill{font-size:11px;background:#e8eaf0;padding:2px 9px;border-radius:20px;color:#555}
+.badge-inactive{background:#FFCDD2;color:#B71C1C;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+.search-box{width:100%;padding:10px 14px;border:1.5px solid #1F4E79;border-radius:12px;font-size:14px;color:#1a1a1a;background:#fff;font-family:inherit;margin-bottom:1rem}
+.agent-card{background:#fff;border:1px solid #dde1e7;border-radius:12px;overflow:hidden;margin-bottom:1rem}
+.agent-header{padding:.9rem 1.1rem;border-bottom:1px solid #f0f2f5;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.agent-name-big{font-size:18px;font-weight:700;margin-bottom:4px}
+.agent-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.85rem 1.1rem;border-bottom:1px solid #f0f2f5}
+.stat-box{text-align:center}
+.stat-num{font-size:18px;font-weight:700;margin-bottom:2px}
+.stat-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:.85rem 1.1rem;border-top:1px solid #f0f2f5}
+.profile-field{display:flex;flex-direction:column;gap:3px}
+.profile-field label{font-size:10px;color:#888;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.profile-field input{padding:6px 9px;border:1px solid #dde1e7;border-radius:7px;font-size:13px;color:#1a1a1a;background:#fff;font-family:inherit;width:100%}
+.history-section{padding:.85rem 1.1rem}
+.history-label{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
+.history-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f0f2f5}
+.history-item:last-child{border-bottom:none}
+.h-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.h-body{flex:1}
+.h-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;flex-wrap:wrap;gap:4px}
+.h-who{font-weight:600;font-size:12px}
+.h-date{font-size:11px;color:#888}
+.h-type{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;margin-bottom:3px;display:inline-block}
+.h-note{font-size:12px;color:#555;font-style:italic}
+.lp-source{background:#E3F2FD;color:#1565C0;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600}
+.rm-source{background:#F3E5F5;color:#6A1B9A;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600}
+.save-btn{border:1px solid #1F4E79;background:#1F4E79;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;color:#fff;font-family:inherit}
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #dde1e7;border-radius:8px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.autocomplete-item{padding:8px 10px;cursor:pointer;font-size:13px}
+.autocomplete-item:hover{background:#f5f6fa}
+.drow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f2f5;font-size:13px}
+.drow:last-child{border-bottom:none}
+.never-banner{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;margin-bottom:.85rem;font-size:13px;color:#854F0B;display:none;align-items:center;gap:8px}
+.attn-box{background:#fff;border:1px solid #EF9A9A;border-left:4px solid #E53935;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem}
+.attn-title{font-size:13px;font-weight:700;color:#C62828;margin-bottom:.6rem;display:flex;align-items:center;gap:6px}
+.attn-item{font-size:12px;color:#555;padding:5px 0;border-bottom:1px solid #f5f5f5;display:flex;align-items:flex-start;gap:7px}
+.attn-item:last-child{border-bottom:none}
+.attn-dot{width:6px;height:6px;border-radius:50%;background:#E53935;flex-shrink:0;margin-top:5px}
+.trend-up{color:#43A047;font-size:11px;font-weight:600}
+.trend-dn{color:#E53935;font-size:11px;font-weight:600}
+.trend-eq{color:#888;font-size:11px;font-weight:600}
+.pace-pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block}
+.pace-ahead{background:#EAF3DE;color:#3B6D11}
+.pace-on{background:#FFF2CC;color:#7D5A00}
+.pace-behind{background:#FFEBEE;color:#C62828}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="header"><div style="display:flex;align-items:center;gap:10px"><span class="brand-logo">CORE TEAM</span><span style="font-size:12px;color:#666">Management Dashboard</span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="week-pill" id="weekPill"></span><div class="sync"><span class="sync-dot" id="syncDot"></span><span id="syncTxt">Loading...</span></div><button class="btn" onclick="loadAll()">&#8635; Refresh</button></div></div>
+<div class="tabs"><div class="tab active" onclick="switchTab('overview')">Overview</div><div class="tab" onclick="switchTab('mtd')">MTD / YTD</div><div class="tab" onclick="switchTab('search')">Agent Search</div></div>
+<div id="view-overview" class="view active">
+<div class="never-banner" id="amanda-alert">&#9888; Amanda has not logged activity in 3+ days.</div>
+<div id="needs-attention-box"></div>
+<div class="section-title">&#127942; Growth scoreboard</div>
+<div class="growth-grid" id="growth-grid"></div>
+<div style="background:#fff;border:1px solid #dde1e7;border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.25rem"><div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.5rem">Level breakdown</div><div id="level-breakdown"></div></div>
+<hr class="divider">
+<div class="section-title">&#128198; LP weekly performance</div>
+<div class="lp-grid" id="lp-grid"></div>
+<div class="scorecard"><div class="sc-header" onclick="toggleSC('tw-body','tw-chev')"><div class="sc-title">&#128200; This week <span style="font-size:11px;font-weight:400;color:#888" id="tw-lbl"></span><div class="pills" id="tw-pills"></div></div><span id="tw-chev" style="font-size:14px;color:#888">&#9660;</span></div><div id="tw-body" style="display:none" class="sc-body-inner"><div id="tw-content"></div></div></div>
+<div class="scorecard" id="lw-scorecard" style="display:none"><div class="sc-header" onclick="toggleSC('lw-body','lw-chev')"><div class="sc-title">&#128197; Last week <span style="font-size:11px;font-weight:400;color:#888" id="lw-lbl"></span><div class="pills" id="lw-pills"></div></div><span id="lw-chev" style="font-size:14px;color:#888">&#9660;</span></div><div id="lw-body" style="display:none" class="sc-body-inner"><div id="lw-content"></div></div></div>
+<hr class="divider">
+<div class="section-title">&#128101; Amanda &mdash; Relationship Manager</div>
+<div class="amanda-grid" id="amanda-grid"></div>
+<div class="scorecard"><div class="sc-header" onclick="toggleSC('atw-body','atw-chev')"><div class="sc-title">&#128200; Amanda this week<div class="pills" id="atw-pills"></div></div><span id="atw-chev" style="font-size:14px;color:#888">&#9660;</span></div><div id="atw-body" style="display:none" class="sc-body-inner"><div id="atw-content"></div></div></div>
+</div>
+
+<div id="view-mtd" class="view">
+<div class="section-title">&#128200; LP Performance — MTD &amp; YTD</div>
+<div id="mtd-lp-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1.5rem"></div>
+<div class="scorecard"><div class="sc-header" onclick="toggleSC('mtd-lp-body','mtd-lp-chev')"><div class="sc-title">LP Detail — Month to Date</div><span id="mtd-lp-chev" style="font-size:14px;color:#888">&#9660;</span></div><div id="mtd-lp-body" style="display:none" class="sc-body-inner"><div id="mtd-lp-content"></div></div></div>
+<div class="scorecard" style="margin-top:.75rem"><div class="sc-header" onclick="toggleSC('ytd-lp-body','ytd-lp-chev')"><div class="sc-title">LP Detail — Year to Date</div><span id="ytd-lp-chev" style="font-size:14px;color:#888">&#9660;</span></div><div id="ytd-lp-body" style="display:none" class="sc-body-inner"><div id="ytd-lp-content"></div></div></div>
+<hr class="divider">
+<div class="section-title">&#128101; Amanda — MTD &amp; YTD</div>
+<div id="mtd-amanda-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:1rem"></div>
+<div class="scorecard"><div class="sc-header" onclick="toggleSC('ytd-amanda-body','ytd-amanda-chev')"><div class="sc-title">Amanda Detail — Year to Date</div><span id="ytd-amanda-chev" style="font-size:14px;color:#888">&#9660;</span></div><div id="ytd-amanda-body" style="display:none" class="sc-body-inner"><div id="ytd-amanda-content"></div></div></div>
+</div>
+
+<div id="view-search" class="view">
+<div class="autocomplete-wrap"><input class="search-box" type="text" id="agent-search-input" placeholder="Search any agent by name..." oninput="searchAgent()" onblur="hideAgentSuggestions()" autocomplete="off"><div class="autocomplete-list" id="agent-suggestions" style="display:none"></div></div>
+<div id="agent-search-result"><div style="text-align:center;padding:3rem;color:#aaa;font-size:13px">Type an agent name to see their full contact history.</div></div>
+</div>
+</div>
+<script>
+var SB_URL="https://uclucbdkjqyqdvifyptx.supabase.co";
+var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHVjYmRranF5cWR2aWZ5cHR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTUyMTMsImV4cCI6MjA5NjA3MTIxM30.VnqWcFT1WLQwCJxSdEIzIgOvETaOQly2IQxht-9uI7E";
+var LPS=["Gavin","Karen","Osgood","Jordan","Said"];
+var LP_COLORS={Gavin:"#4CAF50",Karen:"#2196F3",Osgood:"#FF9800",Jordan:"#E91E63",Said:"#9C27B0"};
+var AMANDA_GOALS={"Cold Calls":25,"New Realtor Meeting":5,"Break Breads":5,"Active Check-in":10,"Realtor Buddy Referral Ask":3};
+var TODAY=new Date();TODAY.setHours(0,0,0,0);
+var CUTOFF=new Date(TODAY);CUTOFF.setDate(TODAY.getDate()-90);
+var weekKey,lastWeekKey;
+var callLogs={},lastWeekCallLogs={},amandaActivities=[],agentProfiles={};
+var mtdCallLogs=[],ytdCallLogs=[],mtdAmanda=[],ytdAmanda=[];
+var agents=[];
+var SEED=[["TIARA VILLATORO", "A", "Karen", "2026-05-08", "2026-05-08", "2026-06-04", "2026-05-22", false, 10], ["BRANDON THOMPSON", "A", "Osgood", "2026-06-01", "2026-06-01", "2026-05-04", "2026-06-01", false, 9], ["MEGAN LYNCH", "A", "Gavin", "2026-06-03", "2026-06-05", "2026-06-01", "2026-06-22", false, 9], ["TODD STONE", "A", "Said", "2026-06-05", "2026-06-09", "2026-04-13", "2026-05-08", false, 9], ["DUSTIN GOLDMAN", "A", "Osgood", "2026-04-20", "2026-04-24", "2026-03-30", "2026-03-27", false, 7], ["TINA HOFFMAN", "A", "Gavin", "2023-10-10", "2026-05-06", "2026-05-27", "2026-02-10", false, 7], ["KEVIN SPEERT", "A", "Gavin", "2026-05-08", "2026-05-27", "2026-06-01", "2026-05-22", false, 6], ["OSCAR MARTINEZ", "A", "Karen", "2026-06-08", "2026-06-08", "2026-05-05", "2026-06-15", false, 6], ["RACQUEL LUDAWAY", "A", "Gavin", "2026-05-29", "2026-05-19", "2026-04-16", "2026-06-04", false, 5], ["CHRIS REED", "A", "Said", "2026-06-03", "2026-06-02", "2026-05-08", "2026-05-27", false, 4], ["MICHELLE ERICKSON", "A", "Gavin", "2025-08-04", "2026-03-25", "2026-04-20", "2026-04-10", false, 4], ["SAHAR SHALASH", "A", "Said", "2026-06-05", "2026-06-05", "2026-05-09", "2026-05-29", false, 4], ["CINDA ERICKSON", "B", "Gavin", "2026-04-23", "2026-04-21", "2026-02-24", "2026-03-26", false, 3], ["CONNER KOCHANSKY", "B", "Gavin", "2026-05-30", "2026-05-19", "2026-05-20", "2026-05-20", false, 3], ["DEANNE RHYNEHARDT", "B", "Osgood", "2026-05-22", "2026-05-28", "2026-05-05", "2026-06-05", false, 3], ["DERON BENDER", "A", "Gavin", "2025-08-11", "2026-04-24", "2026-04-28", "2026-05-08", true, 3], ["INGRID CORREIA", "B", "Gavin", "2026-05-08", "2026-05-08", "2025-12-11", "2026-01-05", false, 3], ["JOHN BRUNNER", "B", "Osgood", "2026-06-01", "2026-06-01", "2026-06-05", "2025-11-17", false, 3], ["KANDIS HALL", "B", "Osgood", "2026-01-04", "2026-01-31", "2026-02-25", "2026-03-17", false, 3], ["KRISTINA MURPHY", "B", "Osgood", "2026-06-02", "2026-05-11", "2025-10-03", "2025-10-21", false, 3], ["MARK BOYD", "B", "Gavin", null, "2026-03-28", "2026-04-08", "2026-02-02", false, 3], ["MATTHEW MONTALVO", "B", "Karen", "2026-04-09", "2026-04-08", "2026-05-29", "2025-11-20", false, 3], ["SETH COLBURN", "B", "Said", "2025-04-23", "2026-03-31", "2026-04-06", "2026-04-30", false, 3], ["ANNIE MORENO", "B", "Karen", "2026-06-06", "2026-06-08", "2026-05-11", "2026-06-05", false, 2], ["DAN MANLEY", "B", "Gavin", "2025-11-23", "2026-04-29", "2026-05-01", "2026-05-19", false, 2], ["ELIZABETH ELLINGER", "B", "Jordan", "2026-03-16", "2026-04-01", "2026-05-18", "2026-06-10", false, 2], ["ERIKA WEHNER", "B", "Gavin", null, "2026-04-13", "2026-05-28", "2026-05-11", false, 2], ["HEATHER HENRY-MINOR", "B", "Jordan", "2026-04-07", "2026-04-15", "2026-05-05", "2026-05-28", false, 2], ["KATIE SUMMERS", "B", "Gavin", null, "2026-04-22", "2026-02-26", "2026-05-29", false, 2], ["KHADIJA FARAH", "B", "Jordan", "2026-05-16", "2026-05-17", "2026-02-09", "2026-03-06", false, 2], ["KISHMA JAMES", "B", "Said", "2026-03-16", "2026-03-12", "2025-06-09", "2025-07-14", false, 2], ["MARIA COMAS", "B", "Karen", "2026-04-27", "2026-03-02", "2025-06-19", "2025-07-21", false, 2], ["MARTIN HOPKINS", "B", "Karen", "2026-02-12", "2026-04-28", "2026-01-29", "2026-02-20", false, 2], ["MARY MCMICHAEL", "B", "Said", "2026-04-13", "2026-04-13", "2025-09-11", "2025-10-10", false, 2], ["MATT PIPER", "B", "Osgood", "2026-05-19", "2026-05-19", "2025-11-11", "2025-12-01", false, 2], ["NATALIE ESTRELLA", "B", "Karen", "2026-05-25", "2026-05-25", "2025-10-08", "2025-11-03", false, 2], ["RAMI TAMIMI", "B", "Jordan", "2026-03-27", "2026-04-20", "2026-05-07", "2026-06-30", false, 2], ["STACEY LAMBRIGHT", "B", "Jordan", null, "2026-03-25", "2026-03-26", "2026-04-07", false, 2], ["TRACY BERARD", "B", "Jordan", null, "2026-04-04", "2026-04-14", "2026-05-27", false, 2], ["AIMEE WHITLOCK", "C", "Gavin", null, "2025-01-14", "2026-02-10", "2026-04-15", false, 1], ["ALEXIS REED", "C", "Said", "2026-03-25", "2026-05-12", "2026-01-30", "2026-02-27", false, 1], ["AMY AGRESTA", "C", "Gavin", "2026-05-23", "2026-05-28", "2025-07-08", "2025-08-05", false, 1], ["ANGELA PEREZ", "C", "Gavin", "2026-04-27", "2026-05-06", "2026-04-06", "2026-04-24", false, 1], ["BRIAN NANTHAVONGDOUANGSY", "C", "Osgood", "2025-10-23", "2025-11-19", "2025-12-18", "2026-03-20", false, 1], ["BRITNEY DODDS", "C", "Gavin", "2026-03-26", "2026-03-26", "2026-03-02", "2026-04-08", false, 1], ["CAROLE MCMAHON", "C", "Osgood", "2026-05-31", "2026-05-31", "2026-05-08", "2026-05-26", false, 1], ["CESIA ESPINOZA YOUNG", "C", "Karen", "2026-03-11", "2026-03-10", "2026-03-26", "2026-04-17", false, 1], ["CHELSEA ANDERSON", "C", "Osgood", "2026-02-07", "2026-02-06", "2026-03-28", "2026-04-17", false, 1], ["COURTNEY HAMILTON", "C", "Osgood", "2026-05-27", "2026-05-27", "2026-06-02", "2025-06-26", false, 1], ["DEVIN JOHNSON", "C", "Said", "2026-03-29", "2026-04-15", "2025-05-30", "2025-07-09", false, 1], ["DIANNA JENKINS", "C", "Said", null, "2026-03-24", "2026-02-23", "2026-04-06", false, 1], ["HAIFA BRUNNEY", "C", "Karen", "2026-05-21", "2026-06-01", "2026-03-26", "2026-04-27", false, 1], ["JACOB ENGLISH", "C", "Jordan", null, "2026-03-18", "2026-04-23", "2026-06-12", false, 1], ["JASMINE MCKENZIE", "C", "Osgood", "2026-05-03", "2026-05-04", "2026-05-06", "2026-05-29", false, 1], ["JESSE MCCRERRY", "C", "Said", null, "2026-04-06", "2026-04-13", "2026-05-26", false, 1], ["JOHN LUBINSKY", "C", "Said", "2025-12-17", "2025-12-19", "2026-02-17", "2026-03-20", false, 1], ["JORDAN HOLLIBAUGH", "C", "Gavin", null, "2026-05-12", "2026-04-29", "2026-04-16", false, 1], ["KATHERINE DE LA ROSA", "C", "Karen", "2026-05-28", "2026-06-02", "2026-04-01", "2026-04-29", false, 1], ["KELSY YODER", "C", "Said", "2026-04-28", "2026-01-09", "2026-01-12", "2026-02-05", false, 1], ["KINSIE HUSKINS", "C", "Jordan", null, "2026-03-17", "2026-04-28", "2026-06-01", false, 1], ["KRISTEN VALENTY", "C", "Jordan", null, "2026-01-21", "2026-02-24", "2026-03-25", false, 1], ["LETIKA WHITE", "C", "Osgood", "2026-05-11", "2026-05-12", "2025-07-31", "2025-08-29", false, 1], ["LISA SIMMONS", "C", "Osgood", null, "2026-03-19", "2026-04-14", "2026-05-27", false, 1], ["LUIS GIL", "C", "Karen", "2026-06-02", "2026-06-02", "2026-06-02", "2025-09-26", false, 1], ["LYNDSEY LANE", "C", "Osgood", "2026-03-16", "2025-09-23", "2025-12-23", "2026-01-23", false, 1], ["MIKE WHITEMAN", "C", "Osgood", null, "2025-07-24", "2025-07-31", "2026-05-11", false, 1], ["NANCY PRICE", "C", "Jordan", "2026-01-03", "2026-01-02", "2026-05-08", "2026-01-30", false, 1], ["PAIGE LUDWIG", "C", "Said", "2026-06-08", "2026-03-05", "2026-03-17", "2026-04-14", false, 1], ["PATRICK ARQUETTE", "C", "Said", "2026-04-22", "2026-01-14", "2025-09-09", "2025-10-07", false, 1], ["PAULA PALLESCHI", "C", "Said", null, "2026-04-21", "2026-04-27", "2026-05-26", false, 1], ["PILAR BENNETT", "C", "Karen", "2026-04-15", "2026-04-15", "2025-07-23", "2025-08-15", false, 1], ["RACHELLE PARSLEY", "C", "Said", "2024-09-03", "2026-04-15", "2026-04-22", "2026-05-13", false, 1], ["ROBERT HAYNER", "C", "Jordan", null, "2026-04-20", "2026-04-23", "2026-05-15", false, 1], ["ROBIN BLAKE", "C", "Gavin", null, "2025-12-19", "2025-12-27", "2026-03-17", false, 1], ["ROSS DIGIORGIO", "C", "Osgood", null, "2025-06-24", "2025-07-14", "2026-04-30", false, 1], ["RUTH ESPINOZA", "C", "Karen", null, "2026-02-26", "2026-03-26", "2026-04-17", false, 1], ["SAM BAMRICK", "C", "Jordan", null, "2026-04-14", "2026-04-20", "2026-05-15", false, 1], ["SARA BUSH", "C", "Said", null, "2026-03-27", "2026-04-13", "2026-05-27", false, 1], ["SLAVI JORDANOV", "C", "Said", "2026-05-30", "2025-10-06", "2025-10-10", "2025-11-07", false, 1], ["STAN GORKSI", "C", "Jordan", null, "2026-03-07", "2026-03-09", "2026-04-07", false, 1], ["THAER AHMED", "C", "Said", "2026-03-31", "2026-03-31", "2025-08-26", "2025-09-30", false, 1], ["TRACI WILLIAMS-JONES", "C", "Jordan", null, "2026-04-09", "2026-03-23", "2026-05-21", false, 1], ["TROY BORDEN", "C", "Gavin", "2026-04-28", "2026-04-30", "2026-04-22", "2026-05-13", false, 1], ["YASMIN DE JESUS", "C", "Karen", "2024-03-27", "2025-11-18", "2026-04-01", "2026-04-29", false, 1], ["ALI SWEAZY", "C", "Osgood", "2026-05-09", "2026-05-09", null, null, false, 0], ["ALINA ILKAEVA", "C", "Said", null, "2026-03-20", null, null, false, 0], ["ANA SORIA", "C", "Karen", "2026-04-19", null, null, null, false, 0], ["ANGELA POTTS", "C", "Osgood", "2026-05-10", "2026-05-10", null, null, false, 0], ["ANGELIQUE SOTONDJI", "C", "Jordan", "2026-03-27", "2026-03-27", null, null, false, 0], ["ASHLEY HENRY", "C", "Osgood", "2026-04-22", "2026-04-21", null, null, false, 0], ["AVA LAIRD", "C", "Jordan", "2026-05-26", "2026-05-25", null, null, false, 0], ["BAILEY STRATHIE", "C", "Osgood", "2026-05-30", "2026-05-30", "2024-11-21", null, false, 0], ["BENJAMIN GAYTAN", "C", "Gavin", "2026-05-16", "2026-05-22", null, null, false, 0], ["BRAD GILLIAM", "C", "Gavin", "2026-05-14", null, null, null, false, 0], ["BRANDON KIDD", "C", "Said", "2026-05-01", null, null, null, false, 0], ["BRANDON MCCLENDON", "C", "Said", "2026-06-08", "2026-06-08", null, null, false, 0], ["BRIAN ZINN", "C", "Jordan", "2026-06-06", "2026-06-07", null, null, false, 0], ["CELINE WILLIAMS", "C", "Jordan", "2026-06-01", null, null, null, false, 0], ["CHERYL KINSEY", "C", "Jordan", "2026-05-05", "2026-05-04", null, null, false, 0], ["CHRISTIAN CHALKIAS", "C", "Osgood", "2026-04-08", "2026-04-08", null, null, false, 0], ["CHRISTINA COUGHLIN", "C", "Osgood", "2026-05-29", "2026-05-29", "2024-09-11", null, false, 0], ["CHUCK KINSEY", "C", "Jordan", "2026-03-16", "2026-03-26", null, null, false, 0], ["CLAUDIA CHUECO", "C", "Karen", "2026-06-08", null, null, null, false, 0], ["CODA GAHRIS", "C", "Jordan", "2026-04-29", "2026-04-29", "2026-05-25", null, false, 0], ["CRAIG MAURER", "C", "Osgood", "2026-05-13", "2026-05-19", null, null, false, 0], ["DAIRDRE SCRIVEN", "C", "Said", "2026-05-19", "2026-05-19", null, null, false, 0], ["DARREN HOGG", "C", "Said", "2026-04-22", "2026-04-28", null, null, false, 0], ["DONALD PAYNE", "C", "Osgood", null, "2026-06-07", "2021-08-11", null, false, 0], ["DONALD PAYNE JR", "C", "Osgood", "2026-06-04", null, null, null, false, 0], ["ELIAS PAPPAN", "C", "Karen", "2026-04-30", null, null, null, false, 0], ["ELIZABETH BONAUDI", "C", "Osgood", "2026-04-17", "2026-04-17", null, null, false, 0], ["ELIZABETH HOWARD", "C", "Osgood", "2026-04-04", "2026-04-03", "2024-11-08", null, false, 0], ["ERIKA BRUNNER", "C", "Gavin", "2026-04-13", "2026-04-15", "2025-11-07", null, false, 0], ["GLADIS CHAVEZ", "C", "Karen", "2026-05-15", "2026-05-05", null, null, false, 0], ["HYPATIA ESPINAL", "C", "Karen", "2026-06-02", "2026-06-02", null, null, false, 0], ["IZXEL MARTINEZ", "C", "Karen", "2026-05-20", "2026-05-20", "2026-06-02", null, false, 0], ["JAIDEN BALLAH", "C", "Said", "2026-06-02", "2026-06-03", null, null, false, 0], ["JASMIN ARCOS", "C", "Karen", "2026-03-19", "2026-03-26", null, null, false, 0], ["JASMIN MONTOYA", "C", "Karen", "2026-05-31", "2026-05-30", null, null, false, 0], ["JEFF MESSMER", "C", "Gavin", "2026-05-12", "2026-05-12", "2025-10-01", null, false, 0], ["JENNIFER BLACKMORE", "C", "Jordan", "2026-05-02", null, null, null, false, 0], ["JENNIFER HOWISON", "C", "Jordan", "2026-03-15", "2026-03-30", "2026-04-06", null, false, 0], ["JESSICA TOWER", "C", "Jordan", "2026-05-27", "2026-05-30", "2023-04-03", null, false, 0], ["JONNATHAN AGUDELO", "C", "Karen", "2026-05-23", "2026-05-19", null, null, false, 0], ["JUSTIN BIERY", "C", "Karen", "2026-05-27", "2026-05-28", null, null, false, 0], ["KATHY HAYES", "C", "Jordan", "2026-05-30", "2026-05-29", "2024-12-09", null, false, 0], ["KATIE MANSOR", "C", "Jordan", "2026-04-27", "2026-04-26", null, null, false, 0], ["KERWIN HEATH", "C", "Said", null, "2026-04-12", null, null, false, 0], ["KYLA AHO", "C", "Said", "2026-03-12", "2025-11-03", "2025-03-28", null, false, 0], ["LAUREN MCCLINTON", "C", "Said", null, "2026-04-29", null, null, false, 0], ["LESLIE HERNANDEZ", "C", "Karen", "2026-05-07", "2026-05-08", "2026-05-19", null, false, 0], ["LILIAN FUENTES", "C", "Karen", "2026-04-21", "2026-04-21", null, null, false, 0], ["LIZBEL CONTRERAS", "C", "Karen", "2026-04-30", "2026-05-11", "2024-09-18", null, false, 0], ["MANDY WILSON", "C", "Jordan", null, "2026-03-28", null, null, false, 0], ["MARK VENNITTI", "C", "Jordan", "2026-04-08", "2026-04-08", "2026-06-01", null, false, 0], ["MARLA SEWELL", "C", "Osgood", null, "2026-03-19", null, null, false, 0], ["MATHEA ARUDDA", "C", "Karen", null, "2026-03-16", "2026-03-23", null, false, 0], ["MICHELE FREDERICK", "C", "Osgood", null, "2026-05-31", null, null, false, 0], ["NANCY BAKER", "C", "Osgood", "2026-04-30", null, null, null, false, 0], ["NIA HARRINGTON", "C", "Said", "2026-05-13", "2026-05-05", "2024-10-17", null, false, 0], ["NICK ZATEZALO", "C", "Osgood", "2026-05-16", "2026-03-19", "2024-03-12", null, false, 0], ["NIKEHA HAYES", "C", "Osgood", "2026-04-15", "2025-09-28", "2024-09-25", null, false, 0], ["NINA AVERY", "C", "Jordan", null, "2026-04-23", null, null, false, 0], ["NORA KERELIUK", "C", "Said", "2026-04-24", null, null, null, false, 0], ["PIERINA MANTILLA", "C", "Karen", null, "2026-03-15", null, null, false, 0], ["ROSALIA PABLO", "C", "Karen", "2026-06-08", "2026-06-04", "2024-11-08", null, false, 0], ["RUTH GONZALEZ", "C", "Karen", "2026-05-19", "2026-05-19", null, null, false, 0], ["SAHEL ALAM", "C", "Said", "2026-05-10", "2026-05-08", null, null, false, 0], ["SARAH HERNANDEZ", "C", "Osgood", "2026-05-28", "2026-05-29", "2024-10-21", null, false, 0], ["SASHA ANTONOVA", "C", "Said", "2026-03-31", "2026-03-31", null, null, false, 0], ["SHANE STINER", "C", "Jordan", null, "2026-04-08", null, null, false, 0], ["SHARON PANTELIS", "C", "Jordan", "2026-04-28", "2025-03-21", "2025-04-01", null, false, 0], ["SHAYNE D. BOYD", "C", "Said", "2026-05-04", "2026-05-07", null, null, false, 0], ["SHIRRELL BURNSIDE", "C", "Osgood", "2026-04-08", "2025-07-14", null, null, false, 0], ["STEVEN OSBORN", "C", "Jordan", "2026-04-30", "2026-02-03", null, null, false, 0], ["SUMMER DURHAM", "C", "Osgood", null, "2026-03-23", null, null, false, 0], ["SUNI RIVAS", "C", "Karen", "2026-05-27", "2026-05-28", null, null, false, 0], ["TAMARA CHARLTON", "C", "Osgood", "2025-07-27", "2026-04-16", "2025-04-14", null, false, 0], ["TATIANA GRIGORITA", "C", "Jordan", "2026-06-08", "2026-06-08", null, null, false, 0], ["THOMAS NEWMAN", "C", "Gavin", "2026-03-02", "2026-03-25", "2022-08-22", null, false, 0], ["TINA-DUTT-HIREN", "C", "Osgood", null, "2026-05-11", null, null, false, 0], ["TOM NEWMAN", "C", "Gavin", "2026-06-08", "2026-06-08", "2024-01-08", null, false, 0], ["TONY AMOS", "C", "Osgood", "2026-04-19", "2026-04-01", "2024-02-27", null, false, 0], ["WENDY RAMIREZ", "C", "Karen", "2026-03-25", "2026-03-25", null, null, false, 0], ["WHITNEY SCHMIDT", "C", "Said", "2026-03-18", "2024-01-12", "2024-01-18", null, false, 0], ["YVETTA HARRISON", "C", "Osgood", "2026-06-04", null, null, null, false, 0]];
+var ALL_AGENTS=["TIARA VILLATORO", "BRANDON THOMPSON", "MEGAN LYNCH", "TODD STONE", "DUSTIN GOLDMAN", "TINA HOFFMAN", "KEVIN SPEERT", "OSCAR MARTINEZ", "RACQUEL LUDAWAY", "CHRIS REED", "MICHELLE ERICKSON", "SAHAR SHALASH", "CINDA ERICKSON", "CONNER KOCHANSKY", "DEANNE RHYNEHARDT", "DERON BENDER", "INGRID CORREIA", "JOHN BRUNNER", "KANDIS HALL", "KRISTINA MURPHY", "MARK BOYD", "MATTHEW MONTALVO", "SETH COLBURN", "ANNIE MORENO", "DAN MANLEY", "ELIZABETH ELLINGER", "ERIKA WEHNER", "HEATHER HENRY-MINOR", "KATIE SUMMERS", "KHADIJA FARAH", "KISHMA JAMES", "MARIA COMAS", "MARTIN HOPKINS", "MARY MCMICHAEL", "MATT PIPER", "NATALIE ESTRELLA", "RAMI TAMIMI", "STACEY LAMBRIGHT", "TRACY BERARD", "AIMEE WHITLOCK", "ALEXIS REED", "AMY AGRESTA", "ANGELA PEREZ", "BRIAN NANTHAVONGDOUANGSY", "BRITNEY DODDS", "CAROLE MCMAHON", "CESIA ESPINOZA YOUNG", "CHELSEA ANDERSON", "COURTNEY HAMILTON", "DEVIN JOHNSON", "DIANNA JENKINS", "HAIFA BRUNNEY", "JACOB ENGLISH", "JASMINE MCKENZIE", "JESSE MCCRERRY", "JOHN LUBINSKY", "JORDAN HOLLIBAUGH", "KATHERINE DE LA ROSA", "KELSY YODER", "KINSIE HUSKINS", "KRISTEN VALENTY", "LETIKA WHITE", "LISA SIMMONS", "LUIS GIL", "LYNDSEY LANE", "MIKE WHITEMAN", "NANCY PRICE", "PAIGE LUDWIG", "PATRICK ARQUETTE", "PAULA PALLESCHI", "PILAR BENNETT", "RACHELLE PARSLEY", "ROBERT HAYNER", "ROBIN BLAKE", "ROSS DIGIORGIO", "RUTH ESPINOZA", "SAM BAMRICK", "SARA BUSH", "SLAVI JORDANOV", "STAN GORKSI", "THAER AHMED", "TRACI WILLIAMS-JONES", "TROY BORDEN", "YASMIN DE JESUS", "ALI SWEAZY", "ALINA ILKAEVA", "ANA SORIA", "ANGELA POTTS", "ANGELIQUE SOTONDJI", "ASHLEY HENRY", "AVA LAIRD", "BAILEY STRATHIE", "BENJAMIN GAYTAN", "BRAD GILLIAM", "BRANDON KIDD", "BRANDON MCCLENDON", "BRIAN ZINN", "CELINE WILLIAMS", "CHERYL KINSEY", "CHRISTIAN CHALKIAS", "CHRISTINA COUGHLIN", "CHUCK KINSEY", "CLAUDIA CHUECO", "CODA GAHRIS", "CRAIG MAURER", "DAIRDRE SCRIVEN", "DARREN HOGG", "DONALD PAYNE", "DONALD PAYNE JR", "ELIAS PAPPAN", "ELIZABETH BONAUDI", "ELIZABETH HOWARD", "ERIKA BRUNNER", "GLADIS CHAVEZ", "HYPATIA ESPINAL", "IZXEL MARTINEZ", "JAIDEN BALLAH", "JASMIN ARCOS", "JASMIN MONTOYA", "JEFF MESSMER", "JENNIFER BLACKMORE", "JENNIFER HOWISON", "JESSICA TOWER", "JONNATHAN AGUDELO", "JUSTIN BIERY", "KATHY HAYES", "KATIE MANSOR", "KERWIN HEATH", "KYLA AHO", "LAUREN MCCLINTON", "LESLIE HERNANDEZ", "LILIAN FUENTES", "LIZBEL CONTRERAS", "MANDY WILSON", "MARK VENNITTI", "MARLA SEWELL", "MATHEA ARUDDA", "MICHELE FREDERICK", "NANCY BAKER", "NIA HARRINGTON", "NICK ZATEZALO", "NIKEHA HAYES", "NINA AVERY", "NORA KERELIUK", "PIERINA MANTILLA", "ROSALIA PABLO", "RUTH GONZALEZ", "SAHEL ALAM", "SARAH HERNANDEZ", "SASHA ANTONOVA", "SHANE STINER", "SHARON PANTELIS", "SHAYNE D. BOYD", "SHIRRELL BURNSIDE", "STEVEN OSBORN", "SUMMER DURHAM", "SUNI RIVAS", "TAMARA CHARLTON", "TATIANA GRIGORITA", "THOMAS NEWMAN", "TINA-DUTT-HIREN", "TOM NEWMAN", "TONY AMOS", "WENDY RAMIREZ", "WHITNEY SCHMIDT", "YVETTA HARRISON"];
+
+function getWeekKey(d){var dt=new Date(d);dt.setHours(0,0,0,0);var day=dt.getDay(),mon=new Date(dt);mon.setDate(dt.getDate()-(day===0?6:day-1));return mon.toISOString().split("T")[0];}
+function getLastWeekKey(d){var dt=new Date(d);dt.setDate(dt.getDate()-7);return getWeekKey(dt);}
+function getWeekLabel(k){var mon=new Date(k),sun=new Date(mon);sun.setDate(mon.getDate()+6);var o={month:"short",day:"numeric"};return "Week of "+mon.toLocaleDateString("en-US",o)+" - "+sun.toLocaleDateString("en-US",o);}
+function fmt(d){if(!d)return "--";return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"2-digit"});}
+function mostRecent(a){return[a[3],a[4],a[5],a[6]].filter(Boolean).sort().reverse()[0]||null;}
+function isActive(a){var d=mostRecent(a);return d?new Date(d)>=CUTOFF:false;}
+function calledThisWeek(name){
+  var log=callLogs[name];
+  if(!log||!log.call_date)return false;
+  return log.call_date>=weekKey&&log.call_date<=getWeekEndKey(weekKey);
+}
+function getWeekEndKey(wk){var d=new Date(wk);d.setDate(d.getDate()+6);return d.toISOString().split("T")[0];}
+function lpDays(name){var log=callLogs[name];if(!log||!log.call_date)return null;var dt=new Date(log.call_date+"T12:00:00");dt.setHours(0,0,0,0);return Math.floor((TODAY-dt)/86400000);}
+function isPriority(a){return a[7]===true;}
+function isThisWeek(ds){return getWeekKey(new Date(ds+"T12:00:00"))===weekKey;}
+function setSyncStatus(s){var dot=document.getElementById("syncDot"),txt=document.getElementById("syncTxt");if(s==="live"){dot.className="sync-dot live";txt.textContent="Live";}else if(s==="saving"){dot.className="sync-dot saving";txt.textContent="Loading...";}else{dot.className="sync-dot error";txt.textContent="Error";}}
+
+function sbFetch(method,path,body){
+  var opts={method:method,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":method==="POST"?"resolution=merge-duplicates,return=minimal":"return=representation"}};
+  if(body)opts.body=JSON.stringify(body);
+  return fetch(SB_URL+"/rest/v1/"+path,opts).then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(t);});return r.status===204?null:r.json();});
+}
+
+function loadAll(){
+  setSyncStatus("saving");
+  weekKey=getWeekKey(TODAY);
+  lastWeekKey=getLastWeekKey(TODAY);
+  agents=SEED.map(function(r){return[r[0],r[1],r[2],r[3],r[4],r[5],r[6],r[7],r[8]];});
+  var ytdStart=TODAY.getFullYear()+"-01-01";
+  var mtdStart=TODAY.getFullYear()+"-"+String(TODAY.getMonth()+1).padStart(2,"0")+"-01";
+  // Use call_date range for current week (more reliable than week_key which can be stale)
+  var weekStart=weekKey;
+  var weekEndDate=new Date(weekKey);weekEndDate.setDate(weekEndDate.getDate()+6);
+  var weekEnd=weekEndDate.toISOString().split("T")[0];
+  var lastWeekStart=lastWeekKey;
+  var lastWeekEndDate=new Date(lastWeekKey);lastWeekEndDate.setDate(lastWeekEndDate.getDate()+6);
+  var lastWeekEnd=lastWeekEndDate.toISOString().split("T")[0];
+  return Promise.all([
+    sbFetch("GET","call_logs?call_date=gte."+weekStart+"&call_date=lte."+weekEnd+"&select=*"),
+    sbFetch("GET","call_logs?call_date=gte."+lastWeekStart+"&call_date=lte."+lastWeekEnd+"&select=*"),
+    sbFetch("GET","amanda_activities?select=*&order=act_date.desc,created_at.desc"),
+    sbFetch("GET","agent_profiles?select=*"),
+    sbFetch("GET","call_logs_history?call_date=gte."+ytdStart+"&select=agent_name,lp,call_date")
+  ]).then(function(res){
+    callLogs={};lastWeekCallLogs={};
+    if(res[0])res[0].forEach(function(r){callLogs[r.agent_name]=r;});
+    if(res[1])res[1].forEach(function(r){lastWeekCallLogs[r.agent_name]=r;});
+    amandaActivities=res[2]||[];
+    agentProfiles={};
+    if(res[3])res[3].forEach(function(p){agentProfiles[p.agent_name]=p;});
+    // Merge current week calls into history for complete MTD/YTD
+    var histCalls=res[4]||[];
+    var seen={};
+    histCalls.forEach(function(h){seen[h.agent_name+"|"+h.call_date+"|"+h.lp]=true;});
+    if(res[0])res[0].forEach(function(c){
+      var key=c.agent_name+"|"+c.call_date+"|"+c.lp;
+      if(c.call_date&&c.lp&&!seen[key]){
+        seen[key]=true;
+        histCalls.push({agent_name:c.agent_name,lp:c.lp,call_date:c.call_date});
+      }
+    });
+    ytdCallLogs=histCalls.filter(function(r){return r.call_date&&r.call_date>=ytdStart;});
+    mtdCallLogs=histCalls.filter(function(r){return r.call_date&&r.call_date>=mtdStart;});
+    mtdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=mtdStart;});
+    ytdAmanda=amandaActivities.filter(function(a){return a.act_date&&a.act_date>=ytdStart;});
+    setSyncStatus("live");
+    renderAll();
+  }).catch(function(e){setSyncStatus("error");console.log(e);});
+}
+
+function getRotation(lp,wkKey){
+  var active=agents.filter(function(a){return a[2]===lp&&isActive(a);});
+  if(!active.length)return[];
+  var wn=Math.floor((new Date(wkKey)-new Date("2024-01-01"))/(7*86400000));
+  var priority=active.filter(isPriority);
+  var normal=active.filter(function(a){return!isPriority(a);});
+  var remaining=Math.max(0,15-priority.length);
+  var pw=Math.min(remaining,normal.length);
+  var si=normal.length?((wn*pw)%normal.length):0;
+  var base=[];for(var i=0;i<pw;i++)base.push(normal[(si+i)%normal.length]);
+  var combined=priority.concat(base);
+  var seen={},res=[];
+  for(var j=0;j<combined.length;j++){if(!seen[combined[j][0]]){seen[combined[j][0]]=true;res.push(combined[j]);}}
+  return res.slice(0,15);
+}
+
+function switchTab(t){
+  document.querySelectorAll(".tab").forEach(function(el,i){el.classList.toggle("active",["overview","mtd","search"][i]===t);});
+  document.getElementById("view-overview").classList.toggle("active",t==="overview");
+  document.getElementById("view-mtd").classList.toggle("active",t==="mtd");
+  document.getElementById("view-search").classList.toggle("active",t==="search");
+  if(t==="mtd")renderMTDYTD();
+}
+
+function toggleSC(bodyId,chevId){
+  var body=document.getElementById(bodyId);
+  var chev=document.getElementById(chevId);
+  var isOpen=body.style.display!=="none";
+  body.style.display=isOpen?"none":"block";
+  if(chev)chev.style.transform=isOpen?"":"rotate(180deg)";
+}
+
+function renderAll(){
+  document.getElementById("weekPill").textContent=getWeekLabel(weekKey);
+  document.getElementById("tw-lbl").textContent=getWeekLabel(weekKey);
+  renderGrowth();
+  renderLPGrid();
+  renderScorecard("tw",callLogs,weekKey);
+  renderScorecard("lw",lastWeekCallLogs,lastWeekKey);
+  renderAmandaGrid();
+  renderAmandaScorecard(amandaActivities.filter(function(a){return isThisWeek(a.act_date);}));
+  checkNeverLogged();
+  renderNeedsAttention();
+}
+
+function renderGrowth(){
+  var active=agents.filter(isActive);
+  var aCount=active.filter(function(a){return a[1]==="A";}).length;
+  var bCount=active.filter(function(a){return a[1]==="B";}).length;
+  var cCount=active.filter(function(a){return a[1]==="C";}).length;
+  var total=active.length;
+  var channel=agents.filter(function(a){return a[8]&&parseInt(a[8])>=10;}).length;
+  // Project date to 200 agents based on YTD growth rate
+  var ytdStart=TODAY.getFullYear()+"-01-01";
+  var agentsAddedYTD=ytdCallLogs.filter(function(r){
+    var d=r.call_date||"";return d>=ytdStart;
+  });
+  var dayOfYear=Math.floor((TODAY-new Date(TODAY.getFullYear()+"-01-01T00:00:00"))/86400000)+1;
+  var weeklyRate=total/(dayOfYear/7);
+  var weeksToGoal=weeklyRate>0?Math.ceil((200-total)/weeklyRate):null;
+  var projDate=null;
+  if(weeksToGoal!==null&&weeksToGoal>0&&weeksToGoal<260){var pd=new Date(TODAY);pd.setDate(pd.getDate()+weeksToGoal*7);projDate=pd.toLocaleDateString("en-US",{month:"short",year:"numeric"});}
+  var goals=[{label:"Total active agents",val:total,goal:200,col:"#1F4E79",proj:projDate},{label:"A agents",val:aCount,goal:30,col:"#43A047"},{label:"B agents",val:bCount,goal:35,col:"#FB8C00"},{label:"C agents",val:cCount,goal:null,col:"#888"},{label:"Channel accounts",val:channel,goal:null,col:"#F57F17"}];
+  document.getElementById("growth-grid").innerHTML=goals.map(function(g){
+    var pct=g.goal?Math.min(100,Math.round(g.val/g.goal*100)):100;
+    var barCol=pct>=100?"#43A047":pct>=60?"#FB8C00":"#E53935";
+    return'<div class="growth-card"><div class="growth-label">'+g.label+'</div>'+
+      '<div class="growth-val" style="color:'+g.col+'">'+g.val+'</div>'+
+      (g.goal?'<div class="growth-goal">Goal: '+g.goal+' ('+pct+'%)'+(g.proj?' &bull; On track for <b>'+g.proj+'</b>':'')+'</div><div class="growth-bar-track"><div class="growth-bar" style="width:'+pct+'%;background:'+barCol+'"></div></div>':'<div class="growth-goal">All time</div>')+
+    '</div>';
+  }).join("");
+  document.getElementById("level-breakdown").innerHTML='<div style="display:flex;width:100%;height:16px;border-radius:20px;overflow:hidden;margin-bottom:6px">'+
+    '<div style="width:'+(total?Math.round(aCount/total*100):0)+'%;background:#43A047"></div>'+
+    '<div style="width:'+(total?Math.round(bCount/total*100):0)+'%;background:#FB8C00"></div>'+
+    '<div style="width:'+(total?Math.round(cCount/total*100):0)+'%;background:#e0e0e0"></div></div>'+
+    '<div style="display:flex;gap:12px;font-size:12px">'+
+    '<span style="color:#43A047;font-weight:600">A: '+aCount+'</span>'+
+    '<span style="color:#FB8C00;font-weight:600">B: '+bCount+'</span>'+
+    '<span style="color:#888;font-weight:600">C: '+cCount+'</span>'+
+    '<span style="color:#888;margin-left:4px">= '+total+' active</span></div>';
+}
+
+function renderLPGrid(){
+  document.getElementById("lp-grid").innerHTML=LPS.map(function(lp){
+    var rot=getRotation(lp,weekKey);
+    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
+    var pct=rot.length?Math.round(done/rot.length*100):0;
+    var all=agents.filter(function(a){return a[2]===lp;});
+    var ic=all.filter(function(a){return!isActive(a);}).length;
+    var pc=all.filter(function(a){return isPriority(a)&&isActive(a);}).length;
+    var col=pct===100?"#43A047":pct>50?"#FB8C00":"#E53935";
+    return'<div class="lp-card">'+
+      '<div class="lp-name"><span style="width:10px;height:10px;border-radius:50%;background:'+LP_COLORS[lp]+';display:inline-block"></span><span style="color:'+LP_COLORS[lp]+'">'+lp+'</span></div>'+
+      '<div class="lp-pct" style="color:'+col+'">'+pct+'%</div>'+
+      '<div class="lp-bar-track"><div class="lp-bar" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+      '<div class="lp-meta"><span>'+done+'/'+rot.length+' this week</span><span>'+all.length+' agents</span></div>'+
+      (pc?'<div style="font-size:11px;color:#C62828;margin-top:4px">'+pc+' priority</div>':"")+
+      (ic?'<div style="font-size:11px;color:#E65100;margin-top:2px">'+ic+' inactive</div>':"")+
+    '</div>';
+  }).join("");
+}
+
+function renderScorecard(which,logs,wkKey){
+  var hasData=Object.keys(logs).length>0&&Object.values(logs).some(function(r){return r.call_date&&r.call_date>=wkKey&&r.call_date<=getWeekEndKey(wkKey);});
+  if(which==="lw"){document.getElementById("lw-scorecard").style.display=hasData?"block":"none";if(!hasData)return;document.getElementById("lw-lbl").textContent=getWeekLabel(wkKey);}
+  var pills="",content="";
+  LPS.forEach(function(lp){
+    var rot=getRotation(lp,wkKey);
+    var done=rot.filter(function(a){return !!(logs[a[0]]&&logs[a[0]].call_date&&logs[a[0]].call_date>=wkKey&&logs[a[0]].call_date<=getWeekEndKey(wkKey));}).length;
+    var missed=rot.filter(function(a){return !(logs[a[0]]&&logs[a[0]].call_date&&logs[a[0]].call_date>=wkKey&&logs[a[0]].call_date<=getWeekEndKey(wkKey));});
+    var pct=rot.length?Math.round(done/rot.length*100):0;
+    var col=pct===100?"#43A047":pct>=80?"#FB8C00":"#E53935";
+    var bg=pct===100?"pill-green":pct>=80?"pill-amber":"pill-red";
+    pills+='<span class="pill '+bg+'">'+lp+" "+pct+'%</span>';
+    content+='<div class="sc-row"><div class="sc-top"><div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+LP_COLORS[lp]+';display:inline-block"></span>'+lp+'</div>'+
+      '<div style="display:flex;align-items:center;gap:10px"><span class="sc-pct" style="color:'+col+'">'+pct+'%</span><span class="sc-sub">'+done+"/"+rot.length+'</span></div></div>'+
+      (pct===100?'<div class="won-box">&#10003; Called all agents!</div>':'<div class="missed-box"><b>Did not call:</b> '+missed.map(function(a){return a[0];}).join(", ")+'</div>')+
+    '</div>';
+  });
+  document.getElementById(which+"-pills").innerHTML=pills;
+  document.getElementById(which+"-content").innerHTML=content;
+}
+
+function renderAmandaGrid(){
+  var acts=amandaActivities.filter(function(a){return isThisWeek(a.act_date);});
+  var lastWeekActs=amandaActivities.filter(function(a){return getWeekKey(new Date(a.act_date+"T12:00:00"))===lastWeekKey;});
+  var counts={};acts.forEach(function(a){counts[a.act_type]=(counts[a.act_type]||0)+1;});
+  var lastCounts={};lastWeekActs.forEach(function(a){lastCounts[a.act_type]=(lastCounts[a.act_type]||0)+1;});
+  var total=Object.values(counts).reduce(function(s,v){return s+v;},0);
+  var lastTotal=Object.values(lastCounts).reduce(function(s,v){return s+v;},0);
+  var goalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
+  function trendArrow(cur,prev){if(!prev)return'';if(cur>prev)return'<span class="trend-up">&#8679; vs last wk</span>';if(cur<prev)return'<span class="trend-dn">&#8681; vs last wk</span>';return'<span class="trend-eq">&#8596; same as last wk</span>';}
+  var cards=[
+    {label:"Overall",val:Math.min(100,Math.round(total/goalTotal*100))+"%",sub:total+" of "+goalTotal+" activities",pct:Math.min(100,Math.round(total/goalTotal*100)),trend:trendArrow(total,lastTotal)},
+    {label:"New meetings",val:(counts["New Realtor Meeting"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["New Realtor Meeting"]||0)/5)*100),trend:trendArrow(counts["New Realtor Meeting"]||0,lastCounts["New Realtor Meeting"]||0)},
+    {label:"Break breads",val:(counts["Break Breads"]||0)+"/5",sub:"weekly goal",pct:Math.min(100,((counts["Break Breads"]||0)/5)*100),trend:trendArrow(counts["Break Breads"]||0,lastCounts["Break Breads"]||0)},
+    {label:"Check-ins",val:(counts["Active Check-in"]||0)+"/10",sub:"weekly goal",pct:Math.min(100,((counts["Active Check-in"]||0)/10)*100),trend:trendArrow(counts["Active Check-in"]||0,lastCounts["Active Check-in"]||0)},
+    {label:"Cold calls",val:(counts["Cold Calls"]||0)+"/25",sub:"weekly goal",pct:Math.min(100,((counts["Cold Calls"]||0)/25)*100),trend:trendArrow(counts["Cold Calls"]||0,lastCounts["Cold Calls"]||0)},
+  ];
+  document.getElementById("amanda-grid").innerHTML=cards.map(function(c){
+    var col=c.pct>=100?"#43A047":c.pct>=60?"#FB8C00":"#E53935";
+    return'<div class="a-card"><div class="a-label">'+c.label+'</div>'+
+      '<div class="a-val" style="color:'+col+'">'+c.val+'</div>'+
+      '<div class="a-bar-track"><div class="a-bar" style="width:'+c.pct+'%;background:'+col+'"></div></div>'+
+      '<div class="a-sub">'+c.sub+'</div>'+
+      (c.trend?'<div style="margin-top:3px">'+c.trend+'</div>':'')+
+    '</div>';
+  }).join("");
+}
+
+function renderAmandaScorecard(acts){
+  var counts={};acts.forEach(function(a){counts[a.act_type]=(counts[a.act_type]||0)+1;});
+  var pills="",content="";
+  Object.keys(AMANDA_GOALS).forEach(function(t){
+    var done=counts[t]||0,goal=AMANDA_GOALS[t];
+    var pct=Math.min(100,Math.round(done/goal*100));
+    var col=pct>=100?"#43A047":pct>=60?"#FB8C00":"#E53935";
+    var bg=pct>=100?"pill-green":pct>=60?"pill-amber":"pill-red";
+    pills+='<span class="pill '+bg+'">'+t.split(" ")[0]+" "+pct+'%</span>';
+    content+='<div class="sc-row"><div class="sc-top"><div style="font-weight:700;font-size:13px">'+t+'</div>'+
+      '<div style="display:flex;align-items:center;gap:10px"><span class="sc-pct" style="color:'+col+'">'+pct+'%</span><span class="sc-sub">'+done+"/"+goal+'</span></div></div>'+
+      (pct>=100?'<div class="won-box">&#10003; Goal hit!</div>':'<div class="missed-box"><b>Short by '+(goal-done)+'</b> this week</div>')+
+    '</div>';
+  });
+  document.getElementById("atw-pills").innerHTML=pills;
+  document.getElementById("atw-content").innerHTML=content;
+}
+
+function checkNeverLogged(){
+  var banner=document.getElementById("amanda-alert");
+  if(!amandaActivities.length){banner.style.display="flex";return;}
+  var last=amandaActivities[0];
+  var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
+  var days=Math.floor((TODAY-lastDate)/86400000);
+  banner.style.display=days>=3?"flex":"none";
+}
+
+function searchAgent(){
+  var val=document.getElementById("agent-search-input").value.toLowerCase();
+  var sugg=document.getElementById("agent-suggestions");
+  if(!val||val.length<2){sugg.style.display="none";return;}
+  var matches=ALL_AGENTS.filter(function(a){return a.toLowerCase().indexOf(val)>=0;}).slice(0,8);
+  if(!matches.length){sugg.style.display="none";return;}
+  sugg.innerHTML=matches.map(function(a){return'<div class="autocomplete-item" data-name="'+a+'" onmousedown="selectAgentSearch(this)">'+a+'</div>';}).join("");
+  sugg.style.display="block";
+}
+function hideAgentSuggestions(){setTimeout(function(){document.getElementById("agent-suggestions").style.display="none";},200);}
+function selectAgentSearch(el){document.getElementById("agent-search-input").value=el.getAttribute("data-name");document.getElementById("agent-suggestions").style.display="none";renderAgentProfile(el.getAttribute("data-name"));}
+
+function renderAgentProfile(name){
+  var el=document.getElementById("agent-search-result");
+  var agent=agents.find(function(a){return a[0]===name;});
+  if(!agent){el.innerHTML='<div style="text-align:center;padding:2rem;color:#aaa">Agent not found.</div>';return;}
+  el.innerHTML='<div style="text-align:center;padding:1rem;color:#888;font-size:12px">Loading history...</div>';
+  var lpCalls=Object.values(callLogs).filter(function(l){return l.agent_name===name;});
+  var amandaTouches=amandaActivities.filter(function(a){return a.agent_name===name;});
+  sbFetch("GET","call_logs_history?agent_name=eq."+encodeURIComponent(name)+"&select=*&order=call_date.desc")
+    .then(function(hist){
+      if(hist&&hist.length){
+        hist.forEach(function(h){if(!lpCalls.find(function(l){return l.call_date===h.call_date&&l.lp===h.lp&&l.note===h.note;})){lpCalls.push(h);}});
+        lpCalls.sort(function(a,b){return(b.call_date||"").localeCompare(a.call_date||"");});
+      }
+      buildAgentCard(name,agent,lpCalls,amandaTouches,el);
+    }).catch(function(){buildAgentCard(name,agent,lpCalls,amandaTouches,el);});
+}
+
+function buildAgentCard(name,agent,lpCalls,amandaTouches,el){
+  var lp=agent[2]||"Unassigned";var level=agent[1]||"C";var active=isActive(agent);
+  var lastLP=lpCalls.length?lpCalls[0].call_date:null;
+  var lastLPDays=lastLP?Math.floor((TODAY-new Date(lastLP+"T12:00:00"))/86400000):null;
+  var mr=mostRecent(agent);var prof=agentProfiles[name]||{};
+  var lpColors={Gavin:"#E8F5E9,#2E7D32",Karen:"#E3F2FD,#1565C0",Osgood:"#FFF8E1,#E65100",Jordan:"#FCE4EC,#880E4F",Said:"#EDE7F6,#4527A0",Unassigned:"#EEE,#555"};
+  var lc=(lpColors[lp]||"#EEE,#555").split(",");
+  var lvc={A:"#C6EFCE,#1B5E20",B:"#BBDEFB,#0D47A1",C:"#EEE,#424242"}[level].split(",");
+  var html='<div class="agent-card">';
+  html+='<div class="agent-header"><div><div class="agent-name-big">'+name+'</div><div class="agent-meta">';
+  html+='<span style="background:'+lvc[0]+';color:'+lvc[1]+';font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">'+level+'</span>';
+  html+='<span style="background:'+lc[0]+';color:'+lc[1]+';font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px">'+lp+'</span>';
+  html+='<span class="'+(active?"active-pill":"badge-inactive")+'">'+(active?"Active":"Inactive")+'</span>';
+  if(mr)html+='<span class="stat-pill">Last activity: '+fmt(mr)+'</span>';
+  html+='</div></div>';
+  html+='<div style="text-align:right"><div style="font-size:11px;color:#888;margin-bottom:4px">Last LP call</div>';
+  html+='<div style="font-weight:700;font-size:13px;color:'+(lastLPDays===null?"#E53935":lastLPDays>14?"#FB8C00":"#43A047")+'">'+(lastLP?fmt(lastLP)+" ("+lastLPDays+"d ago)":"Never called")+'</div></div></div>';
+  html+='<div class="stats-row">';
+  html+='<div class="stat-box"><div class="stat-num" style="color:#1F4E79">'+(lpCalls.length+amandaTouches.length)+'</div><div class="stat-lbl">Total touches</div></div>';
+  html+='<div class="stat-box"><div class="stat-num" style="color:#43A047">'+lpCalls.length+'</div><div class="stat-lbl">LP calls</div></div>';
+  html+='<div class="stat-box"><div class="stat-num" style="color:#7B1FA2">'+amandaTouches.length+'</div><div class="stat-lbl">RM Activity</div></div>';
+  var fuCount=amandaTouches.filter(function(a){return a.follow_up_date&&a.follow_up_date>=TODAY.toISOString().split("T")[0];}).length;
+  html+='<div class="stat-box"><div class="stat-num" style="color:#FB8C00">'+fuCount+'</div><div class="stat-lbl">Follow-ups</div></div></div>';
+  html+='<div class="profile-grid">';
+  html+='<div class="profile-field"><label>Email</label><input id="prof-email" type="text" value="'+(prof.email||'')+'" placeholder="email@example.com"></div>';
+  html+='<div class="profile-field"><label>Phone</label><input id="prof-phone" type="text" value="'+(prof.phone||'')+'" placeholder="(614) 555-5555"></div>';
+  html+='<div class="profile-field"><label>Home address</label><input id="prof-address" type="text" value="'+(prof.address||'')+'" placeholder="123 Main St, Columbus OH"></div>';
+  html+='<div class="profile-field"><label>Birthday</label><input id="prof-birthday" type="text" value="'+(prof.birthday||'')+'" placeholder="MM/DD"></div>';
+  html+='</div>';
+  html+='<div style="padding:.5rem 1.1rem .85rem;border-top:1px solid #f0f2f5"><button class="save-btn" data-name="'+name+'" onclick="saveAgentProfile(this.getAttribute(\'data-name\'))">Save contact info</button></div>';
+  var history=[];
+  lpCalls.forEach(function(l){history.push({date:l.call_date,who:l.lp,type:"LP Call",note:l.note||"",source:"lp"});});
+  amandaTouches.forEach(function(a){history.push({date:a.act_date,who:"Amanda",type:a.act_type,note:a.notes||"",source:"rm"});});
+  history.sort(function(a,b){return(b.date||"").localeCompare(a.date||"");});
+  html+='<div class="history-section"><div class="history-label">Full contact history</div>';
+  if(!history.length){html+='<div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px">No contact history yet.</div>';}
+  else{
+    var ICONS={"LP Call":"📱","Cold Calls":"📞","New Realtor Meeting":"🤝","Break Breads":"🍞","Active Check-in":"💬","Realtor Buddy Referral Ask":"🌟","Re-engagement":"🔄","Agent Appreciation":"🏆","Business Planning Session":"📋"};
+    html+=history.map(function(h){
+      var icon=ICONS[h.type]||"📌";var bg=h.source==="lp"?"#E3F2FD":"#F3E5F5";
+      return'<div class="history-item"><div class="h-icon" style="background:'+bg+'">'+icon+'</div>'+
+        '<div class="h-body"><div class="h-top"><div><span class="h-who">'+h.who+'</span>'+
+        '<span class="'+(h.source==="lp"?"lp-source":"rm-source")+'" style="margin-left:5px">'+(h.source==="lp"?"LP Call":"RM Activity")+'</span></div>'+
+        '<span class="h-date">'+fmt(h.date)+'</span></div>'+
+        '<span class="h-type" style="background:'+bg+';color:#333">'+h.type+'</span>'+
+        (h.note?'<div class="h-note">&ldquo;'+h.note+'&rdquo;</div>':"")+
+        '</div></div>';
+    }).join("");
+  }
+  html+='</div></div>';
+  el.innerHTML=html;
+}
+
+function renderMTDYTD(){
+  var monthName=TODAY.toLocaleDateString("en-US",{month:"long"});
+  var year=TODAY.getFullYear();
+
+  // --- LP summary cards (MTD calls per LP) ---
+  var mtdByLP={},ytdByLP={};
+  LPS.forEach(function(lp){mtdByLP[lp]=0;ytdByLP[lp]=0;});
+  mtdCallLogs.forEach(function(r){if(mtdByLP[r.lp]!==undefined)mtdByLP[r.lp]++;});
+  ytdCallLogs.forEach(function(r){if(ytdByLP[r.lp]!==undefined)ytdByLP[r.lp]++;});
+
+  document.getElementById("mtd-lp-grid").innerHTML=LPS.map(function(lp){
+    var col=LP_COLORS[lp];
+    var agentCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
+    var mtdPct=agentCount?Math.min(100,Math.round(mtdByLP[lp]/agentCount*100)):0;
+    var barCol=mtdPct>=80?"#43A047":mtdPct>=50?"#FB8C00":"#E53935";
+    // Pace: compare calls to date vs expected based on days elapsed this month
+    var dayOfMonth=TODAY.getDate();
+    var daysInMonth=new Date(TODAY.getFullYear(),TODAY.getMonth()+1,0).getDate();
+    var weeksElapsed=dayOfMonth/7;
+    var expected=Math.round(weeksElapsed*agentCount);
+    var actual=mtdByLP[lp];
+    var pacePct=expected>0?actual/expected:1;
+    var paceLabel=pacePct>=1.1?'<span class="pace-pill pace-ahead">Ahead of pace</span>':pacePct>=0.75?'<span class="pace-pill pace-on">On pace</span>':'<span class="pace-pill pace-behind">Behind pace</span>';
+    return'<div class="lp-card">'+
+      '<div class="lp-name"><span style="width:10px;height:10px;border-radius:50%;background:'+col+';display:inline-block"></span><span style="color:'+col+'">'+lp+'</span></div>'+
+      '<div style="font-size:11px;color:#888;margin-bottom:6px">'+monthName+' MTD</div>'+
+      '<div style="font-size:26px;font-weight:800;color:'+barCol+'">'+mtdByLP[lp]+'</div>'+
+      '<div style="font-size:11px;color:#888;margin-bottom:4px">calls logged</div>'+
+      '<div class="lp-bar-track"><div class="lp-bar" style="width:'+mtdPct+'%;background:'+barCol+'"></div></div>'+
+      '<div style="font-size:11px;color:#888;margin-top:4px">YTD: <b style="color:#1F4E79">'+ytdByLP[lp]+'</b></div>'+
+      '<div style="margin-top:5px">'+paceLabel+'</div>'+
+    '</div>';
+  }).join("");
+
+  // --- LP MTD detail breakdown ---
+  var mtdDetail="",ytdDetail="";
+  LPS.forEach(function(lp){
+    var col=LP_COLORS[lp];
+    var agentCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
+    var calledMTD=mtdCallLogs.filter(function(r){return r.lp===lp;});
+    var calledYTD=ytdCallLogs.filter(function(r){return r.lp===lp;});
+    var uniqueMTD=[...new Set(calledMTD.map(function(r){return r.agent_name;}))].length;
+    var uniqueYTD=[...new Set(calledYTD.map(function(r){return r.agent_name;}))].length;
+    mtdDetail+='<div class="sc-row"><div class="sc-top">'+
+      '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';display:inline-block"></span>'+lp+'</div>'+
+      '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
+      '<span><b style="font-size:15px;color:#1F4E79">'+calledMTD.length+'</b> calls</span>'+
+      '<span><b style="font-size:15px;color:#43A047">'+uniqueMTD+'</b> agents reached</span>'+
+      '</div></div></div>';
+    ytdDetail+='<div class="sc-row"><div class="sc-top">'+
+      '<div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+col+';display:inline-block"></span>'+lp+'</div>'+
+      '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
+      '<span><b style="font-size:15px;color:#1F4E79">'+calledYTD.length+'</b> calls</span>'+
+      '<span><b style="font-size:15px;color:#43A047">'+uniqueYTD+'</b> agents reached</span>'+
+      '</div></div></div>';
+  });
+  document.getElementById("mtd-lp-content").innerHTML=mtdDetail||'<div style="color:#aaa;font-size:13px;padding:.5rem 0">No call data yet this month.</div>';
+  document.getElementById("ytd-lp-content").innerHTML=ytdDetail||'<div style="color:#aaa;font-size:13px;padding:.5rem 0">No call data yet this year.</div>';
+
+  // --- Amanda MTD cards ---
+  var amandaTypes=Object.keys(AMANDA_GOALS);
+  var mtdACounts={},ytdACounts={};
+  amandaTypes.forEach(function(t){mtdACounts[t]=0;ytdACounts[t]=0;});
+  mtdAmanda.forEach(function(a){if(mtdACounts[a.act_type]!==undefined)mtdACounts[a.act_type]++;});
+  ytdAmanda.forEach(function(a){if(ytdACounts[a.act_type]!==undefined)ytdACounts[a.act_type]++;});
+  var mtdTotal=mtdAmanda.length,ytdTotal=ytdAmanda.length;
+
+  document.getElementById("mtd-amanda-grid").innerHTML=[
+    {label:monthName+" MTD",val:mtdTotal,sub:"total activities",col:"#7B1FA2"},
+    {label:year+" YTD",val:ytdTotal,sub:"total activities",col:"#7B1FA2"},
+    {label:"New meetings MTD",val:mtdACounts["New Realtor Meeting"]||0,sub:"/ YTD: "+(ytdACounts["New Realtor Meeting"]||0),col:"#1F4E79"},
+    {label:"Break breads MTD",val:mtdACounts["Break Breads"]||0,sub:"/ YTD: "+(ytdACounts["Break Breads"]||0),col:"#FB8C00"},
+    {label:"Check-ins MTD",val:mtdACounts["Active Check-in"]||0,sub:"/ YTD: "+(ytdACounts["Active Check-in"]||0),col:"#43A047"},
+    {label:"Cold calls MTD",val:mtdACounts["Cold Calls"]||0,sub:"/ YTD: "+(ytdACounts["Cold Calls"]||0),col:"#E53935"},
+  ].map(function(c){
+    return'<div class="a-card"><div class="a-label">'+c.label+'</div>'+
+      '<div class="a-val" style="color:'+c.col+'">'+c.val+'</div>'+
+      '<div class="a-sub">'+c.sub+'</div></div>';
+  }).join("");
+
+  // --- Amanda YTD detail ---
+  var ytdADetail=amandaTypes.map(function(t){
+    return'<div class="sc-row"><div class="sc-top">'+
+      '<div style="font-weight:700;font-size:13px">'+t+'</div>'+
+      '<div style="display:flex;gap:16px;font-size:12px;color:#555">'+
+      '<span><b style="font-size:15px;color:#7B1FA2">'+mtdACounts[t]+'</b> MTD</span>'+
+      '<span><b style="font-size:15px;color:#1F4E79">'+ytdACounts[t]+'</b> YTD</span>'+
+      '</div></div></div>';
+  }).join("");
+  document.getElementById("ytd-amanda-content").innerHTML=ytdADetail;
+}
+
+function renderNeedsAttention(){
+  var items=[];
+  var todayStr=TODAY.toISOString().split("T")[0];
+  var dayOfMonth=TODAY.getDate();
+
+  // Only show pace flags after day 14 (give new tracker time to build data)
+  var showPaceFlags=dayOfMonth>14;
+
+  // 1. Osgood (or any LP) at 0% — frame as opportunity
+  LPS.forEach(function(lp){
+    var rot=getRotation(lp,weekKey);
+    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
+    if(rot.length>0&&done===0){
+      items.push({icon:"📞",text:"<b>"+lp+"</b> — "+rot.length+" agents ready to hear from you this week. Let's get those calls in!",type:"opportunity"});
+    }
+  });
+
+  // 2. Agents never called — frame as opportunity not failure
+  var neverCalled=agents.filter(function(a){
+    return isActive(a)&&!Object.values(callLogs).find(function(l){return l.agent_name===a[0];})&&!ytdCallLogs.find(function(l){return l.agent_name===a[0];});
+  });
+  if(neverCalled.length>0){
+    items.push({icon:"🌟",text:"<b>"+neverCalled.length+" active agents</b> haven't been reached yet — big opportunity to make new connections this week",type:"opportunity"});
+  }
+
+  // 3. Amanda inactivity — only flag if 3+ days, frame gently
+  if(amandaActivities.length){
+    var last=amandaActivities[0];
+    var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
+    var days=Math.floor((TODAY-lastDate)/86400000);
+    if(days>=3)items.push({icon:"💬",text:"Amanda's last logged activity was <b>"+days+" days ago</b> — a quick log-in keeps the momentum going!",type:"nudge"});
+  } else {
+    items.push({icon:"💬",text:"Amanda hasn't logged any activity yet this week — encourage her to log today!",type:"nudge"});
+  }
+
+  // 4. Pace flags — only after day 14
+  if(showPaceFlags){
+    LPS.forEach(function(lp){
+      var mtdCalls=mtdCallLogs.filter(function(r){return r.lp===lp;}).length;
+      var activeCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
+      var weeksElapsed=dayOfMonth/7;
+      var expectedCalls=Math.round(weeksElapsed*activeCount);
+      if(activeCount>0&&mtdCalls<expectedCalls*0.5){
+        items.push({icon:"📈",text:"<b>"+lp+"</b> has room to accelerate this month — "+mtdCalls+" calls logged so far, goal is to keep building",type:"pace"});
+      }
+    });
+    var amandaMTDTotal=mtdAmanda.length;
+    var weeklyGoalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
+    var expectedAmanda=Math.round((dayOfMonth/7)*weeklyGoalTotal);
+    if(amandaMTDTotal<expectedAmanda*0.5){
+      items.push({icon:"📈",text:"Amanda has room to accelerate this month — "+amandaMTDTotal+" activities logged so far",type:"pace"});
+    }
+  }
+
+  var box=document.getElementById("needs-attention-box");
+  if(!items.length){
+    box.innerHTML='<div style="background:#EAF3DE;border:1px solid #A5D6A7;border-left:4px solid #43A047;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:#2E7D32;font-weight:500">&#10003; Everything looks great this week — the team is on track!</div>';
+    return;
+  }
+  var typeColors={opportunity:"#1F4E79",nudge:"#7B1FA2",pace:"#E65100"};
+  var typeBg={opportunity:"#E3F2FD",nudge:"#F3E5F5",pace:"#FFF8E1"};
+  box.innerHTML='<div style="background:#fff;border:1px solid #dde1e7;border-left:4px solid #1F4E79;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem">'+
+    '<div style="font-size:13px;font-weight:700;color:#1F4E79;margin-bottom:.6rem">&#127919; This Week\'s Focus ('+items.length+')</div>'+
+    items.map(function(i){
+      var col=typeColors[i.type]||"#555";
+      var bg=typeBg[i.type]||"#f5f5f5";
+      return'<div style="display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid #f5f5f5">'+
+        '<div style="width:28px;height:28px;border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+i.icon+'</div>'+
+        '<div style="font-size:12px;color:#333;padding-top:5px">'+i.text+'</div>'+
+      '</div>';
+    }).join("")+
+  '</div>';
+}
+
+// Uses PATCH to update existing profiles, POST to insert new ones.
+function saveAgentProfile(name){
+  var data={agent_name:name,email:document.getElementById("prof-email").value.trim(),phone:document.getElementById("prof-phone").value.trim(),address:document.getElementById("prof-address").value.trim(),birthday:document.getElementById("prof-birthday").value.trim()};
+  var exists=!!(agentProfiles[name]&&agentProfiles[name].agent_name);
+  var method=exists?"PATCH":"POST";
+  var path=exists?"agent_profiles?agent_name=eq."+encodeURIComponent(name):"agent_profiles";
+  var body=Object.assign({},data);
+  if(method==="PATCH"){delete body.agent_name;}
+  var opts={method:method,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":"return=minimal"}};
+  opts.body=JSON.stringify(body);
+  fetch(SB_URL+"/rest/v1/"+path,opts).then(function(r){
+    if(!r.ok)return r.text().then(function(t){throw new Error(t);});
+    agentProfiles[name]=data;
+    alert("Saved!");
+  }).catch(function(e){console.error("Save error:",e);alert("Error saving: "+e.message);});
+}
+
+setInterval(function(){loadAll();},60000);
+loadAll();
+</script>
+</body>
+</html>
