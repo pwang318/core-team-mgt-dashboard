@@ -332,8 +332,12 @@ function renderGrowth(){
 function renderLPGrid(){
   document.getElementById("lp-grid").innerHTML=LPS.map(function(lp){
     var rot=getRotation(lp,weekKey);
-    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
-    var pct=rot.length?Math.round(done/rot.length*100):0;
+    // Count any active agent called this week (matches LP tracker behavior)
+    var allActive=agents.filter(function(a){return a[2]===lp&&isActive(a);});
+    var calledAny=allActive.filter(function(a){return calledThisWeek(a[0]);}).length;
+    var target=Math.min(15,allActive.length);
+    var done=Math.min(calledAny,target);
+    var pct=target?Math.round(done/target*100):0;
     var all=agents.filter(function(a){return a[2]===lp;});
     var ic=all.filter(function(a){return!isActive(a);}).length;
     var pc=all.filter(function(a){return isPriority(a)&&isActive(a);}).length;
@@ -342,7 +346,7 @@ function renderLPGrid(){
       '<div class="lp-name"><span style="width:10px;height:10px;border-radius:50%;background:'+LP_COLORS[lp]+';display:inline-block"></span><span style="color:'+LP_COLORS[lp]+'">'+lp+'</span></div>'+
       '<div class="lp-pct" style="color:'+col+'">'+pct+'%</div>'+
       '<div class="lp-bar-track"><div class="lp-bar" style="width:'+pct+'%;background:'+col+'"></div></div>'+
-      '<div class="lp-meta"><span>'+done+'/'+rot.length+' this week</span><span>'+all.length+' agents</span></div>'+
+      '<div class="lp-meta"><span>'+done+'/'+target+' this week</span><span>'+allActive.length+' active</span></div>'+
       (pc?'<div style="font-size:11px;color:#C62828;margin-top:4px">'+pc+' priority</div>':"")+
       (ic?'<div style="font-size:11px;color:#E65100;margin-top:2px">'+ic+' inactive</div>':"")+
     '</div>';
@@ -356,24 +360,26 @@ function renderScorecard(which,logs,wkKey){
   if(which==="lw"){document.getElementById("lw-scorecard").style.display=hasData?"block":"none";if(!hasData)return;document.getElementById("lw-lbl").textContent=getWeekLabel(wkKey);}
   var pills="",content="";
   LPS.forEach(function(lp){
-    var rot=getRotation(lp,wkKey);
-    var done=rot.filter(function(a){
+    var allActive=agents.filter(function(a){return a[2]===lp&&isActive(a);});
+    var target=Math.min(15,allActive.length);
+    var calledAny=allActive.filter(function(a){
       var rows=logs[a[0]];
       if(!rows||!rows.length)return false;
       return rows.some(function(r){return r.call_date&&r.call_date>=wkKey&&r.call_date<=getWeekEndKey(wkKey);});
     }).length;
-    var missed=rot.filter(function(a){
+    var done=Math.min(calledAny,target);
+    var missed=allActive.filter(function(a){
       var rows=logs[a[0]];
       if(!rows||!rows.length)return true;
       return !rows.some(function(r){return r.call_date&&r.call_date>=wkKey&&r.call_date<=getWeekEndKey(wkKey);});
-    });
-    var pct=rot.length?Math.round(done/rot.length*100):0;
+    }).slice(0,10);
+    var pct=target?Math.round(done/target*100):0;
     var col=pct===100?"#43A047":pct>=80?"#FB8C00":"#E53935";
     var bg=pct===100?"pill-green":pct>=80?"pill-amber":"pill-red";
     pills+='<span class="pill '+bg+'">'+lp+" "+pct+'%</span>';
     content+='<div class="sc-row"><div class="sc-top"><div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:'+LP_COLORS[lp]+';display:inline-block"></span>'+lp+'</div>'+
-      '<div style="display:flex;align-items:center;gap:10px"><span class="sc-pct" style="color:'+col+'">'+pct+'%</span><span class="sc-sub">'+done+"/"+rot.length+'</span></div></div>'+
-      (pct===100?'<div class="won-box">&#10003; Called all agents!</div>':'<div class="missed-box"><b>Did not call:</b> '+missed.map(function(a){return a[0];}).join(", ")+'</div>')+
+      '<div style="display:flex;align-items:center;gap:10px"><span class="sc-pct" style="color:'+col+'">'+pct+'%</span><span class="sc-sub">'+done+"/"+target+'</span></div></div>'+
+      (pct===100?'<div class="won-box">&#10003; Called all agents!</div>':'<div class="missed-box"><b>Not yet called:</b> '+missed.map(function(a){return a[0];}).join(", ")+(allActive.length-done>10?" and "+(allActive.length-done-10)+" more":"")+'</div>')+
     '</div>';
   });
   document.getElementById(which+"-pills").innerHTML=pills;
@@ -619,10 +625,10 @@ function renderNeedsAttention(){
 
   // 1. Osgood (or any LP) at 0% — frame as opportunity
   LPS.forEach(function(lp){
-    var rot=getRotation(lp,weekKey);
-    var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
-    if(rot.length>0&&done===0){
-      items.push({icon:"📞",text:"<b>"+lp+"</b> — "+rot.length+" agents ready to hear from you this week. Let's get those calls in!",type:"opportunity"});
+    var allActive=agents.filter(function(a){return a[2]===lp&&isActive(a);});
+    var done=allActive.filter(function(a){return calledThisWeek(a[0]);}).length;
+    if(allActive.length>0&&done===0){
+      items.push({icon:"📞",text:"<b>"+lp+"</b> — "+Math.min(15,allActive.length)+" agents ready to hear from you this week. Let's get those calls in!",type:"opportunity"});
     }
   });
 
