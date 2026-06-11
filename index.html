@@ -417,9 +417,23 @@ function buildAgentCard(name,agent,lpCalls,amandaTouches,el){
   el.innerHTML=html;
 }
 
+// FIXED: Uses PATCH to update existing profiles, POST to insert new ones.
+// This resolves the "Error saving" issue caused by Supabase rejecting duplicate upserts
+// when agent_name lacks a unique constraint enforced at the API level.
 function saveAgentProfile(name){
   var data={agent_name:name,email:document.getElementById("prof-email").value.trim(),phone:document.getElementById("prof-phone").value.trim(),address:document.getElementById("prof-address").value.trim(),birthday:document.getElementById("prof-birthday").value.trim()};
-  sbFetch("POST","agent_profiles",data).then(function(){agentProfiles[name]=data;alert("Saved!");}).catch(function(){alert("Error saving.");});
+  var exists=!!(agentProfiles[name]&&agentProfiles[name].agent_name);
+  var method=exists?"PATCH":"POST";
+  var path=exists?"agent_profiles?agent_name=eq."+encodeURIComponent(name):"agent_profiles";
+  var body=Object.assign({},data);
+  if(method==="PATCH"){delete body.agent_name;}
+  var opts={method:method,headers:{"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":"return=minimal"}};
+  opts.body=JSON.stringify(body);
+  fetch(SB_URL+"/rest/v1/"+path,opts).then(function(r){
+    if(!r.ok)return r.text().then(function(t){throw new Error(t);});
+    agentProfiles[name]=data;
+    alert("Saved!");
+  }).catch(function(e){console.error("Save error:",e);alert("Error saving: "+e.message);});
 }
 
 setInterval(function(){loadAll();},60000);
