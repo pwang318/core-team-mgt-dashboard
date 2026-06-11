@@ -577,52 +577,73 @@ function renderNeedsAttention(){
   var items=[];
   var todayStr=TODAY.toISOString().split("T")[0];
   var dayOfMonth=TODAY.getDate();
-  var daysInMonth=new Date(TODAY.getFullYear(),TODAY.getMonth()+1,0).getDate();
 
-  // 1. Amanda inactivity
-  if(amandaActivities.length){
-    var last=amandaActivities[0];
-    var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
-    var days=Math.floor((TODAY-lastDate)/86400000);
-    if(days>=3)items.push("Amanda has not logged any activity in <b>"+days+" days</b> — last logged "+fmt(last.act_date));
-  } else {
-    items.push("Amanda has not logged any activity yet this week");
-  }
+  // Only show pace flags after day 14 (give new tracker time to build data)
+  var showPaceFlags=dayOfMonth>14;
 
-  // 2. LPs with 0% this week
+  // 1. Osgood (or any LP) at 0% — frame as opportunity
   LPS.forEach(function(lp){
     var rot=getRotation(lp,weekKey);
     var done=rot.filter(function(a){return calledThisWeek(a[0]);}).length;
-    if(rot.length>0&&done===0)items.push("<b>"+lp+"</b> has not called any agents this week (0/"+rot.length+")");
+    if(rot.length>0&&done===0){
+      items.push({icon:"📞",text:"<b>"+lp+"</b> — "+rot.length+" agents ready to hear from you this week. Let's get those calls in!",type:"opportunity"});
+    }
   });
 
-  // 3. Agents never called (no entry in callLogs or history)
+  // 2. Agents never called — frame as opportunity not failure
   var neverCalled=agents.filter(function(a){
     return isActive(a)&&!Object.values(callLogs).find(function(l){return l.agent_name===a[0];})&&!ytdCallLogs.find(function(l){return l.agent_name===a[0];});
   });
   if(neverCalled.length>0){
-    items.push("<b>"+neverCalled.length+" active agents</b> have never been called: "+neverCalled.slice(0,5).map(function(a){return a[0];}).join(", ")+(neverCalled.length>5?" and "+(neverCalled.length-5)+" more":""));
+    items.push({icon:"🌟",text:"<b>"+neverCalled.length+" active agents</b> haven't been reached yet — big opportunity to make new connections this week",type:"opportunity"});
   }
 
-  // 4. LPs behind pace MTD
-  LPS.forEach(function(lp){
-    var mtdCalls=mtdCallLogs.filter(function(r){return r.lp===lp;}).length;
-    var activeCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
-    var weeksElapsed=dayOfMonth/7;
-    var expectedCalls=Math.round(weeksElapsed*activeCount);
-    if(activeCount>0&&mtdCalls<expectedCalls*0.5&&dayOfMonth>7)items.push("<b>"+lp+"</b> is behind pace MTD — "+mtdCalls+" calls logged, expected ~"+expectedCalls+" by now");
-  });
+  // 3. Amanda inactivity — only flag if 3+ days, frame gently
+  if(amandaActivities.length){
+    var last=amandaActivities[0];
+    var lastDate=new Date(last.act_date+"T12:00:00");lastDate.setHours(0,0,0,0);
+    var days=Math.floor((TODAY-lastDate)/86400000);
+    if(days>=3)items.push({icon:"💬",text:"Amanda's last logged activity was <b>"+days+" days ago</b> — a quick log-in keeps the momentum going!",type:"nudge"});
+  } else {
+    items.push({icon:"💬",text:"Amanda hasn't logged any activity yet this week — encourage her to log today!",type:"nudge"});
+  }
 
-  // 5. Amanda MTD pace check
-  var amandaMTDTotal=mtdAmanda.length;
-  var weeklyGoalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
-  var expectedAmanda=Math.round((dayOfMonth/7)*weeklyGoalTotal);
-  if(dayOfMonth>7&&amandaMTDTotal<expectedAmanda*0.5)items.push("Amanda is behind pace this month — "+amandaMTDTotal+" activities logged, expected ~"+expectedAmanda+" by now");
+  // 4. Pace flags — only after day 14
+  if(showPaceFlags){
+    LPS.forEach(function(lp){
+      var mtdCalls=mtdCallLogs.filter(function(r){return r.lp===lp;}).length;
+      var activeCount=agents.filter(function(a){return a[2]===lp&&isActive(a);}).length;
+      var weeksElapsed=dayOfMonth/7;
+      var expectedCalls=Math.round(weeksElapsed*activeCount);
+      if(activeCount>0&&mtdCalls<expectedCalls*0.5){
+        items.push({icon:"📈",text:"<b>"+lp+"</b> has room to accelerate this month — "+mtdCalls+" calls logged so far, goal is to keep building",type:"pace"});
+      }
+    });
+    var amandaMTDTotal=mtdAmanda.length;
+    var weeklyGoalTotal=Object.values(AMANDA_GOALS).reduce(function(s,v){return s+v;},0);
+    var expectedAmanda=Math.round((dayOfMonth/7)*weeklyGoalTotal);
+    if(amandaMTDTotal<expectedAmanda*0.5){
+      items.push({icon:"📈",text:"Amanda has room to accelerate this month — "+amandaMTDTotal+" activities logged so far",type:"pace"});
+    }
+  }
 
   var box=document.getElementById("needs-attention-box");
-  if(!items.length){box.innerHTML='<div style="background:#EAF3DE;border:1px solid #A5D6A7;border-left:4px solid #43A047;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:#2E7D32;font-weight:500">&#10003; No issues flagged — everything looks on track!</div>';return;}
-  box.innerHTML='<div class="attn-box"><div class="attn-title">&#9888; Needs Attention ('+items.length+')</div>'+
-    items.map(function(i){return'<div class="attn-item"><div class="attn-dot"></div><div>'+i+'</div></div>';}).join("")+
+  if(!items.length){
+    box.innerHTML='<div style="background:#EAF3DE;border:1px solid #A5D6A7;border-left:4px solid #43A047;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:13px;color:#2E7D32;font-weight:500">&#10003; Everything looks great this week — the team is on track!</div>';
+    return;
+  }
+  var typeColors={opportunity:"#1F4E79",nudge:"#7B1FA2",pace:"#E65100"};
+  var typeBg={opportunity:"#E3F2FD",nudge:"#F3E5F5",pace:"#FFF8E1"};
+  box.innerHTML='<div style="background:#fff;border:1px solid #dde1e7;border-left:4px solid #1F4E79;border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem">'+
+    '<div style="font-size:13px;font-weight:700;color:#1F4E79;margin-bottom:.6rem">&#127919; This Week\'s Focus ('+items.length+')</div>'+
+    items.map(function(i){
+      var col=typeColors[i.type]||"#555";
+      var bg=typeBg[i.type]||"#f5f5f5";
+      return'<div style="display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid #f5f5f5">'+
+        '<div style="width:28px;height:28px;border-radius:8px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">'+i.icon+'</div>'+
+        '<div style="font-size:12px;color:#333;padding-top:5px">'+i.text+'</div>'+
+      '</div>';
+    }).join("")+
   '</div>';
 }
 
