@@ -301,7 +301,7 @@ function renderLPGrid(){
 }
 
 function renderScorecard(which,logs,wkKey){
-  var hasData=Object.keys(logs).length>0;
+  var hasData=Object.keys(logs).length>0&&Object.values(logs).some(function(r){return r.call_date;});
   if(which==="lw"){document.getElementById("lw-scorecard").style.display=hasData?"block":"none";if(!hasData)return;document.getElementById("lw-lbl").textContent=getWeekLabel(wkKey);}
   var pills="",content="";
   LPS.forEach(function(lp){
