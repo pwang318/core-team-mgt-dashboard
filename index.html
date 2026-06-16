@@ -172,8 +172,8 @@ tr:hover td{background:#fafbfd}
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="go('overview')">Overview</div>
-  <div class="tab" onclick="go('mtdytd')">MTD / YTD</div>
+  <div class="tab active" onclick="go('overview')">LP Calls</div>
+  <div class="tab" onclick="go('mtdytd')">Relationship Manager</div>
   <div class="tab" onclick="go('agents')">Agent Search</div>
   <div class="tab" onclick="go('scorecards')">Scorecards</div>
   <div class="tab" onclick="go('message')">Teams Message</div>
@@ -195,7 +195,7 @@ tr:hover td{background:#fafbfd}
     <div class="lvl-leg" id="lvl-leg"></div>
   </div>
 
-  <div class="sh">📅 LP weekly performance</div>
+  <div class="sh">📞 LP Realtor Calls — this week</div>
   <div class="lp-grid" id="lp-cards"></div>
 
   <div class="acc" id="acc-tw">
@@ -222,7 +222,7 @@ tr:hover td{background:#fafbfd}
     <div class="acc-body" id="body-acc-lw"></div>
   </div>
 
-  <div class="sh" style="margin-top:24px">🌸 Amanda — this week</div>
+  <div class="sh" style="margin-top:24px">🌸 Relationship Manager — Amanda Dearth</div>
   <div class="two-col">
     <div class="card">
       <div class="card-ttl">Weekly goals</div>
@@ -244,7 +244,7 @@ tr:hover td{background:#fafbfd}
     <button class="btn btn-p" id="btn-mtd" onclick="showPeriod('mtd')">Month to date</button>
     <button class="btn" id="btn-ytd" onclick="showPeriod('ytd')">Year to date</button>
   </div>
-  <div class="sh">Amanda — <span id="period-lbl">month to date</span></div>
+  <div class="sh">Relationship Manager — Amanda Dearth &mdash; <span id="period-lbl">Month to date</span></div>
   <div class="card"><div id="period-goals"></div></div>
   <div class="sh" style="margin-top:4px">Activity feed</div>
   <div class="card">
@@ -719,12 +719,12 @@ function renderOverview() {
     <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ccc;margin-right:4px;vertical-align:middle"></span><b style="color:#888">C: ${cC}</b></span>
     <span style="color:#aaa">= ${tot} active</span>`;
 
-  // LP cards
+  // LP cards — matches LP tracker: done = raw call count this week, target = 15
+  const WEEKLY_TARGET = 15;
   let lpHtml = "";
   LPS.forEach(lp => {
-    const rot  = twRotation(lp);
-    const done = rot.filter(a => calledThisWeek(a[0])).length;
-    const pct  = rot.length ? Math.round(done/rot.length*100) : 0;
+    const done = Object.values(callLogs).filter(l => l.lp===lp && l.week_key===WK).length;
+    const pct  = Math.min(100, Math.round(done/WEEKLY_TARGET*100));
     const col  = LP_COL[lp];
     const pctCol = pct===100?"#43A047":pct>=70?"#FB8C00":"#E53935";
     const lpAgents = agents.filter(a => a[2]===lp);
@@ -738,7 +738,7 @@ function renderOverview() {
       </div>
       <div class="lp-pct" style="color:${pctCol}">${pct}%</div>
       <div class="lp-bt"><div class="lp-bf" style="width:${pct}%;background:${col}"></div></div>
-      <div class="lp-meta"><span>${done}/${rot.length} this week</span><span>${active} active</span></div>
+      <div class="lp-meta"><span>${done}/${WEEKLY_TARGET} calls this week</span><span>${active} active agents</span></div>
       ${pri    ? `<div class="lp-flag" style="color:#C62828">${pri} priority</div>` : ""}
       ${inactive ? `<div class="lp-flag" style="color:#E65100">${inactive} inactive</div>` : ""}
     </div>`;
