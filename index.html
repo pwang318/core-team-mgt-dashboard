@@ -154,8 +154,12 @@ tr:hover td{background:#fafbfd}
 
 <div class="header">
   <div class="brand">
-    <span class="brand-mark">CORE TEAM</span>
-    <span class="brand-title">Management Dashboard</span>
+    <img src="https://nfmlending.com/wp-content/uploads/2020/09/logo_NFMLending.svg" alt="NFM Lending" style="height:28px;filter:brightness(0) saturate(100%) invert(18%) sepia(53%) saturate(600%) hue-rotate(185deg) brightness(90%);flex-shrink:0">
+    <div style="width:1px;height:28px;background:#e0e4ef;flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:0px">
+      <span style="font-size:10px;font-weight:700;color:#1F4E79;letter-spacing:.07em;text-transform:uppercase">CORE Team &middot; NFM Lending</span>
+      <span class="brand-title" style="font-size:13px;color:#555;font-weight:400">Management Dashboard</span>
+    </div>
   </div>
   <div class="header-right">
     <span class="week-pill" id="weekPill"></span>
@@ -171,6 +175,7 @@ tr:hover td{background:#fafbfd}
   <div class="tab active" onclick="go('overview')">Overview</div>
   <div class="tab" onclick="go('mtdytd')">MTD / YTD</div>
   <div class="tab" onclick="go('agents')">Agent Search</div>
+  <div class="tab" onclick="go('scorecards')">Scorecards</div>
   <div class="tab" onclick="go('message')">Teams Message</div>
 </div>
 
@@ -959,16 +964,248 @@ function copyTeams() {
 // ── TAB SWITCHING ──────────────────────────────────────────────────────────
 function go(name) {
   document.querySelectorAll(".tab").forEach((t,i) => {
-    t.classList.toggle("active", ["overview","mtdytd","agents","message"][i]===name);
+    t.classList.toggle("active", ["overview","mtdytd","agents","scorecards","message"][i]===name);
   });
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.getElementById("view-"+name).classList.add("active");
   if(name==="mtdytd") showPeriod(currentPeriod);
+  if(name==="scorecards") scLoad();
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
 loadAll();
 setInterval(loadAll, 60000);
 </script>
+
+<!-- SCORECARDS VIEW -->
+<div id="view-scorecards" class="view" style="padding:24px 32px;max-width:900px">
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+    <div class="sh" style="margin:0">📋 LP Scorecards</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="sc-lp-tabs">
+      <button class="sc-lp-btn active" onclick="scSelectLP('Isaak',this)">Isaak</button>
+      <button class="sc-lp-btn" onclick="scSelectLP('Gavin',this)">Gavin</button>
+      <button class="sc-lp-btn" onclick="scSelectLP('Osgood',this)">Osgood</button>
+      <button class="sc-lp-btn" onclick="scSelectLP('Karen',this)">Karen</button>
+      <button class="sc-lp-btn" onclick="scSelectLP('Said',this)">Said</button>
+      <button class="sc-lp-btn" onclick="scSelectLP('Jordan',this)">Jordan</button>
+    </div>
+  </div>
+
+  <!-- Date range search -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+    <label style="font-size:12px;color:#888">From</label>
+    <input type="date" id="sc-from" style="padding:6px 10px;border:1px solid #e0e4ef;border-radius:8px;font-size:12px;font-family:inherit">
+    <label style="font-size:12px;color:#888">To</label>
+    <input type="date" id="sc-to" style="padding:6px 10px;border:1px solid #e0e4ef;border-radius:8px;font-size:12px;font-family:inherit">
+    <button onclick="scLoad()" style="padding:6px 14px;background:#1F4E79;color:#fff;border:none;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer">Search</button>
+  </div>
+
+  <!-- Summary cards -->
+  <div id="sc-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px"></div>
+
+  <!-- Weekly table -->
+  <div style="background:#fff;border-radius:12px;border:1px solid #e8eaf0;overflow:hidden;margin-bottom:14px">
+    <div style="background:#1F4E79;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+      <span style="color:#fff;font-size:13px;font-weight:600" id="sc-person-label">Weekly History</span>
+      <span style="color:#f0c84a;font-size:11px">Click a week to see daily breakdown</span>
+    </div>
+    <div id="sc-table-wrap" style="overflow-x:auto">
+      <div style="text-align:center;padding:40px;color:#888;font-size:14px">Select an LP above to load their scorecard history.</div>
+    </div>
+  </div>
+
+  <!-- Daily breakdown (shown on week click) -->
+  <div id="sc-daily-wrap" style="display:none;background:#fff;border-radius:12px;border:1px solid #e8eaf0;overflow:hidden;margin-bottom:14px">
+    <div style="background:#243d7a;padding:12px 16px">
+      <span style="color:#fff;font-size:13px;font-weight:600" id="sc-daily-label">Daily Breakdown</span>
+    </div>
+    <div id="sc-daily-content" style="overflow-x:auto"></div>
+  </div>
+
+  <!-- Trend charts -->
+  <div id="sc-charts"></div>
+</div>
+
+<style>
+.sc-lp-btn{padding:6px 16px;font-size:12px;font-weight:500;border:1px solid #d0d5e8;border-radius:20px;background:transparent;color:#666;cursor:pointer;font-family:inherit;transition:all .15s}
+.sc-lp-btn.active{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.sc-lp-btn:hover:not(.active){background:#f0f2f8;color:#333}
+.sc-pct-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
+.sc-pct-green{background:#dcf5e3;color:#1a5c2a}
+.sc-pct-amber{background:#fef3dc;color:#7a4f0a}
+.sc-pct-gray{background:#f0f0f0;color:#555}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── SCORECARDS ──────────────────────────────────────────────────────────────
+const SC_METRICS_MAP = {
+  Isaak: [
+    {key:"apps_1003",label:"1003's",icon:"📋",goal:10},
+    {key:"realtor_calls",label:"Realtor calls",icon:"📞",goal:100},
+    {key:"meetings",label:"Realtor meetings scheduled",icon:"📅",goal:10}
+  ],
+  _lp2: [
+    {key:"referred_leads",label:"Referred leads",icon:"👥",goal:16},
+    {key:"apps_1003",label:"1003's",icon:"📋",goal:13},
+    {key:"pre_approvals",label:"Pre-approvals",icon:"✅",goal:6},
+    {key:"contracts",label:"Contracts",icon:"🤝",goal:3},
+    {key:"rltr_talks",label:"Rltr talk to's",icon:"📲",goal:10}
+  ]
+};
+["Gavin","Osgood","Karen","Said","Jordan"].forEach(n=>SC_METRICS_MAP[n]=SC_METRICS_MAP._lp2);
+
+const SC_DAYS = ["Mon","Tue","Wed","Thu","Fri"];
+const SC_CHART_COLORS = ["#1F4E79","#b8922a","#2a7a3b","#c0392b","#8e44ad"];
+let scCurrentLP = "Isaak", scCharts = [];
+
+function scSelectLP(name, btn) {
+  document.querySelectorAll(".sc-lp-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  scCurrentLP = name;
+  document.getElementById("sc-person-label").textContent = name + " — Weekly History";
+  document.getElementById("sc-daily-wrap").style.display = "none";
+  scLoad();
+}
+
+function scGetTotal(key, data) {
+  return SC_DAYS.reduce((s,d)=>s+(parseInt((data||{})[key+"_"+d]||0)||0),0);
+}
+
+function scPctBadge(t,g) {
+  const p=t/g, c=p>=1?"sc-pct-green":p>=0.6?"sc-pct-amber":"sc-pct-gray";
+  return "<span class=\"sc-pct-badge "+c+"\">"+Math.round(p*100)+"%</span>";
+}
+
+function fmtRangeSc(wk) {
+  const mon=new Date(wk+"T12:00:00"), fri=new Date(mon);
+  fri.setDate(fri.getDate()+4);
+  const o={month:"short",day:"numeric"};
+  return mon.toLocaleDateString("en-US",o)+" – "+fri.toLocaleDateString("en-US",o);
+}
+
+async function scLoad() {
+  const fromEl=document.getElementById("sc-from"), toEl=document.getElementById("sc-to");
+  if(!fromEl.value){const d=new Date();d.setDate(d.getDate()-56);fromEl.value=d.toISOString().slice(0,10);}
+  if(!toEl.value) toEl.value=new Date().toISOString().slice(0,10);
+
+  const wrap=document.getElementById("sc-table-wrap");
+  const chartsEl=document.getElementById("sc-charts");
+  const summaryEl=document.getElementById("sc-summary");
+  wrap.innerHTML="<div style=\"text-align:center;padding:30px;color:#888\">Loading...</div>";
+  chartsEl.innerHTML=""; summaryEl.innerHTML="";
+  scCharts.forEach(c=>c.destroy()); scCharts=[];
+
+  const metrics = SC_METRICS_MAP[scCurrentLP];
+
+  try {
+    const res = await fetch(
+      SB_URL+"/rest/v1/lp_scorecards?person=eq."+encodeURIComponent(scCurrentLP)+"&week_key=gte."+fromEl.value+"&week_key=lte."+toEl.value+"&order=week_key.desc&select=week_key,data",
+      {headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}}
+    );
+    const rows = await res.json();
+
+    if(!rows||!rows.length){
+      wrap.innerHTML="<div style=\"text-align:center;padding:40px;color:#888\">No data found for this date range.</div>";
+      return;
+    }
+
+    // Summary cards — totals across all weeks shown
+    summaryEl.innerHTML="";
+    metrics.forEach((m,i)=>{
+      const grandTotal = rows.reduce((s,r)=>s+scGetTotal(m.key,r.data),0);
+      const avgPerWeek = Math.round(grandTotal/rows.length);
+      const pct = Math.min(avgPerWeek/m.goal,1);
+      const color = pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
+      const card = document.createElement("div");
+      card.style="background:#fff;border-radius:10px;border:1px solid #e8eaf0;padding:12px 14px;text-align:center";
+      card.innerHTML="<div style=\"font-size:18px;margin-bottom:4px\">"+m.icon+"</div>"
+        +"<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
+        +"<div style=\"font-size:10px;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:.04em\">"+m.label+"</div>"
+        +"<div style=\"font-size:10px;color:#aaa;margin-top:1px\">avg/wk &bull; goal "+m.goal+"</div>"
+        +"<div style=\"height:3px;background:#e9ecf3;border-radius:2px;margin-top:6px;overflow:hidden\">"
+        +"<div style=\"height:100%;width:"+Math.round(pct*100)+"%;background:"+color+";border-radius:2px\"></div></div>";
+      summaryEl.appendChild(card);
+    });
+
+    // History table
+    let thead="<thead><tr><th style=\"background:#1F4E79;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600\">Week</th>";
+    metrics.forEach(m=>thead+="<th style=\"background:#1F4E79;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+m.icon+" "+m.label+"</th>");
+    thead+="</tr></thead>";
+
+    let tbody="<tbody>";
+    rows.forEach((row,idx)=>{
+      const label=fmtRangeSc(row.week_key);
+      tbody+="<tr style=\"cursor:pointer\" onclick=\"scShowDaily('"+row.week_key+"',"+JSON.stringify(row.data).replace(/"/g,"&quot;")+")\">"
+        +"<td style=\"padding:9px 12px;font-size:12px;font-weight:500;border-bottom:1px solid #f0f2f8;white-space:nowrap\">"+label+"</td>";
+      metrics.forEach(m=>{
+        const t=scGetTotal(m.key,row.data);
+        tbody+="<td style=\"padding:9px 8px;text-align:center;font-size:12px;border-bottom:1px solid #f0f2f8\">"+t+" "+scPctBadge(t,m.goal)+"</td>";
+      });
+      tbody+="</tr>";
+    });
+    tbody+="</tbody>";
+    wrap.innerHTML="<table style=\"width:100%;border-collapse:collapse\">"+thead+tbody+"</table>";
+
+    // Trend charts
+    const weeks=rows.map(r=>fmtRangeSc(r.week_key)).reverse();
+    metrics.forEach((m,i)=>{
+      const vals=rows.map(r=>scGetTotal(m.key,r.data)).reverse();
+      const div=document.createElement("div");
+      div.style="background:#fff;border-radius:12px;border:1px solid #e8eaf0;padding:16px;margin-bottom:12px";
+      div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+m.icon+" "+m.label+" — weekly trend</div>"
+        +"<div style=\"position:relative;height:180px\"><canvas id=\"sc-chart-"+i+"\"></canvas></div>";
+      chartsEl.appendChild(div);
+      setTimeout(()=>{
+        const ch=new Chart(document.getElementById("sc-chart-"+i).getContext("2d"),{
+          type:"line",
+          data:{labels:weeks,datasets:[
+            {label:m.label,data:vals,borderColor:SC_CHART_COLORS[i%5],backgroundColor:SC_CHART_COLORS[i%5]+"22",borderWidth:2,pointRadius:4,fill:true,tension:0.3},
+            {label:"Goal",data:weeks.map(()=>m.goal),borderColor:"#ccc",borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false}
+          ]},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{font:{size:11}}},x:{ticks:{font:{size:10}}}}}
+        });
+        scCharts.push(ch);
+      },50);
+    });
+
+  } catch(e) {
+    wrap.innerHTML="<div style=\"text-align:center;padding:40px;color:#888\">Could not load scorecard data.</div>";
+    console.warn(e);
+  }
+}
+
+function scShowDaily(wk, data) {
+  const metrics = SC_METRICS_MAP[scCurrentLP];
+  const wrap = document.getElementById("sc-daily-wrap");
+  const label = document.getElementById("sc-daily-label");
+  const content = document.getElementById("sc-daily-content");
+  label.textContent = scCurrentLP + " — " + fmtRangeSc(wk) + " (Daily Breakdown)";
+
+  let thead="<thead><tr><th style=\"background:#243d7a;color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600\">Metric</th>";
+  SC_DAYS.forEach(d=>thead+="<th style=\"background:#243d7a;color:#fff;padding:8px 10px;text-align:center;font-size:11px;font-weight:600\">"+d+"</th>");
+  thead+="<th style=\"background:#243d7a;color:#f0c84a;padding:8px 10px;text-align:center;font-size:11px;font-weight:600\">Total</th></tr></thead>";
+
+  let tbody="<tbody>";
+  metrics.forEach(m=>{
+    const total=scGetTotal(m.key,data);
+    const pct=Math.min(total/m.goal,1);
+    const color=pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
+    tbody+="<tr><td style=\"padding:9px 12px;font-size:12px;font-weight:500;border-bottom:1px solid #f0f2f8\">"+m.icon+" "+m.label+"</td>";
+    SC_DAYS.forEach(day=>{
+      const v=parseInt((data||{})[m.key+"_"+day]||0)||0;
+      tbody+="<td style=\"padding:9px 10px;text-align:center;font-size:13px;font-weight:500;border-bottom:1px solid #f0f2f8\">"+v+"</td>";
+    });
+    tbody+="<td style=\"padding:9px 10px;text-align:center;font-size:13px;font-weight:700;color:"+color+";border-bottom:1px solid #f0f2f8\">"+total+" <span style=\"font-size:10px;color:#aaa\">/"+m.goal+"</span></td></tr>";
+  });
+  tbody+="</tbody>";
+
+  content.innerHTML="<table style=\"width:100%;border-collapse:collapse\">"+thead+tbody+"</table>";
+  wrap.style.display="block";
+  wrap.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+</script>
+
 </body>
 </html>
