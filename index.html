@@ -5,160 +5,202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Core Team | Management Dashboard</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --ink:#0B1B33;
+  --ink-2:#142845;
+  --ink-3:#1E3A60;
+  --paper:#FAFAF7;
+  --paper-dim:#F2F1EB;
+  --line:rgba(11,27,51,0.10);
+  --line-dark:rgba(255,255,255,0.12);
+  --gold:#C9A227;
+  --gold-soft:#E8C766;
+  --slate:#5C6478;
+  --slate-soft:#8B92A3;
+  --green:#1F6B45;
+  --green-bg:#E7F1EA;
+  --amber:#9A6A12;
+  --amber-bg:#FAEFD8;
+  --red:#9B3B3B;
+  --red-bg:#F6E8E8;
+  --serif:'Fraunces',serif;
+  --sans:'Inter',-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f2f3f7;color:#1a1a1a;min-height:100vh;font-size:14px}
-.header{background:#fff;border-bottom:1px solid #e8eaf0;padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:56px;position:sticky;top:0;z-index:100}
-.brand{display:flex;align-items:center;gap:14px}
-.brand-mark{background:#1F4E79;color:#fff;font-weight:700;font-size:12px;padding:6px 14px;border-radius:8px;letter-spacing:.06em}
-.brand-title{font-size:15px;color:#555;font-weight:400}
-.header-right{display:flex;align-items:center;gap:12px}
-.week-pill{font-size:12px;color:#666;background:#f0f2f6;padding:5px 13px;border-radius:20px;border:1px solid #e4e6ee}
-.sync-pill{display:flex;align-items:center;gap:6px;font-size:12px;color:#666;background:#f0f2f6;padding:5px 13px;border-radius:20px;border:1px solid #e4e6ee;cursor:pointer;transition:background .15s}
-.sync-pill:hover{background:#e8eaf0}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0}
-.sync-dot.ok{background:#43A047}.sync-dot.err{background:#E53935}.sync-dot.spin{background:#FB8C00;animation:blink 1s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.tabs{background:#fff;border-bottom:1px solid #e8eaf0;padding:0 32px;display:flex}
-.tab{padding:14px 20px;font-size:13px;color:#888;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;white-space:nowrap}
-.tab:hover{color:#444}
-.tab.active{color:#1F4E79;border-bottom-color:#1F4E79;font-weight:600}
-.view{display:none;padding:28px 32px;max-width:1140px;margin:0 auto}
+body{font-family:var(--sans);background:var(--paper-dim);color:var(--ink);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.header{background:var(--ink);border-bottom:1px solid var(--line-dark);padding:0 36px;display:flex;justify-content:space-between;align-items:center;height:72px;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:18px}
+.brand-mark{display:none}
+.brand-title{font-family:var(--serif);font-size:17px;color:#fff;font-weight:500;letter-spacing:.01em}
+.header-right{display:flex;align-items:center;gap:14px}
+.week-pill{font-family:var(--mono);font-size:11px;color:var(--gold-soft);background:rgba(255,255,255,0.06);padding:7px 16px;border-radius:3px;border:1px solid var(--line-dark);letter-spacing:.04em}
+.sync-pill{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.06);padding:7px 16px;border-radius:3px;border:1px solid var(--line-dark);cursor:pointer;transition:background .15s;letter-spacing:.04em}
+.sync-pill:hover{background:rgba(255,255,255,0.12)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:#666;flex-shrink:0}
+.sync-dot.ok{background:#3FA56B}.sync-dot.err{background:#C0504D}.sync-dot.spin{background:var(--gold);animation:blink 1.1s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ── TABS ── */
+.tabs{background:var(--ink-2);border-bottom:1px solid var(--line-dark);padding:0 36px;display:flex}
+.tab{padding:16px 22px;font-family:var(--sans);font-size:12.5px;font-weight:500;letter-spacing:.02em;color:rgba(255,255,255,0.45);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;white-space:nowrap;text-transform:uppercase}
+.tab:hover{color:rgba(255,255,255,0.8)}
+.tab.active{color:var(--gold-soft);border-bottom-color:var(--gold);font-weight:600}
+.view{display:none;padding:40px 36px 64px;max-width:1180px;margin:0 auto}
 .view.active{display:block}
 
-/* Focus banner */
-.focus-banner{background:#fff;border:1px solid #e8eaf0;border-left:4px solid #1F4E79;border-radius:10px;padding:14px 18px;margin-bottom:24px}
-.focus-title{font-size:12px;font-weight:700;color:#1F4E79;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.focus-item{font-size:13px;color:#333;padding:3px 0}
+/* ── FOCUS BANNER ── */
+.focus-banner{background:var(--ink);border-radius:4px;padding:20px 26px;margin-bottom:32px;position:relative;overflow:hidden}
+.focus-banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+.focus-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--gold-soft);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+.focus-item{font-family:var(--sans);font-size:13.5px;color:rgba(255,255,255,0.85);padding:4px 0;line-height:1.5}
 
-/* Section headers */
-.sh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#999;margin:20px 0 12px}
+/* ── SECTION HEADERS ── */
+.sh{font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--slate);margin:36px 0 16px;display:flex;align-items:center;gap:12px}
+.sh::after{content:"";flex:1;height:1px;background:var(--line)}
 
-/* Scoreboard */
-.sb-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:12px}
-.sb-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px}
-.sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:8px}
-.sb-val{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
-.sb-sub{font-size:11px;color:#888;margin-bottom:8px}
-.pbar{background:#eee;border-radius:20px;height:5px;overflow:hidden}
-.pbar-fill{height:5px;border-radius:20px;transition:width .5s}
+/* ── SCOREBOARD ── */
+.sb-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-bottom:14px;background:var(--line);border-radius:4px;overflow:hidden}
+.sb-card{background:#fff;padding:22px 20px 20px}
+.sb-lbl{font-family:var(--mono);font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--slate-soft);margin-bottom:10px}
+.sb-val{font-family:var(--serif);font-size:34px;font-weight:600;line-height:1;margin-bottom:6px;color:var(--ink)}
+.sb-sub{font-family:var(--sans);font-size:11px;color:var(--slate);margin-bottom:10px}
+.pbar{background:var(--paper-dim);border-radius:2px;height:4px;overflow:hidden}
+.pbar-fill{height:4px;border-radius:2px;transition:width .5s}
 
-/* Level bar */
-.lvl-wrap{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 20px;margin-bottom:24px}
-.lvl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;margin-bottom:12px}
-.stk{background:#eee;border-radius:20px;height:12px;overflow:hidden;display:flex;margin-bottom:10px}
-.stk-seg{height:12px}
-.lvl-leg{display:flex;gap:20px;font-size:12px}
+/* ── LEVEL BAR ── */
+.lvl-wrap{background:#fff;border:1px solid var(--line);border-radius:4px;padding:22px 24px;margin-bottom:32px}
+.lvl-lbl{font-family:var(--mono);font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--slate-soft);margin-bottom:14px}
+.stk{background:var(--paper-dim);border-radius:2px;height:10px;overflow:hidden;display:flex;margin-bottom:12px}
+.stk-seg{height:10px}
+.lvl-leg{display:flex;gap:24px;font-family:var(--sans);font-size:12px;color:var(--slate)}
 
-/* LP grid */
-.lp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
-.lp-card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 18px}
-.lp-hd{display:flex;align-items:center;gap:7px;margin-bottom:10px}
-.lp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.lp-n{font-size:14px;font-weight:700}
-.lp-pct{font-size:32px;font-weight:700;margin-bottom:6px;line-height:1}
-.lp-bt{background:#eee;border-radius:20px;height:6px;overflow:hidden;margin-bottom:10px}
-.lp-bf{height:6px;border-radius:20px}
-.lp-meta{display:flex;justify-content:space-between;font-size:11px;color:#999}
-.lp-flag{font-size:11px;margin-top:5px;font-weight:600}
+/* ── LP GRID ── */
+.lp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-bottom:24px;background:var(--line);border-radius:4px;overflow:hidden}
+.lp-card{background:#fff;padding:22px 20px}
+.lp-hd{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.lp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.lp-n{font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.lp-pct{font-family:var(--serif);font-size:36px;font-weight:600;margin-bottom:10px;line-height:1;color:var(--ink)}
+.lp-bt{background:var(--paper-dim);border-radius:2px;height:4px;overflow:hidden;margin-bottom:12px}
+.lp-bf{height:4px;border-radius:2px}
+.lp-meta{display:flex;flex-direction:column;gap:2px;font-family:var(--sans);font-size:11px;color:var(--slate-soft)}
+.lp-flag{font-family:var(--sans);font-size:11px;margin-top:8px;font-weight:600;letter-spacing:.01em}
 
-/* Accordions */
-.acc{background:#fff;border:1px solid #e8eaf0;border-radius:12px;margin-bottom:10px;overflow:hidden}
-.acc-hd{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
-.acc-hd-l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.acc-ttl{font-size:13px;font-weight:700}
-.acc-wk{font-size:11px;color:#999;margin-left:2px}
-.acc-pills{display:flex;gap:5px;flex-wrap:wrap}
-.acc-pill{font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
-.pill-g{background:#E8F5E9;color:#2E7D32}
-.pill-a{background:#FFF8E1;color:#E65100}
-.pill-r{background:#FFEBEE;color:#C62828}
-.acc-chev{color:#bbb;font-size:13px;transition:transform .2s;flex-shrink:0}
-.acc-body{display:none;border-top:1px solid #f0f2f5;padding:4px 18px 12px}
-.acc-row{padding:10px 0;border-bottom:1px solid #f5f6fa}
+/* ── ACCORDIONS ── */
+.acc{background:#fff;border:1px solid var(--line);border-radius:4px;margin-bottom:10px;overflow:hidden;transition:border-color .15s}
+.acc:hover{border-color:rgba(11,27,51,0.18)}
+.acc-hd{padding:18px 22px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.acc-hd-l{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.acc-ttl{font-family:var(--sans);font-size:13.5px;font-weight:600;letter-spacing:.01em}
+.acc-wk{font-family:var(--mono);font-size:10.5px;color:var(--slate-soft);margin-left:2px}
+.acc-pills{display:flex;gap:6px;flex-wrap:wrap}
+.acc-pill{font-family:var(--mono);font-size:9.5px;font-weight:600;padding:3px 10px;border-radius:2px;letter-spacing:.03em}
+.pill-g{background:var(--green-bg);color:var(--green)}
+.pill-a{background:var(--amber-bg);color:var(--amber)}
+.pill-r{background:var(--red-bg);color:var(--red)}
+.acc-chev{color:var(--slate-soft);font-size:13px;transition:transform .2s;flex-shrink:0}
+.acc-body{display:none;border-top:1px solid var(--line);padding:6px 22px 16px}
+.acc-row{padding:13px 0;border-bottom:1px solid var(--paper-dim)}
 .acc-row:last-child{border-bottom:none}
-.acc-rt{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.acc-lp{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
-.acc-pct{font-size:20px;font-weight:700}
-.missed{background:#FFEBEE;border-radius:6px;padding:5px 10px;font-size:11px;color:#C62828;margin-top:4px;line-height:1.5}
-.won{font-size:11px;color:#43A047;font-weight:600;margin-top:3px}
+.acc-rt{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.acc-lp{font-family:var(--sans);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.acc-pct{font-family:var(--serif);font-size:21px;font-weight:600}
+.missed{background:var(--red-bg);border-radius:3px;padding:7px 12px;font-family:var(--sans);font-size:11px;color:var(--red);margin-top:6px;line-height:1.5}
+.won{font-family:var(--sans);font-size:11px;color:var(--green);font-weight:600;margin-top:4px}
 
-/* Two col */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.card{background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:18px 20px}
-.card-ttl{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:24px;background:var(--line);border-radius:4px;overflow:hidden}
+.card{background:#fff;border:none;border-radius:0;padding:24px 26px}
+.card-ttl{font-family:var(--sans);font-size:13px;font-weight:600;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;letter-spacing:.01em}
 
-/* RM goals */
-.gr{margin-bottom:13px}
+/* ── RM GOALS ── */
+.gr{margin-bottom:16px}
 .gr:last-child{margin-bottom:0}
-.gr-lr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
-.gr-n{font-size:12px;color:#555}
-.gr-c{font-size:13px;font-weight:700}
-.gr-t{font-size:11px;color:#bbb}
-.g-track{background:#eee;border-radius:20px;height:5px;overflow:hidden}
-.g-fill{height:5px;border-radius:20px}
-.ctc-row{border-top:1px solid #f0f2f5;padding-top:12px;margin-top:12px;display:flex;justify-content:space-between;align-items:center}
+.gr-lr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.gr-n{font-family:var(--sans);font-size:12px;color:var(--slate)}
+.gr-c{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink)}
+.gr-t{font-family:var(--mono);font-size:11px;color:var(--slate-soft)}
+.g-track{background:var(--paper-dim);border-radius:2px;height:4px;overflow:hidden}
+.g-fill{height:4px;border-radius:2px}
+.ctc-row{border-top:1px solid var(--line);padding-top:16px;margin-top:16px;display:flex;justify-content:space-between;align-items:center}
 
-/* FU list */
-.fu-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f6fa}
+/* ── FU LIST ── */
+.fu-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--paper-dim)}
 .fu-item:last-child{border-bottom:none}
-.fu-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.fu-n{font-size:13px;font-weight:600}
-.fu-m{font-size:11px;color:#aaa;margin-top:1px}
-.fu-due{font-size:11px;font-weight:700;white-space:nowrap}
+.fu-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.fu-n,.fu-name{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink)}
+.fu-m,.fu-meta{font-family:var(--sans);font-size:11px;color:var(--slate-soft);margin-top:2px}
+.fu-due,.fu-date{font-family:var(--mono);font-size:10.5px;font-weight:600;white-space:nowrap}
+.fu-body{flex:1}
 
-/* Feed */
-.feed-item{padding:9px 0;border-bottom:1px solid #f5f6fa}
+/* ── FEED ── */
+.feed-item{padding:12px 0;border-bottom:1px solid var(--paper-dim)}
 .feed-item:last-child{border-bottom:none}
-.feed-t{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
-.feed-ag{font-size:13px;font-weight:700}
-.feed-dt{font-size:11px;color:#aaa}
-.feed-ty{font-size:11px;color:#666}
-.feed-nt{font-size:11px;color:#aaa;font-style:italic;margin-top:2px}
+.feed-t{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.feed-ag{font-family:var(--sans);font-size:13px;font-weight:600}
+.feed-dt{font-family:var(--mono);font-size:10.5px;color:var(--slate-soft)}
+.feed-ty{font-family:var(--sans);font-size:11px;color:var(--slate)}
+.feed-nt{font-family:var(--sans);font-size:11.5px;color:var(--slate-soft);font-style:italic;margin-top:3px}
 
-/* Leaderboard */
-.lb-row{background:#fff;border:1px solid #e8eaf0;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+/* ── LEADERBOARD ── */
+.lb-row{background:#fff;border:1px solid var(--line);border-radius:4px;padding:16px 20px;margin-bottom:8px;display:flex;align-items:center;gap:14px;transition:border-color .15s}
+.lb-row:hover{border-color:rgba(11,27,51,0.18)}
 
-/* Roster */
-.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.filter-bar input,.filter-bar select{padding:7px 11px;border:1px solid #e4e6ee;border-radius:8px;font-size:12px;color:#1a1a1a;background:#fff;font-family:inherit;outline:none}
+/* ── ROSTER ── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filter-bar input,.filter-bar select{padding:9px 13px;border:1px solid var(--line);border-radius:3px;font-size:12px;color:var(--ink);background:#fff;font-family:var(--sans);outline:none}
 .filter-bar input{flex:1;min-width:140px}
-.tbl-wrap{border:1px solid #e8eaf0;border-radius:10px;overflow:hidden}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#aaa;background:#f8f9fc;border-bottom:1px solid #e8eaf0;white-space:nowrap}
-td{padding:9px 12px;border-bottom:1px solid #f5f6fa;vertical-align:middle}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--ink-3)}
+.tbl-wrap{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:12px 14px;font-family:var(--mono);font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--slate-soft);background:var(--paper-dim);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--paper-dim);vertical-align:middle;font-family:var(--sans)}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafbfd}
-.lp-chip{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
-.chip-Gavin{background:#E8F5E9;color:#2E7D32}.chip-Karen{background:#E3F2FD;color:#1565C0}
-.chip-Osgood{background:#FFF8E1;color:#E65100}.chip-Jordan{background:#FCE4EC;color:#880E4F}.chip-Said{background:#EDE7F6;color:#4527A0}
-.badge-a{background:#E8F5E9;color:#2E7D32;display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
-.badge-b{background:#E3F2FD;color:#1565C0;display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
-.badge-c{background:#F5F5F5;color:#757575;display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+tr:hover td{background:var(--paper-dim)}
+.lp-chip{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:3px 10px;border-radius:2px;letter-spacing:.03em}
+.chip-Gavin{background:var(--green-bg);color:var(--green)}.chip-Karen{background:#E3EBF5;color:#2B547A}
+.chip-Osgood{background:var(--amber-bg);color:var(--amber)}.chip-Jordan{background:#F5E3EC;color:#8A3A5C}.chip-Said{background:#EBE5F2;color:#5B3E8A}
+.badge-a{background:var(--green-bg);color:var(--green);display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:3px 9px;border-radius:2px}
+.badge-b{background:#E3EBF5;color:#2B547A;display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:3px 9px;border-radius:2px}
+.badge-c{background:var(--paper-dim);color:var(--slate);display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:600;padding:3px 9px;border-radius:2px}
 
-/* Teams */
-.teams-box{background:#f8f9fc;border:1px solid #e8eaf0;border-radius:8px;padding:14px;font-size:12px;line-height:1.8;white-space:pre-wrap;font-family:inherit;color:#444;margin-bottom:12px}
-.btn{background:#fff;border:1px solid #dde1e7;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:#444;cursor:pointer;font-family:inherit;transition:background .15s}
-.btn:hover{background:#f5f6fa}
-.btn-p{background:#1F4E79;color:#fff;border-color:#1F4E79}
-.btn-p:hover{background:#1a4269}
-.no-data{text-align:center;color:#ccc;padding:24px;font-size:13px}
+/* ── TEAMS ── */
+.teams-box{background:var(--paper-dim);border:1px solid var(--line);border-radius:4px;padding:18px;font-family:var(--sans);font-size:12.5px;line-height:1.8;white-space:pre-wrap;color:var(--ink);margin-bottom:14px}
+.btn{background:#fff;border:1px solid var(--line);border-radius:3px;padding:10px 20px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .15s;letter-spacing:.01em}
+.btn:hover{background:var(--paper-dim);border-color:rgba(11,27,51,0.2)}
+.btn-p{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn-p:hover{background:var(--ink-3)}
+.no-data{text-align:center;color:var(--slate-soft);padding:32px;font-family:var(--sans);font-size:13px}
 
-/* Period toggle */
-.period-btns{display:flex;gap:8px;margin-bottom:20px}
+/* ── PERIOD TOGGLE ── */
+.period-btns,.period-toggle{display:flex;gap:1px;margin-bottom:24px;background:var(--line);border-radius:3px;overflow:hidden;width:fit-content}
+.period-btns button,.ptoggle{background:#fff;border:none;padding:9px 18px;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--slate);cursor:pointer;transition:all .15s}
+.period-btns button:hover,.ptoggle:hover{background:var(--paper-dim)}
+.period-btns button.active,.ptoggle.active{background:var(--ink);color:#fff;font-weight:600}
+
+/* ── SCORECARDS TAB ── */
+.sc-lp-btn{font-family:var(--sans) !important}
+.sc-lp-btn.active{background:var(--ink) !important;border-color:var(--ink) !important}
 
 @media(max-width:900px){.sb-grid,.lp-grid{grid-template-columns:1fr 1fr}.two-col{grid-template-columns:1fr}}
-@media(max-width:600px){.sb-grid,.lp-grid{grid-template-columns:1fr}.view{padding:18px 14px}.header,.tabs{padding-left:16px;padding-right:16px}}
+@media(max-width:600px){.sb-grid,.lp-grid{grid-template-columns:1fr}.view{padding:24px 18px 48px}.header,.tabs{padding-left:18px;padding-right:18px}.header{height:64px}}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="brand">
-    <img src="https://nfmlending.com/wp-content/uploads/2020/09/logo_NFMLending.svg" alt="NFM Lending" style="height:28px;filter:brightness(0) saturate(100%) invert(18%) sepia(53%) saturate(600%) hue-rotate(185deg) brightness(90%);flex-shrink:0">
-    <div style="width:1px;height:28px;background:#e0e4ef;flex-shrink:0"></div>
-    <div style="display:flex;flex-direction:column;gap:0px">
-      <span style="font-size:10px;font-weight:700;color:#1F4E79;letter-spacing:.07em;text-transform:uppercase">CORE Team &middot; NFM Lending</span>
-      <span class="brand-title" style="font-size:13px;color:#555;font-weight:400">Management Dashboard</span>
+    <img src="https://nfmlending.com/wp-content/uploads/2020/09/logo_NFMLending.svg" alt="NFM Lending" style="height:24px;filter:brightness(0) invert(1);opacity:.95;flex-shrink:0">
+    <div style="width:1px;height:30px;background:rgba(255,255,255,0.14);flex-shrink:0"></div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;color:#C9A227;letter-spacing:.12em;text-transform:uppercase">CORE Team &middot; NFM Lending</span>
+      <span class="brand-title">Management Dashboard</span>
     </div>
   </div>
   <div class="header-right">
@@ -222,18 +264,6 @@ tr:hover td{background:#fafbfd}
     <div class="acc-body" id="body-acc-lw"></div>
   </div>
 
-  <div class="sh" style="margin-top:24px">🌸 Relationship Manager — Amanda Dearth</div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-ttl">Weekly goals</div>
-      <div id="rm-goals"></div>
-    </div>
-    <div class="card">
-      <div class="card-ttl">Follow-ups due <span style="font-size:11px;font-weight:400;color:#aaa" id="fu-lbl"></span></div>
-      <div id="rm-fu"></div>
-    </div>
-  </div>
-
   <div class="sh">🏆 All-time leaderboard</div>
   <div id="leaderboard"></div>
 </div>
@@ -241,6 +271,7 @@ tr:hover td{background:#fafbfd}
 <!-- MTD / YTD -->
 <div id="view-mtdytd" class="view">
   <div class="period-btns">
+    <button class="btn" id="btn-wtd" onclick="showPeriod('wtd')">Week to date</button>
     <button class="btn btn-p" id="btn-mtd" onclick="showPeriod('mtd')">Month to date</button>
     <button class="btn" id="btn-ytd" onclick="showPeriod('ytd')">Year to date</button>
   </div>
@@ -249,7 +280,7 @@ tr:hover td{background:#fafbfd}
   <div class="sh" style="margin-top:4px">Activity feed</div>
   <div class="card">
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-      <select id="feed-type" onchange="renderFeed()" style="padding:7px 11px;border:1px solid #e4e6ee;border-radius:8px;font-size:12px;color:#1a1a1a;background:#fff;font-family:inherit;outline:none;flex:1;min-width:160px">
+      <select id="feed-type" onchange="renderFeed()" style="padding:9px 13px;border:1px solid var(--line);border-radius:3px;font-size:12px;color:var(--ink);background:#fff;font-family:var(--sans);outline:none;flex:1;min-width:160px">
         <option value="">All activity types</option>
         <option>Cold Calls</option><option>New Realtor Meeting</option><option>Break Breads</option>
         <option>Active Agent Check-in</option><option>CTC Call</option><option>Realtor Buddy Referral Ask</option>
@@ -270,7 +301,7 @@ tr:hover td{background:#fafbfd}
     <select id="r-st" onchange="renderRoster()"><option value="">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
   </div>
   <div class="tbl-wrap">
-    <table><thead><tr><th>Agent</th><th>Level</th><th>LP</th><th>Status</th><th>Called this week</th><th>Last LP call</th><th>Last activity</th></tr></thead>
+    <table><thead><tr><th>Agent</th><th>Level</th><th>LP</th><th>Status</th><th>Called this week</th><th>Last LP call</th></tr></thead>
     <tbody id="roster-body"></tbody></table>
   </div>
 </div>
@@ -583,25 +614,27 @@ function setSyncStatus(s) {
   else           { dot.className="sync-dot spin"; txt.textContent="Loading..."; }
 }
 
-function loadAgents() {
-  agents = SEED.map(r => [...r]);
+async function loadAgents() {
   try {
-    const raw = localStorage.getItem("ct_agents_v3");
-    if(raw) {
-      const d = JSON.parse(raw);
-      if(d.ov) d.ov.forEach(o => {
-        const a = agents.find(x => x[0]===o.n);
-        if(a) { a[2]=o.lp; if(o.pr!==undefined) a[7]=o.pr; }
-        else if(o.added) agents.push([o.n,o.lv,o.lp,null,null,null,null,o.pr||false]);
-      });
-      if(d.rm) d.rm.forEach(n => { agents=agents.filter(a=>a[0]!==n); });
+    const rows = await sbGet("agent_roster?select=agent_name,tier,lp,latest_lead,latest_file_started,latest_contract,latest_close,priority&order=agent_name.asc&limit=1000");
+    if(rows && rows.length) {
+      agents = rows.map(r => [
+        r.agent_name, r.tier, r.lp,
+        r.latest_lead, r.latest_file_started, r.latest_contract, r.latest_close,
+        r.priority || false
+      ]);
+      return;
     }
-  } catch(e) {}
+  } catch(e) {
+    console.warn("agent_roster fetch failed, falling back to SEED:", e);
+  }
+  // Fallback if Supabase is unreachable or table is empty
+  agents = SEED.map(r => [...r]);
 }
 
 async function loadAll() {
   setSyncStatus("loading");
-  loadAgents();
+  await loadAgents();
   try {
     const now = new Date();
     const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
@@ -748,42 +781,6 @@ function renderOverview() {
   document.getElementById("lw-wk-lbl").textContent = weekLabel(LWK);
   renderAccordion("lw", lastWeekLogs, LWK, lwRotation);
 
-  // RM goals
-  let gHtml = "";
-  RM_GOALS.forEach(g => {
-    const count = rmWeek.filter(a => a.act_type===g.type).length;
-    const pct   = Math.min(100, Math.round(count/g.weekly*100));
-    gHtml += `<div class="gr">
-      <div class="gr-lr">
-        <span class="gr-n">${RM_EMOJI[g.type]||""} ${g.label}</span>
-        <span><span class="gr-c">${count}</span><span class="gr-t"> / ${g.weekly}</span></span>
-      </div>
-      <div class="g-track"><div class="g-fill" style="width:${pct}%;background:${goalColor(pct)}"></div></div>
-    </div>`;
-  });
-  const ctc = rmWeek.filter(a => a.act_type==="CTC Call").length;
-  gHtml += `<div class="ctc-row"><span style="font-size:12px;color:#555">⚡ CTC calls this week</span><span style="font-size:22px;font-weight:700">${ctc}</span></div>`;
-  document.getElementById("rm-goals").innerHTML = gHtml;
-
-  // Follow-ups
-  const todayStr = localDateStr(TODAY);
-  document.getElementById("fu-lbl").textContent = rmFu.length ? `${rmFu.length} upcoming` : "";
-  document.getElementById("rm-fu").innerHTML = rmFu.length
-    ? rmFu.slice(0,8).map(f => {
-        const isOvr = f.follow_up_date < todayStr;
-        const days  = Math.round((new Date(f.follow_up_date+"T12:00:00")-new Date())/86400000);
-        const lbl   = isOvr ? `Overdue ${Math.abs(days)}d` : days===0 ? "Today" : `In ${days}d`;
-        return `<div class="fu-item">
-          <div class="fu-dot" style="background:${isOvr?"#E53935":"#1F4E79"}"></div>
-          <div style="flex:1">
-            <div class="fu-n">${f.agent_name}</div>
-            <div class="fu-m">${RM_EMOJI[f.act_type]||""} ${f.act_type}${f.notes?" · "+f.notes.substring(0,40):""}</div>
-          </div>
-          <div class="fu-due" style="color:${isOvr?"#E53935":"#555"}">${lbl}</div>
-        </div>`;
-      }).join("")
-    : `<div class="no-data">No follow-ups pending</div>`;
-
   // Leaderboard — matches LP tracker: done = raw call count this week / 15 target
   const LB_WEEKLY_TARGET = 15;
   const stats = LPS.map(lp => {
@@ -851,14 +848,15 @@ function toggleAcc(id) {
 // ── MTD / YTD ──────────────────────────────────────────────────────────────
 function showPeriod(p) {
   currentPeriod = p;
+  document.getElementById("btn-wtd").className = "btn"+(p==="wtd"?" btn-p":"");
   document.getElementById("btn-mtd").className = "btn"+(p==="mtd"?" btn-p":"");
   document.getElementById("btn-ytd").className = "btn"+(p==="ytd"?" btn-p":"");
-  document.getElementById("period-lbl").textContent = p==="mtd"?"month to date":"year to date";
-  const data = p==="ytd" ? rmYtd : rmMtd;
+  document.getElementById("period-lbl").textContent = p==="wtd"?"week to date":p==="mtd"?"month to date":"year to date";
+  const data = p==="ytd" ? rmYtd : p==="wtd" ? rmWeek : rmMtd;
   const mult = p==="ytd" ? 12 : 1;
   let html = "";
   RM_GOALS.forEach(g => {
-    const target = g.monthly * mult;
+    const target = p==="wtd" ? g.weekly : g.monthly * mult;
     const count  = data.filter(a => a.act_type===g.type).length;
     const pct    = Math.min(100, Math.round(count/target*100));
     html += `<div class="gr">
@@ -879,7 +877,7 @@ function showPeriod(p) {
 
 function renderFeed() {
   const typeF = document.getElementById("feed-type")?.value || "";
-  const data  = currentPeriod==="ytd" ? rmYtd : rmMtd;
+  const data  = currentPeriod==="ytd" ? rmYtd : currentPeriod==="wtd" ? rmWeek : rmMtd;
   const filt  = typeF ? data.filter(a=>a.act_type===typeF) : data;
   const el    = document.getElementById("feed-list");
   if(!filt.length) { el.innerHTML='<div class="no-data">No activity found</div>'; return; }
@@ -908,9 +906,9 @@ function renderRoster() {
     return (lpDays(b[0])||9999)-(lpDays(a[0])||9999);
   });
   const body = document.getElementById("roster-body");
-  if(!list.length) { body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#ccc">No agents match this filter</td></tr>'; return; }
+  if(!list.length) { body.innerHTML='<tr><td colspan="6" style="text-align:center;padding:24px;color:#ccc">No agents match this filter</td></tr>'; return; }
   body.innerHTML = list.map(a => {
-    const act  = isActive(a), ds = lpDays(a[0]), mr = mostRecent(a), cal = calledThisWeek(a[0]);
+    const act  = isActive(a), ds = lpDays(a[0]), cal = calledThisWeek(a[0]);
     const dCol = ds===null?"color:#E53935":ds>=14?"color:#FB8C00":"color:#43A047";
     return `<tr>
       <td style="font-weight:600">${a[0]}${a[7]?` <span style="background:#FFEBEE;color:#C62828;font-size:9px;font-weight:700;padding:1px 7px;border-radius:20px;vertical-align:middle">PRIORITY</span>`:""}</td>
@@ -919,7 +917,6 @@ function renderRoster() {
       <td>${act?'<span style="color:#43A047;font-size:12px;font-weight:600">Active</span>':'<span style="background:#FFEBEE;color:#C62828;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">Inactive</span>'}</td>
       <td style="text-align:center">${cal?'<span style="color:#43A047;font-size:16px">✓</span>':'<span style="color:#e0e0e0">—</span>'}</td>
       <td style="font-size:12px;${dCol}">${ds===null?"Never":ds===0?"Today":ds+"d ago"}</td>
-      <td style="font-size:12px;color:#aaa">${mr?fmt(mr):"—"}</td>
     </tr>`;
   }).join("");
 }
@@ -976,7 +973,7 @@ setInterval(loadAll, 60000);
 <div id="view-scorecards" class="view" style="padding:24px 32px;max-width:900px">
 
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-    <div class="sh" style="margin:0">📋 LP Scorecards</div>
+    <div class="sh" style="margin:0">📋 CORE Team Scorecards</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap" id="sc-lp-tabs">
       <button class="sc-lp-btn active" onclick="scSelectLP('Isaak',this)">Isaak</button>
       <button class="sc-lp-btn" onclick="scSelectLP('Gavin',this)">Gavin</button>
@@ -984,26 +981,27 @@ setInterval(loadAll, 60000);
       <button class="sc-lp-btn" onclick="scSelectLP('Karen',this)">Karen</button>
       <button class="sc-lp-btn" onclick="scSelectLP('Said',this)">Said</button>
       <button class="sc-lp-btn" onclick="scSelectLP('Jordan',this)">Jordan</button>
+      <button class="sc-lp-btn" onclick="scSelectLP('Amanda',this)">Amanda (RM)</button>
     </div>
   </div>
 
   <!-- Date range search -->
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
-    <label style="font-size:12px;color:#888">From</label>
-    <input type="date" id="sc-from" style="padding:6px 10px;border:1px solid #e0e4ef;border-radius:8px;font-size:12px;font-family:inherit">
-    <label style="font-size:12px;color:#888">To</label>
-    <input type="date" id="sc-to" style="padding:6px 10px;border:1px solid #e0e4ef;border-radius:8px;font-size:12px;font-family:inherit">
-    <button onclick="scLoad()" style="padding:6px 14px;background:#1F4E79;color:#fff;border:none;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer">Search</button>
+    <label style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--slate)">From</label>
+    <input type="date" id="sc-from" style="padding:8px 12px;border:1px solid var(--line);border-radius:3px;font-size:12px;font-family:var(--sans)">
+    <label style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--slate)">To</label>
+    <input type="date" id="sc-to" style="padding:8px 12px;border:1px solid var(--line);border-radius:3px;font-size:12px;font-family:var(--sans)">
+    <button onclick="scCurrentLP==='Amanda'?scLoadAmanda():scLoad()" style="padding:8px 18px;background:var(--ink);color:#fff;border:none;border-radius:3px;font-size:12px;font-weight:600;font-family:var(--sans);cursor:pointer;letter-spacing:.01em">Search</button>
   </div>
 
   <!-- Summary cards -->
   <div id="sc-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px"></div>
 
   <!-- Weekly table -->
-  <div style="background:#fff;border-radius:12px;border:1px solid #e8eaf0;overflow:hidden;margin-bottom:14px">
-    <div style="background:#1F4E79;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+  <div style="background:#fff;border-radius:4px;border:1px solid var(--line);overflow:hidden;margin-bottom:14px">
+    <div style="background:#0B1B33;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
       <span style="color:#fff;font-size:13px;font-weight:600" id="sc-person-label">Weekly History</span>
-      <span style="color:#f0c84a;font-size:11px">Click a week to see daily breakdown</span>
+      <span style="color:#E8C766;font-size:11px">Click a week to see daily breakdown</span>
     </div>
     <div id="sc-table-wrap" style="overflow-x:auto">
       <div style="text-align:center;padding:40px;color:#888;font-size:14px">Select an LP above to load their scorecard history.</div>
@@ -1011,8 +1009,8 @@ setInterval(loadAll, 60000);
   </div>
 
   <!-- Daily breakdown (shown on week click) -->
-  <div id="sc-daily-wrap" style="display:none;background:#fff;border-radius:12px;border:1px solid #e8eaf0;overflow:hidden;margin-bottom:14px">
-    <div style="background:#243d7a;padding:12px 16px">
+  <div id="sc-daily-wrap" style="display:none;background:#fff;border-radius:4px;border:1px solid var(--line);overflow:hidden;margin-bottom:14px">
+    <div style="background:#1E3A60;padding:12px 16px">
       <span style="color:#fff;font-size:13px;font-weight:600" id="sc-daily-label">Daily Breakdown</span>
     </div>
     <div id="sc-daily-content" style="overflow-x:auto"></div>
@@ -1023,8 +1021,8 @@ setInterval(loadAll, 60000);
 </div>
 
 <style>
-.sc-lp-btn{padding:6px 16px;font-size:12px;font-weight:500;border:1px solid #d0d5e8;border-radius:20px;background:transparent;color:#666;cursor:pointer;font-family:inherit;transition:all .15s}
-.sc-lp-btn.active{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.sc-lp-btn{padding:8px 18px;font-size:11.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--slate);cursor:pointer;font-family:var(--sans);transition:all .15s}
+.sc-lp-btn.active{background:#0B1B33;color:#fff;border-color:#0B1B33}
 .sc-lp-btn:hover:not(.active){background:#f0f2f8;color:#333}
 .sc-pct-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600}
 .sc-pct-green{background:#dcf5e3;color:#1a5c2a}
@@ -1052,7 +1050,7 @@ const SC_METRICS_MAP = {
 ["Gavin","Osgood","Karen","Said","Jordan"].forEach(n=>SC_METRICS_MAP[n]=SC_METRICS_MAP._lp2);
 
 const SC_DAYS = ["Mon","Tue","Wed","Thu","Fri"];
-const SC_CHART_COLORS = ["#1F4E79","#b8922a","#2a7a3b","#c0392b","#8e44ad"];
+const SC_CHART_COLORS = ["#0B1B33","#b8922a","#2a7a3b","#c0392b","#8e44ad"];
 let scCurrentLP = "Isaak", scCharts = [];
 
 function scSelectLP(name, btn) {
@@ -1061,7 +1059,7 @@ function scSelectLP(name, btn) {
   scCurrentLP = name;
   document.getElementById("sc-person-label").textContent = name + " — Weekly History";
   document.getElementById("sc-daily-wrap").style.display = "none";
-  scLoad();
+  if(name === "Amanda") { scLoadAmanda(); } else { scLoad(); }
 }
 
 function scGetTotal(key, data) {
@@ -1114,7 +1112,7 @@ async function scLoad() {
       const pct = Math.min(avgPerWeek/m.goal,1);
       const color = pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
       const card = document.createElement("div");
-      card.style="background:#fff;border-radius:10px;border:1px solid #e8eaf0;padding:12px 14px;text-align:center";
+      card.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:18px 16px;text-align:center";
       card.innerHTML="<div style=\"font-size:18px;margin-bottom:4px\">"+m.icon+"</div>"
         +"<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
         +"<div style=\"font-size:10px;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:.04em\">"+m.label+"</div>"
@@ -1125,8 +1123,8 @@ async function scLoad() {
     });
 
     // History table
-    let thead="<thead><tr><th style=\"background:#1F4E79;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600\">Week</th>";
-    metrics.forEach(m=>thead+="<th style=\"background:#1F4E79;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+m.icon+" "+m.label+"</th>");
+    let thead="<thead><tr><th style=\"background:#0B1B33;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600\">Week</th>";
+    metrics.forEach(m=>thead+="<th style=\"background:#0B1B33;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+m.icon+" "+m.label+"</th>");
     thead+="</tr></thead>";
 
     let tbody="<tbody>";
@@ -1148,7 +1146,7 @@ async function scLoad() {
     metrics.forEach((m,i)=>{
       const vals=rows.map(r=>scGetTotal(m.key,r.data)).reverse();
       const div=document.createElement("div");
-      div.style="background:#fff;border-radius:12px;border:1px solid #e8eaf0;padding:16px;margin-bottom:12px";
+      div.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:22px 20px;margin-bottom:12px";
       div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+m.icon+" "+m.label+" — weekly trend</div>"
         +"<div style=\"position:relative;height:180px\"><canvas id=\"sc-chart-"+i+"\"></canvas></div>";
       chartsEl.appendChild(div);
@@ -1171,6 +1169,128 @@ async function scLoad() {
   }
 }
 
+// ── AMANDA (Relationship Manager) Scorecard ──────────────────────────────
+const AMANDA_GOALS = [
+  {key:"Cold Calls",            label:"Cold calls",                icon:"🎯", goal:25},
+  {key:"New Realtor Meeting",   label:"New realtor meetings",      icon:"🌳", goal:5},
+  {key:"Break Breads",          label:"Break breads",              icon:"🥐", goal:5},
+  {key:"Active Agent Check-in", label:"Active agent check-ins",    icon:"🤝", goal:15},
+  {key:"Realtor Buddy Referral Ask", label:"Buddy referral ask",   icon:"🏆", goal:3}
+];
+
+function amWeekKeyOf(dateStr){
+  const d = new Date(dateStr+"T12:00:00");
+  const day = d.getDay();
+  const diff = day===0?-6:1-day;
+  d.setDate(d.getDate()+diff);
+  d.setHours(0,0,0,0);
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),dd=String(d.getDate()).padStart(2,"0");
+  return y+"-"+m+"-"+dd;
+}
+function amFmtRange(wk){
+  const mon=new Date(wk+"T12:00:00"), fri=new Date(mon);
+  fri.setDate(fri.getDate()+4);
+  const o={month:"short",day:"numeric"};
+  return mon.toLocaleDateString("en-US",o)+" – "+fri.toLocaleDateString("en-US",o);
+}
+
+async function scLoadAmanda() {
+  const fromEl=document.getElementById("sc-from"), toEl=document.getElementById("sc-to");
+  if(!fromEl.value){const d=new Date();d.setDate(d.getDate()-56);fromEl.value=d.toISOString().slice(0,10);}
+  if(!toEl.value) toEl.value=new Date().toISOString().slice(0,10);
+
+  const wrap=document.getElementById("sc-table-wrap");
+  const chartsEl=document.getElementById("sc-charts");
+  const summaryEl=document.getElementById("sc-summary");
+  wrap.innerHTML="<div style=\"text-align:center;padding:30px;color:#888\">Loading...</div>";
+  chartsEl.innerHTML=""; summaryEl.innerHTML="";
+  scCharts.forEach(c=>c.destroy()); scCharts=[];
+
+  try {
+    const res = await fetch(
+      SB_URL+"/rest/v1/amanda_activities?act_date=gte."+fromEl.value+"&act_date=lte."+toEl.value+"&select=act_type,act_date",
+      {headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}}
+    );
+    const acts = await res.json();
+
+    if(!acts||!acts.length){
+      wrap.innerHTML="<div style=\"text-align:center;padding:40px;color:#888\">No data found for this date range.</div>";
+      return;
+    }
+
+    // Group by week_key
+    const byWeek = {};
+    acts.forEach(a=>{
+      const wk = amWeekKeyOf(a.act_date);
+      if(!byWeek[wk]) byWeek[wk]={};
+      byWeek[wk][a.act_type] = (byWeek[wk][a.act_type]||0)+1;
+    });
+    const weekKeys = Object.keys(byWeek).sort().reverse();
+
+    // Summary cards — avg/week across range
+    summaryEl.innerHTML="";
+    AMANDA_GOALS.forEach(g=>{
+      const grandTotal = acts.filter(a=>a.act_type===g.key).length;
+      const avgPerWeek = Math.round(grandTotal/Math.max(1,weekKeys.length));
+      const pct = Math.min(avgPerWeek/g.goal,1);
+      const color = pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
+      const card = document.createElement("div");
+      card.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:18px 16px;text-align:center";
+      card.innerHTML="<div style=\"font-size:18px;margin-bottom:4px\">"+g.icon+"</div>"
+        +"<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
+        +"<div style=\"font-size:10px;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:.04em\">"+g.label+"</div>"
+        +"<div style=\"font-size:10px;color:#aaa;margin-top:1px\">avg/wk &bull; goal "+g.goal+"</div>"
+        +"<div style=\"height:3px;background:#e9ecf3;border-radius:2px;margin-top:6px;overflow:hidden\">"
+        +"<div style=\"height:100%;width:"+Math.round(pct*100)+"%;background:"+color+";border-radius:2px\"></div></div>";
+      summaryEl.appendChild(card);
+    });
+
+    // History table
+    let thead="<thead><tr><th style=\"background:#0B1B33;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600\">Week</th>";
+    AMANDA_GOALS.forEach(g=>thead+="<th style=\"background:#0B1B33;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+g.icon+" "+g.label+"</th>");
+    thead+="</tr></thead>";
+
+    let tbody="<tbody>";
+    weekKeys.forEach(wk=>{
+      const label=amFmtRange(wk);
+      tbody+="<tr><td style=\"padding:9px 12px;font-size:12px;font-weight:500;border-bottom:1px solid #f0f2f8;white-space:nowrap\">"+label+"</td>";
+      AMANDA_GOALS.forEach(g=>{
+        const t=(byWeek[wk][g.key]||0);
+        tbody+="<td style=\"padding:9px 8px;text-align:center;font-size:12px;border-bottom:1px solid #f0f2f8\">"+t+" "+scPctBadge(t,g.goal)+"</td>";
+      });
+      tbody+="</tr>";
+    });
+    tbody+="</tbody>";
+    wrap.innerHTML="<table style=\"width:100%;border-collapse:collapse\">"+thead+tbody+"</table>";
+
+    // Trend charts
+    const weekLabels=weekKeys.map(wk=>amFmtRange(wk)).reverse();
+    AMANDA_GOALS.forEach((g,i)=>{
+      const vals=weekKeys.map(wk=>byWeek[wk][g.key]||0).reverse();
+      const div=document.createElement("div");
+      div.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:22px 20px;margin-bottom:12px";
+      div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+g.icon+" "+g.label+" — weekly trend</div>"
+        +"<div style=\"position:relative;height:180px\"><canvas id=\"sc-chart-am-"+i+"\"></canvas></div>";
+      chartsEl.appendChild(div);
+      setTimeout(()=>{
+        const ch=new Chart(document.getElementById("sc-chart-am-"+i).getContext("2d"),{
+          type:"line",
+          data:{labels:weekLabels,datasets:[
+            {label:g.label,data:vals,borderColor:SC_CHART_COLORS[i%5],backgroundColor:SC_CHART_COLORS[i%5]+"22",borderWidth:2,pointRadius:4,fill:true,tension:0.3},
+            {label:"Goal",data:weekLabels.map(()=>g.goal),borderColor:"#ccc",borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false}
+          ]},
+          options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{font:{size:11}}},x:{ticks:{font:{size:10}}}}}
+        });
+        scCharts.push(ch);
+      },50);
+    });
+
+  } catch(e) {
+    wrap.innerHTML="<div style=\"text-align:center;padding:40px;color:#888\">Could not load Amanda's data.</div>";
+    console.warn(e);
+  }
+}
+
 function scShowDaily(wk, data) {
   const metrics = SC_METRICS_MAP[scCurrentLP];
   const wrap = document.getElementById("sc-daily-wrap");
@@ -1178,9 +1298,9 @@ function scShowDaily(wk, data) {
   const content = document.getElementById("sc-daily-content");
   label.textContent = scCurrentLP + " — " + fmtRangeSc(wk) + " (Daily Breakdown)";
 
-  let thead="<thead><tr><th style=\"background:#243d7a;color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600\">Metric</th>";
-  SC_DAYS.forEach(d=>thead+="<th style=\"background:#243d7a;color:#fff;padding:8px 10px;text-align:center;font-size:11px;font-weight:600\">"+d+"</th>");
-  thead+="<th style=\"background:#243d7a;color:#f0c84a;padding:8px 10px;text-align:center;font-size:11px;font-weight:600\">Total</th></tr></thead>";
+  let thead="<thead><tr><th style=\"background:#1E3A60;color:#fff;padding:8px 12px;text-align:left;font-size:11px;font-weight:600\">Metric</th>";
+  SC_DAYS.forEach(d=>thead+="<th style=\"background:#1E3A60;color:#fff;padding:8px 10px;text-align:center;font-size:11px;font-weight:600\">"+d+"</th>");
+  thead+="<th style=\"background:#1E3A60;color:#E8C766;padding:8px 10px;text-align:center;font-size:11px;font-weight:600\">Total</th></tr></thead>";
 
   let tbody="<tbody>";
   metrics.forEach(m=>{
