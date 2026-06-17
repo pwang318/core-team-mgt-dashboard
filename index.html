@@ -789,13 +789,13 @@ function renderOverview() {
       }).join("")
     : `<div class="no-data">No follow-ups pending</div>`;
 
-  // Leaderboard
+  // Leaderboard — matches LP tracker: done = raw call count this week / 15 target
+  const LB_WEEKLY_TARGET = 15;
   const stats = LPS.map(lp => {
-    const twDone = twRotation(lp).filter(a=>calledThisWeek(a[0])).length;
-    const twTot  = twRotation(lp).length;
+    const twDone = Object.values(callLogs).filter(l=>l.lp===lp && l.week_key===WK).length;
     const allCls = Object.values(callLogs).filter(l=>l.lp===lp).length
                  + Object.values(lastWeekLogs).filter(l=>l.lp===lp).length;
-    return { lp, twDone, twTot, pct: twTot?Math.round(twDone/twTot*100):0, allCls };
+    return { lp, twDone, twTot: LB_WEEKLY_TARGET, pct: Math.min(100, Math.round(twDone/LB_WEEKLY_TARGET*100)), allCls };
   }).sort((a,b) => b.allCls-a.allCls);
   const medals = ["🥇","🥈","🥉","4.","5."];
   document.getElementById("leaderboard").innerHTML = stats.map((s,i) => `
