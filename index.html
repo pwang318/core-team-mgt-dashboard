@@ -55,10 +55,14 @@ body{font-family:var(--sans);background:var(--paper-dim);color:var(--ink);min-he
 .view.active{display:block}
 
 /* ── FOCUS BANNER ── */
-.focus-banner{background:var(--ink);border-radius:4px;padding:20px 26px;margin-bottom:32px;position:relative;overflow:hidden}
-.focus-banner::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
-.focus-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--gold-soft);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
-.focus-item{font-family:var(--sans);font-size:13.5px;color:rgba(255,255,255,0.85);padding:4px 0;line-height:1.5}
+.focus-banner{background:var(--ink);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.focus-strip{display:grid;grid-template-columns:repeat(4,1fr)}
+.focus-stat{padding:10px 16px;border-right:1px solid rgba(255,255,255,0.08);display:flex;align-items:baseline;gap:8px}
+.focus-stat:last-child{border-right:none}
+.focus-stat-lbl{font-family:var(--mono);font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--slate-soft);white-space:nowrap}
+.focus-stat-val{font-family:var(--sans);font-size:15px;font-weight:700;color:#fff;line-height:1}
+.focus-stat-sub{font-family:var(--sans);font-size:10px;color:#6b7488}
+@media(max-width:700px){.focus-strip{grid-template-columns:1fr 1fr}.focus-stat{padding:9px 12px;flex-wrap:wrap}.focus-stat:nth-child(2){border-right:none}}
 
 /* ── SECTION HEADERS ── */
 .sh{font-family:var(--mono);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--slate);margin:36px 0 16px;display:flex;align-items:center;gap:12px}
@@ -224,12 +228,11 @@ tr:hover td{background:var(--paper-dim)}
 <!-- OVERVIEW -->
 <div id="view-overview" class="view active">
 
-  <div class="focus-banner" id="focus-banner" style="display:none">
-    <div class="focus-title">🎯 This Week's Focus</div>
-    <div id="focus-items"></div>
+  <div class="focus-banner" id="focus-banner" style="padding:0">
+    <div id="focus-strip"></div>
   </div>
 
-  <div class="sh">📊 Growth scoreboard</div>
+  <div class="sh">Growth scoreboard</div>
   <div class="sb-grid" id="scoreboard"></div>
   <div class="lvl-wrap">
     <div class="lvl-lbl">Level breakdown</div>
@@ -237,13 +240,13 @@ tr:hover td{background:var(--paper-dim)}
     <div class="lvl-leg" id="lvl-leg"></div>
   </div>
 
-  <div class="sh">📞 LP Realtor Calls — this week</div>
+  <div class="sh">LP Realtor Calls — this week</div>
   <div class="lp-grid" id="lp-cards"></div>
 
   <div class="acc" id="acc-tw">
     <div class="acc-hd" onclick="toggleAcc('acc-tw')">
       <div class="acc-hd-l">
-        <span class="acc-ttl">📝 This week</span>
+        <span class="acc-ttl">This week</span>
         <span class="acc-wk" id="tw-wk-lbl"></span>
         <div class="acc-pills" id="tw-pills"></div>
       </div>
@@ -255,7 +258,7 @@ tr:hover td{background:var(--paper-dim)}
   <div class="acc" id="acc-lw">
     <div class="acc-hd" onclick="toggleAcc('acc-lw')">
       <div class="acc-hd-l">
-        <span class="acc-ttl">📆 Last week</span>
+        <span class="acc-ttl">Last week</span>
         <span class="acc-wk" id="lw-wk-lbl"></span>
         <div class="acc-pills" id="lw-pills"></div>
       </div>
@@ -264,7 +267,7 @@ tr:hover td{background:var(--paper-dim)}
     <div class="acc-body" id="body-acc-lw"></div>
   </div>
 
-  <div class="sh">🏆 All-time leaderboard</div>
+  <div class="sh">All-time leaderboard</div>
   <div id="leaderboard"></div>
 </div>
 
@@ -332,15 +335,7 @@ const RM_GOALS = [
   {label:"Agent check-ins",   type:"Active Agent Check-in",     weekly:15, monthly:60 },
   {label:"Referral asks",     type:"Realtor Buddy Referral Ask",weekly:3,  monthly:12 }
 ];
-const RM_EMOJI = {
-  "Cold Calls":"🎯","New Realtor Meeting":"🌸","Break Breads":"🥐",
-  "Active Agent Check-in":"🫂","Realtor Buddy Referral Ask":"🌈","CTC Call":"⚡",
-  "Coffee Meeting":"☕","Lunch or Dinner":"🍜","Pop-By":"🌻","Market Update Call":"📊",
-  "Agent Appreciation":"💐","Business Planning Session":"🗓️","Open House Visit":"🏡",
-  "Recruiting Conversation":"🌟","Sent Market Report":"📬","Closed Deal Thank You":"🎊",
-  "Birthday Outreach":"🎂","Holiday Outreach":"🎁","Co-hosted Event":"🎪",
-  "Team Presentation":"🎤","Co-Marketing Discussion":"🤙","Sent Referral":"💌"
-};
+const RM_EMOJI = {};
 
 // ── SEED DATA — full roster matching LP Tracker exactly ───────────────────
 // Format: [name, level, lp, leadDate, fileDate, contractDate, closeDate, isPriority]
@@ -682,19 +677,45 @@ function renderAll() {
 
 // ── OVERVIEW ───────────────────────────────────────────────────────────────
 function renderOverview() {
-  // Focus banner
-  const uncalled = agents.filter(a => isActive(a) && !calledThisWeek(a[0]));
+  // Focus strip — team-wide stats for the week
+  const FOCUS_WEEKLY_TARGET = 15;
+  const activeNow = agents.filter(isActive);
   const priority = agents.filter(a => a[7]===true && isActive(a) && !calledThisWeek(a[0]));
-  const focusItems = [];
-  if(uncalled.length) focusItems.push(`☀️ <b>${uncalled.length} active agents</b> haven't been reached yet this week`);
-  if(priority.length) focusItems.push(`⚠️ <b>${priority.length} priority agent${priority.length>1?"s":""}</b> need to be called ASAP: ${priority.slice(0,3).map(a=>a[0]).join(", ")}${priority.length>3?"…":""}`);
-  const fb = document.getElementById("focus-banner");
-  if(focusItems.length) {
-    document.getElementById("focus-items").innerHTML = focusItems.map(t=>`<div class="focus-item" style="margin-bottom:4px">${t}</div>`).join("");
-    fb.style.display = "block";
-  } else {
-    fb.style.display = "none";
-  }
+
+  const teamCalls = LPS.reduce((sum, lp) => sum + Object.values(callLogs).filter(l => l.lp===lp && l.week_key===WK).length, 0);
+  const teamTarget = LPS.length * FOCUS_WEEKLY_TARGET;
+
+  const reachedCount = activeNow.filter(a => calledThisWeek(a[0])).length;
+  const reachPct = activeNow.length ? Math.round(reachedCount/activeNow.length*100) : 0;
+
+  let topLp = null, topPct = -1;
+  LPS.forEach(lp => {
+    const done = Object.values(callLogs).filter(l => l.lp===lp && l.week_key===WK).length;
+    const pct = Math.min(100, Math.round(done/FOCUS_WEEKLY_TARGET*100));
+    if(pct > topPct) { topPct = pct; topLp = lp; }
+  });
+  const topDone = Object.values(callLogs).filter(l => l.lp===topLp && l.week_key===WK).length;
+
+  document.getElementById("focus-strip").innerHTML = `
+    <div class="focus-stat">
+      <span class="focus-stat-lbl">Team calls</span>
+      <span class="focus-stat-val">${teamCalls}</span>
+      <span class="focus-stat-sub">/${teamTarget}</span>
+    </div>
+    <div class="focus-stat">
+      <span class="focus-stat-lbl">Reached</span>
+      <span class="focus-stat-val">${reachPct}%</span>
+      <span class="focus-stat-sub">${reachedCount}/${activeNow.length}</span>
+    </div>
+    <div class="focus-stat">
+      <span class="focus-stat-lbl">Priority waiting</span>
+      <span class="focus-stat-val" style="color:${priority.length?'var(--gold-soft)':'#fff'}">${priority.length}</span>
+    </div>
+    <div class="focus-stat">
+      <span class="focus-stat-lbl">Top performer</span>
+      <span class="focus-stat-val">${topLp||"—"}</span>
+      <span class="focus-stat-sub">${topPct}%</span>
+    </div>`;
 
   // Scoreboard
   const activeAll = agents.filter(isActive);
@@ -789,7 +810,7 @@ function renderOverview() {
                  + Object.values(lastWeekLogs).filter(l=>l.lp===lp).length;
     return { lp, twDone, twTot: LB_WEEKLY_TARGET, pct: Math.min(100, Math.round(twDone/LB_WEEKLY_TARGET*100)), allCls };
   }).sort((a,b) => b.allCls-a.allCls);
-  const medals = ["🥇","🥈","🥉","4.","5."];
+  const medals = ["1.","2.","3.","4.","5."];
   document.getElementById("leaderboard").innerHTML = stats.map((s,i) => `
     <div class="lb-row">
       <span style="font-size:18px;width:26px;text-align:center;flex-shrink:0">${medals[i]}</span>
@@ -861,15 +882,15 @@ function showPeriod(p) {
     const pct    = Math.min(100, Math.round(count/target*100));
     html += `<div class="gr">
       <div class="gr-lr">
-        <span class="gr-n">${RM_EMOJI[g.type]||""} ${g.label}</span>
-        <span><span class="gr-c">${count}</span><span class="gr-t"> / ${target}${pct>=100?" 🥳":""}</span></span>
+        <span class="gr-n">${g.label}</span>
+        <span><span class="gr-c">${count}</span><span class="gr-t"> / ${target}</span></span>
       </div>
       <div class="g-track"><div class="g-fill" style="width:${pct}%;background:${goalColor(pct)}"></div></div>
       <div style="font-size:10px;color:#bbb;margin-top:3px">${pct}% of goal</div>
     </div>`;
   });
   const ctc = data.filter(a => a.act_type==="CTC Call").length;
-  html += `<div class="ctc-row"><span style="font-size:12px;color:#555">⚡ CTC calls</span><span style="font-size:22px;font-weight:700">${ctc}</span></div>`;
+  html += `<div class="ctc-row"><span style="font-size:12px;color:#555">CTC calls</span><span style="font-size:22px;font-weight:700">${ctc}</span></div>`;
   document.getElementById("period-goals").innerHTML = html;
   document.getElementById("feed-type").value = "";
   renderFeed();
@@ -884,7 +905,7 @@ function renderFeed() {
   el.innerHTML = filt.slice(0,80).map(a => `
     <div class="feed-item">
       <div class="feed-t"><span class="feed-ag">${a.agent_name||"—"}</span><span class="feed-dt">${fmt(a.act_date)}</span></div>
-      <div class="feed-ty">${RM_EMOJI[a.act_type]||"•"} ${a.act_type}${a.outcome?" · "+a.outcome:""}</div>
+      <div class="feed-ty">${a.act_type}${a.outcome?" · "+a.outcome:""}</div>
       ${a.notes?`<div class="feed-nt">"${String(a.notes).substring(0,80)}"</div>`:""}
     </div>`).join("");
 }
@@ -938,7 +959,7 @@ function renderTeamsMsg() {
     const pct   = g.weekly ? Math.round(count/g.weekly*100) : 0;
     lines.push(`  ${pct>=100?"✅":pct>=60?"🟡":"🔴"} ${g.label}: ${count}/${g.weekly}`);
   });
-  lines.push(`  ⚡ CTC calls: ${rmWeek.filter(a=>a.act_type==="CTC Call").length}`);
+  lines.push(`  CTC calls: ${rmWeek.filter(a=>a.act_type==="CTC Call").length}`);
   lines.push("");
   lines.push("Tracker: https://pwang318.github.io/core-team-tracker");
   document.getElementById("teams-msg").textContent = lines.join("\n");
@@ -973,7 +994,7 @@ setInterval(loadAll, 60000);
 <div id="view-scorecards" class="view" style="padding:24px 32px;max-width:900px">
 
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-    <div class="sh" style="margin:0">📋 CORE Team Scorecards</div>
+    <div class="sh" style="margin:0">CORE Team Scorecards</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap" id="sc-lp-tabs">
       <button class="sc-lp-btn active" onclick="scSelectLP('Isaak',this)">Isaak</button>
       <button class="sc-lp-btn" onclick="scSelectLP('Gavin',this)">Gavin</button>
@@ -1035,16 +1056,16 @@ setInterval(loadAll, 60000);
 // ── SCORECARDS ──────────────────────────────────────────────────────────────
 const SC_METRICS_MAP = {
   Isaak: [
-    {key:"apps_1003",label:"1003's",icon:"📋",goal:10},
-    {key:"realtor_calls",label:"Realtor calls",icon:"📞",goal:100},
-    {key:"meetings",label:"Realtor meetings scheduled",icon:"📅",goal:10}
+    {key:"apps_1003",label:"1003's",icon:"",goal:10},
+    {key:"realtor_calls",label:"Realtor calls",icon:"",goal:100},
+    {key:"meetings",label:"Realtor meetings scheduled",icon:"",goal:10}
   ],
   _lp2: [
-    {key:"referred_leads",label:"Referred leads",icon:"👥",goal:16},
-    {key:"apps_1003",label:"1003's",icon:"📋",goal:13},
-    {key:"pre_approvals",label:"Pre-approvals",icon:"✅",goal:6},
-    {key:"contracts",label:"Contracts",icon:"🤝",goal:3},
-    {key:"rltr_talks",label:"Rltr talk to's",icon:"📲",goal:10}
+    {key:"referred_leads",label:"Referred leads",icon:"",goal:16},
+    {key:"apps_1003",label:"1003's",icon:"",goal:13},
+    {key:"pre_approvals",label:"Pre-approvals",icon:"",goal:6},
+    {key:"contracts",label:"Contracts",icon:"",goal:3},
+    {key:"rltr_talks",label:"Rltr talk to's",icon:"",goal:10}
   ]
 };
 ["Gavin","Osgood","Karen","Said","Jordan"].forEach(n=>SC_METRICS_MAP[n]=SC_METRICS_MAP._lp2);
@@ -1113,8 +1134,7 @@ async function scLoad() {
       const color = pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
       const card = document.createElement("div");
       card.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:18px 16px;text-align:center";
-      card.innerHTML="<div style=\"font-size:18px;margin-bottom:4px\">"+m.icon+"</div>"
-        +"<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
+      card.innerHTML="<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
         +"<div style=\"font-size:10px;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:.04em\">"+m.label+"</div>"
         +"<div style=\"font-size:10px;color:#aaa;margin-top:1px\">avg/wk &bull; goal "+m.goal+"</div>"
         +"<div style=\"height:3px;background:#e9ecf3;border-radius:2px;margin-top:6px;overflow:hidden\">"
@@ -1124,7 +1144,7 @@ async function scLoad() {
 
     // History table
     let thead="<thead><tr><th style=\"background:#0B1B33;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600\">Week</th>";
-    metrics.forEach(m=>thead+="<th style=\"background:#0B1B33;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+m.icon+" "+m.label+"</th>");
+    metrics.forEach(m=>thead+="<th style=\"background:#0B1B33;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+m.label+"</th>");
     thead+="</tr></thead>";
 
     let tbody="<tbody>";
@@ -1147,7 +1167,7 @@ async function scLoad() {
       const vals=rows.map(r=>scGetTotal(m.key,r.data)).reverse();
       const div=document.createElement("div");
       div.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:22px 20px;margin-bottom:12px";
-      div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+m.icon+" "+m.label+" — weekly trend</div>"
+      div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+m.label+" — weekly trend</div>"
         +"<div style=\"position:relative;height:180px\"><canvas id=\"sc-chart-"+i+"\"></canvas></div>";
       chartsEl.appendChild(div);
       setTimeout(()=>{
@@ -1171,11 +1191,11 @@ async function scLoad() {
 
 // ── AMANDA (Relationship Manager) Scorecard ──────────────────────────────
 const AMANDA_GOALS = [
-  {key:"Cold Calls",            label:"Cold calls",                icon:"🎯", goal:25},
-  {key:"New Realtor Meeting",   label:"New realtor meetings",      icon:"🌳", goal:5},
-  {key:"Break Breads",          label:"Break breads",              icon:"🥐", goal:5},
-  {key:"Active Agent Check-in", label:"Active agent check-ins",    icon:"🤝", goal:15},
-  {key:"Realtor Buddy Referral Ask", label:"Buddy referral ask",   icon:"🏆", goal:3}
+  {key:"Cold Calls",            label:"Cold calls",                icon:"", goal:25},
+  {key:"New Realtor Meeting",   label:"New realtor meetings",      icon:"", goal:5},
+  {key:"Break Breads",          label:"Break breads",              icon:"", goal:5},
+  {key:"Active Agent Check-in", label:"Active agent check-ins",    icon:"", goal:15},
+  {key:"Realtor Buddy Referral Ask", label:"Buddy referral ask",   icon:"", goal:3}
 ];
 
 function amWeekKeyOf(dateStr){
@@ -1236,8 +1256,7 @@ async function scLoadAmanda() {
       const color = pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
       const card = document.createElement("div");
       card.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:18px 16px;text-align:center";
-      card.innerHTML="<div style=\"font-size:18px;margin-bottom:4px\">"+g.icon+"</div>"
-        +"<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
+      card.innerHTML="<div style=\"font-size:20px;font-weight:700;color:"+color+"\">"+avgPerWeek+"</div>"
         +"<div style=\"font-size:10px;color:#888;margin-top:2px;text-transform:uppercase;letter-spacing:.04em\">"+g.label+"</div>"
         +"<div style=\"font-size:10px;color:#aaa;margin-top:1px\">avg/wk &bull; goal "+g.goal+"</div>"
         +"<div style=\"height:3px;background:#e9ecf3;border-radius:2px;margin-top:6px;overflow:hidden\">"
@@ -1247,7 +1266,7 @@ async function scLoadAmanda() {
 
     // History table
     let thead="<thead><tr><th style=\"background:#0B1B33;color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600\">Week</th>";
-    AMANDA_GOALS.forEach(g=>thead+="<th style=\"background:#0B1B33;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+g.icon+" "+g.label+"</th>");
+    AMANDA_GOALS.forEach(g=>thead+="<th style=\"background:#0B1B33;color:#fff;padding:9px 8px;text-align:center;font-size:11px;font-weight:600\">"+g.label+"</th>");
     thead+="</tr></thead>";
 
     let tbody="<tbody>";
@@ -1269,7 +1288,7 @@ async function scLoadAmanda() {
       const vals=weekKeys.map(wk=>byWeek[wk][g.key]||0).reverse();
       const div=document.createElement("div");
       div.style="background:#fff;border-radius:4px;border:1px solid var(--line);padding:22px 20px;margin-bottom:12px";
-      div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+g.icon+" "+g.label+" — weekly trend</div>"
+      div.innerHTML="<div style=\"font-size:13px;font-weight:600;color:#1a1f2e;margin-bottom:12px\">"+g.label+" — weekly trend</div>"
         +"<div style=\"position:relative;height:180px\"><canvas id=\"sc-chart-am-"+i+"\"></canvas></div>";
       chartsEl.appendChild(div);
       setTimeout(()=>{
@@ -1307,7 +1326,7 @@ function scShowDaily(wk, data) {
     const total=scGetTotal(m.key,data);
     const pct=Math.min(total/m.goal,1);
     const color=pct>=1?"#2a7a3b":pct>=0.6?"#b8922a":"#9ca3af";
-    tbody+="<tr><td style=\"padding:9px 12px;font-size:12px;font-weight:500;border-bottom:1px solid #f0f2f8\">"+m.icon+" "+m.label+"</td>";
+    tbody+="<tr><td style=\"padding:9px 12px;font-size:12px;font-weight:500;border-bottom:1px solid #f0f2f8\">"+m.label+"</td>";
     SC_DAYS.forEach(day=>{
       const v=parseInt((data||{})[m.key+"_"+day]||0)||0;
       tbody+="<td style=\"padding:9px 10px;text-align:center;font-size:13px;font-weight:500;border-bottom:1px solid #f0f2f8\">"+v+"</td>";
